@@ -1,0 +1,30 @@
+{
+  "namespace": "com.subtitlescorrector.generated.avro",
+  "type": "record",
+  "name": "SubtitleCorrectionEvent",
+  "fields": [
+    {
+      "name": "fileId",
+      "type": "long",
+      "doc": "Id of the subtitles file"
+    },
+    {
+   	  "name": "eventTimestamp",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "detectedEncoding",
+      "type": "string",
+      "doc": "Detected encoding of the provided subtitles file"
+    },
+    {
+      "name": "correction",
+      "type": "string",
+      "doc": "Explanation of the correction applied to the subtitle"
+    }
+     
+  ]
+}

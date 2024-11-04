@@ -1,9 +1,11 @@
 package com.subtitlescorrector.service;
 
+import java.io.File;
+
 import org.springframework.web.multipart.MultipartFile;
 
 public interface StorageService {
 
-	void store(MultipartFile file);
+	File store(MultipartFile file);
 
 }

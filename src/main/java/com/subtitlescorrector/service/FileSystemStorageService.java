@@ -8,9 +8,11 @@ import java.io.InputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.util.Util;
 
 /**
@@ -23,10 +25,13 @@ public class FileSystemStorageService implements StorageService{
 
 	Logger log = LoggerFactory.getLogger(FileSystemStorageService.class);
 	
+	@Autowired
+	ApplicationProperties properties;
+	
 	@Override
-	public void store(MultipartFile file) {
+	public File store(MultipartFile file) {
 		
-		File storageFolderOnDisk = new File("D:/upload/");
+		File storageFolderOnDisk = new File(properties.getUploadFolderLocation());
 		if(!storageFolderOnDisk.exists()) {
 			storageFolderOnDisk.mkdirs();
 		}
@@ -39,6 +44,8 @@ public class FileSystemStorageService implements StorageService{
 	    } catch (IOException e) {
 	        log.error("Error handling file: [{}] upload", file.getOriginalFilename(), e);
 	    }
+		
+		return fileOnDisk;
 		
 	}
 
