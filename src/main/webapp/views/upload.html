@@ -6,11 +6,40 @@
 </head>
 <body>
 
-<form action="/subtitles/api/rest/1.0/upload" method="POST" enctype="multipart/form-data">
+<form id="subtitle_file_upload_form" action="/subtitles/api/rest/1.0/upload" method="POST" enctype="multipart/form-data">
 
 	<input type="file" id="file_upload" name="file"/>
 	<input type="submit">
 </form>
 
+<p id="download_link"></p>
+
 </body>
+
+<script>
+	document.getElementById("subtitle_file_upload_form").addEventListener("submit", async function(event) {
+	    event.preventDefault(); // Prevents the default form submission
+	
+	    const formData = new FormData(this); // Collects form data
+	    try {
+	        const response = await fetch('/subtitles/api/rest/1.0/upload', { 
+	            method: 'POST', 
+	            body: formData
+	        });
+	        
+	        if (response.ok) {
+	            const result = await response.text(); // Parse the JSON response
+	            document.getElementById("download_link").innerText = result;
+	        } else {
+	            document.getElementById("download_link").innerText = "Submission failed!";
+	        }
+	    } catch (error) {
+	        console.error("Error:", error);
+	        document.getElementById("download_link").innerText = "An error occurred!";
+	    }
+	});
+</script>
+
 </html>
+
+ 

@@ -4,6 +4,6 @@ import java.io.File;
 
 public interface SubtitlesFileProcessor {
 
-	void process(File storedFile);
+	File process(File storedFile);
 
 }

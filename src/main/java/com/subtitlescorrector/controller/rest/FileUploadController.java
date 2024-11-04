@@ -3,6 +3,7 @@ package com.subtitlescorrector.controller.rest;
 import java.io.File;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,10 +24,12 @@ public class FileUploadController {
 	SubtitlesFileProcessor processor;
 	
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
-	public void uploadFile(@RequestParam("file") MultipartFile file) {
+	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
 		
 		File storedFile = fileSystemStorageService.store(file);
-		processor.process(storedFile);
+		File processedFile = processor.process(storedFile);
+		
+		return ResponseEntity.ok(processedFile.getAbsolutePath());
 		
 	}
 	
