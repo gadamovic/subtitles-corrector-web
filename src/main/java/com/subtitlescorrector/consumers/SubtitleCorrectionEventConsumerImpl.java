@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.domain.KafkaTopic;
+import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 
 @Service
 public class SubtitleCorrectionEventConsumerImpl implements SubtitleCorrectionEventConsumer {
@@ -27,7 +28,7 @@ public class SubtitleCorrectionEventConsumerImpl implements SubtitleCorrectionEv
 
 	@Override
 	@Async
-	public void consumeSayings() {
+	public void consumeCorrections() {
 
 		Properties kaProperties = new Properties();
 		kaProperties.put("bootstrap.servers", "localhost:9092,localhost:9093");
@@ -38,17 +39,17 @@ public class SubtitleCorrectionEventConsumerImpl implements SubtitleCorrectionEv
 		kaProperties.put("specific.avro.reader", "true");
 		kaProperties.put("schema.registry.url", "http://localhost:8081");
 		
-		try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(kaProperties)) {
+		try (KafkaConsumer<String, SubtitleCorrectionEvent> consumer = new KafkaConsumer<>(kaProperties)) {
 
 			consumer.subscribe(List.of(KafkaTopic.SUBTITLE_CORRECTIONS.getTopicName()));
 
 			while (true) {
-				ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(250));
-				for (ConsumerRecord<String, String> record : records) {
+				ConsumerRecords<String, SubtitleCorrectionEvent> records = consumer.poll(Duration.ofMillis(250));
+				for (ConsumerRecord<String, SubtitleCorrectionEvent> record : records) {
 
-					String consumedEvent = record.value();
+					SubtitleCorrectionEvent consumedEvent = record.value();
 
-					log.info("kinaction_info offset = {}, value = {}", record.offset(), consumedEvent);
+					log.info("subtitle_corrections offset = {}, value = {}", record.offset(), consumedEvent);
 					
 					OffsetAndMetadata offsetMeta = new OffsetAndMetadata(record.offset() + 1, "");
 

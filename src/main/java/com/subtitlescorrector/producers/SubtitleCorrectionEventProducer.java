@@ -8,6 +8,6 @@ import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 
 public interface SubtitleCorrectionEventProducer {
 
-	Future<RecordMetadata> generateCorrectionEvent(SubtitleCorrectionEvent saying);
+	Future<RecordMetadata> generateCorrectionEvent(SubtitleCorrectionEvent event);
 
 }

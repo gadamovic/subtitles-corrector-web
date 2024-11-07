@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import com.subtitlescorrector.domain.KafkaTopic;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 
+import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
+
 @Service
 public class SubtitleCorrectionEventProducerImpl implements SubtitleCorrectionEventProducer {
 
@@ -27,6 +29,8 @@ public class SubtitleCorrectionEventProducerImpl implements SubtitleCorrectionEv
 	    producerProperties.put("key.serializer", "org.apache.kafka.common.serialization.LongSerializer");
 	    producerProperties.put("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
 	    producerProperties.put("schema.registry.url", "http://localhost:8081");
+	    producerProperties.put("avro.use.logical.type.converters", "true");
+	    
 	    //producerProperties.put("interceptor.classes", "com.say.say.events.interceptors.SayingPostedEventProducerInterceptor");
 
 	    try(Producer<Long, SubtitleCorrectionEvent> producer = new KafkaProducer<Long, SubtitleCorrectionEvent>(producerProperties)){

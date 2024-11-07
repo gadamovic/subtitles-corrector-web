@@ -9,16 +9,18 @@
       "doc": "Id of the subtitles file"
     },
     {
-   	  "name": "eventTimestamp",
-      "type": {
+   	 "name": "eventTimestamp",
+      "type": ["null", {
         "type": "long",
         "logicalType": "timestamp-millis"
-      }
+      }],
+      "default": null
     },
     {
       "name": "detectedEncoding",
-      "type": "string",
-      "doc": "Detected encoding of the provided subtitles file"
+      "type": ["null","string"],
+      "doc": "Detected encoding of the provided subtitles file",
+      "default":null
     },
     {
       "name": "correction",
