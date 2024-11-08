@@ -1,5 +1,4 @@
 
-version: '2'
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:6.1.1
@@ -125,3 +124,10 @@ services:
     tty: true
     environment:
       KSQL_CONFIG_DIR: "/etc/ksqldb"
+
+  redis:
+    image: redis:8.0-M02-alpine3.20
+    hostname: redis-server
+    container_name: redis-server
+    ports:
+    - "6379:6379"

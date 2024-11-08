@@ -24,16 +24,16 @@ public class SubtitleCorrectionEventConsumerImpl implements SubtitleCorrectionEv
 
 	Logger log = LoggerFactory.getLogger(SubtitleCorrectionEventConsumerImpl.class);
 
-	private static final String SAYING_CONSUMER_GROUP_ID = "0";
+	private static final String SUBTITLE_CORRECTIONS_CONSUMER_GROUP_ID = "0";
 
 	@Override
-	@Async
+	@Async //TODO: not sure if we need @Async here
 	public void consumeCorrections() {
 
 		Properties kaProperties = new Properties();
 		kaProperties.put("bootstrap.servers", "localhost:9092,localhost:9093");
 		kaProperties.put("enable.auto.commit", "false");
-		kaProperties.put("group.id", SAYING_CONSUMER_GROUP_ID);
+		kaProperties.put("group.id", SUBTITLE_CORRECTIONS_CONSUMER_GROUP_ID);
 		kaProperties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 		kaProperties.put("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
 		kaProperties.put("specific.avro.reader", "true");

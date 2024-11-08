@@ -39,7 +39,8 @@ public class FileUploadController {
 		File storedFile = fileSystemStorageService.store(file);
 		File processedFile = processor.process(storedFile);
 		
-		//s3Service.uploadFileToS3(storedFile.getName(), S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), processedFile);
+		log.info("Attempting upload to s3...");
+		s3Service.uploadFileToS3(storedFile.getName(), S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), processedFile);
 		
 		return ResponseEntity.ok("https://subtitles-uploaded-files.s3.eu-north-1.amazonaws.com/" + storedFile.getName());
 		

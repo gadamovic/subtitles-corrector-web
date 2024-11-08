@@ -7,6 +7,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
 
 import com.subtitlescorrector.util.Util;
 
@@ -24,6 +25,7 @@ public class ApplicationProperties {
 	private static final String UPLOAD_FOLDER_LOCATION = "upload.folder_location";
 	private static final String REDIS_CONNECTION_PORT_KEY = "redis.connection.port";
 	private static final String REDIS_CONNECTION_HOST_KEY = "redis.connection.host";
+	private static final String S3_UPLOAD_COOLDOWN = "aws.s3.upload.cooldown.minutes";
 	
 	public void init() {
 		
@@ -57,6 +59,10 @@ public class ApplicationProperties {
 	
 	public Integer getRedisConnectionPortAsInt() {
 		return Integer.parseInt(getProperty(REDIS_CONNECTION_PORT_KEY));
+	}
+	
+	public Long getS3UploadCooldownMinutes() {
+		return Long.parseLong(getProperty(S3_UPLOAD_COOLDOWN));
 	}
 	
 }
