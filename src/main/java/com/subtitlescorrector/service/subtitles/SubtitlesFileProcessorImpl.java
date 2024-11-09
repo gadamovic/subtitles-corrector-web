@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +62,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			correctedLines.add(beforeCorrection);
 		}
 		
-		File correctedFile = new File("correctedFile.srt");
+		File correctedFile = new File(storedFile.getName());
 		FileUtil.writeLinesToFile(correctedFile, correctedLines, StandardCharsets.UTF_8);
 		return correctedFile;
 	}

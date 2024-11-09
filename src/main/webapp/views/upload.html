@@ -7,19 +7,23 @@
 <body>
 
 <form id="subtitle_file_upload_form" action="/subtitles/api/rest/1.0/upload" method="POST" enctype="multipart/form-data">
-
-	<input type="file" id="file_upload" name="file"/>
+	<input type="file" id="file_upload" name="file" accept=".srt, .sub, .txt" />
 	<input type="submit">
 </form>
-
-<p id="download_link"></p>
+<br/>
+<br/>
+<img src="img/icons/loading_icon.gif" id="loading_icon" width="40px" style="display:none"/>
+<div id="download_link"></div>
 
 </body>
 
 <script>
 	document.getElementById("subtitle_file_upload_form").addEventListener("submit", async function(event) {
-	    event.preventDefault(); // Prevents the default form submission
 	
+		event.preventDefault(); // Prevents the default form submission
+		document.getElementById("loading_icon").style.display = "block";
+		document.getElementById("download_link").style.display = "none";
+	    
 	    const formData = new FormData(this); // Collects form data
 	    try {
 	        const response = await fetch('/subtitles/api/rest/1.0/upload', { 
@@ -29,10 +33,14 @@
 	        
 	        if (response.ok) {
 	            const result = await response.text(); // Parse the JSON response
-	            document.getElementById("download_link").innerText = result;
+	            document.getElementById("download_link").innerHTML = "<a href='" + result + "'>download</a>" ;
 	        } else {
 	            document.getElementById("download_link").innerText = "Submission failed!";
 	        }
+	        
+	        document.getElementById("loading_icon").style.display = "none";
+	        document.getElementById("download_link").style.display = "block";
+	        
 	    } catch (error) {
 	        console.error("Error:", error);
 	        document.getElementById("download_link").innerText = "An error occurred!";
