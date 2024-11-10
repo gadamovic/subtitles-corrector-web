@@ -1,6 +1,7 @@
 package com.subtitlescorrector.service.subtitles;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -25,8 +26,9 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	SubtitleCorrectionEventProducer producer;
 	
 	@Override
-	public File process(File storedFile) {
+	public File process(File storedFile, String s3KeyUUIDPrefix) {
 		
+		Charset detectedEncoding = FileUtil.detectEncodingOfFile(storedFile);
 		List<String> lines = FileUtil.loadTextFile(storedFile);
 		List<String> correctedLines = new ArrayList<>();
 		
@@ -36,28 +38,28 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			String beforeCorrection = line;
 			
 			tmp = line.replace("", "ž");
-			beforeCorrection = checkForChanges(tmp, beforeCorrection, "\"\" -> ž");
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> ž", detectedEncoding);
 			
 			tmp = beforeCorrection.replace("", "Ž");
-			beforeCorrection = checkForChanges(tmp, beforeCorrection, "\"\" -> Ž");
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> Ž", detectedEncoding);
 			
 			tmp = beforeCorrection.replace("", "š");
-			beforeCorrection = checkForChanges(tmp, beforeCorrection, "\"\" -> š");
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> š", detectedEncoding);
 			
 			tmp = beforeCorrection.replace("", "Š");
-			beforeCorrection = checkForChanges(tmp, beforeCorrection, "\"\" -> Š");
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> Š", detectedEncoding);
 	
 			tmp = beforeCorrection.replace("æ", "ć");
-			beforeCorrection = checkForChanges(tmp, beforeCorrection, "æ -> Š");
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "æ -> Š", detectedEncoding);
 			
 			tmp = beforeCorrection.replace("Æ", "Ć");
-			beforeCorrection = checkForChanges(tmp, beforeCorrection, "Æ -> Š");
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "Æ -> Š", detectedEncoding);
 	
 			tmp = beforeCorrection.replace("è", "č");
-			beforeCorrection = checkForChanges(tmp, beforeCorrection, "è -> Š");
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "è -> Š", detectedEncoding);
 			
 			tmp = beforeCorrection.replace("È", "Č");
-			beforeCorrection = checkForChanges(tmp, beforeCorrection, "È -> Č");
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "È -> Č", detectedEncoding);
 			
 			correctedLines.add(beforeCorrection);
 		}
@@ -67,14 +69,15 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		return correctedFile;
 	}
 
-	private String checkForChanges(String afterCorrection, String beforeCorrection, String correctionDescription) {
+	private String checkForChanges(String s3Key, String afterCorrection, String beforeCorrection, String correctionDescription, Charset detectedEncoding) {
 		if(!afterCorrection.equals(beforeCorrection)) {
 			log.info("Correction applied: " + correctionDescription);
 			
 			SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
 			event.setCorrection(correctionDescription);
 			event.setEventTimestamp(Instant.now());
-			//event.setDetectedEncoding("UTF-8");
+			event.setDetectedEncoding(detectedEncoding.displayName());
+			event.setFileId(s3Key);
 
 			producer.generateCorrectionEvent(event);
 			

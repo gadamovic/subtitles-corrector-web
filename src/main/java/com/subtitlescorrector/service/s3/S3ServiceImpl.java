@@ -39,6 +39,8 @@ public class S3ServiceImpl implements S3Service {
 					.bucket(bucket)
 					.key(key)
 					.build();
+			
+			redis.updateLastS3UploadTimestamp();
 
 			return s3Client.putObject(putObjectRequest, file.toPath());
 		}else {

@@ -44,9 +44,12 @@ public class FileUploadController {
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
 	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
 		
+		String s3KeyUUIDPrefix = UUID.randomUUID().toString();
+
 		File storedFile = fileSystemStorageService.store(file);
-		File processedFile = processor.process(storedFile);
-		String s3Key = UUID.randomUUID().toString() + processedFile.getName();
+		File processedFile = processor.process(storedFile, s3KeyUUIDPrefix);
+
+		String s3Key = s3KeyUUIDPrefix + processedFile.getName();
 		
 		log.info("Attempting upload to s3...");
 		s3Service.uploadFileToS3(s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), processedFile);

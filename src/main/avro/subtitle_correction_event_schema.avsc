@@ -5,7 +5,7 @@
   "fields": [
     {
       "name": "fileId",
-      "type": "long",
+      "type": "string",
       "doc": "Id of the subtitles file"
     },
     {
