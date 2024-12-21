@@ -1,13 +1,12 @@
 package com.subtitlescorrector.applicationproperties;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Component;
 
 import com.subtitlescorrector.util.Util;
 
@@ -30,8 +29,8 @@ public class ApplicationProperties {
 	public void init() {
 		
 		try {
-			File applicationProperties = new ClassPathResource("businessProperties.properties").getFile();
-			propertyMap = Util.loadPropertiesFileIntoMap(applicationProperties);
+			InputStream is = new ClassPathResource("businessProperties.properties").getInputStream();
+			propertyMap = Util.loadPropertiesFileIntoMap(is);
 			log.info("Application properties initialized!");
 		} catch (IOException e) {
 			log.error("Error loading business properties!", e);

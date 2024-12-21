@@ -12,7 +12,7 @@
 	<groupId>com</groupId>
 	<artifactId>subtitlescorrector</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>subtitlescorrector</name>
 	<description>Project for subtitles manipulation</description>
 	<url />

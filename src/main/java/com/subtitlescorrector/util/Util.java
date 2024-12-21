@@ -1,15 +1,22 @@
 package com.subtitlescorrector.util;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.apache.commons.io.input.BufferedFileChannelInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.io.Files;
 
 public class Util {
 
@@ -19,14 +26,16 @@ public class Util {
 		return LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyyHHmmssSSS"));
 	}
 
-	public static Map<String, String> loadPropertiesFileIntoMap(File props) {
+	public static Map<String, String> loadPropertiesFileIntoMap(InputStream is) {
 
+		File file = inputStreamToFile(is);
+		
 		Map<String, String> propsMap = new HashMap<String, String>();
 
 		Scanner scanner = null;
-
+		
 		try {
-			scanner = new Scanner(props);
+			scanner = new Scanner(file);
 		} catch (FileNotFoundException e) {
 			log.error("Error loading properties into map!", e);
 		}
@@ -48,8 +57,27 @@ public class Util {
 		}
 
 		scanner.close();
-
+		
+		file.delete();
 		return propsMap;
+	}
+	
+	public static File inputStreamToFile(InputStream inputStream) {
+		
+		File file = new File("temp" + getCurrentTimestampAsString() + ".properties");
+		try(BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))){
+			
+			byte[] buffer = new byte[1024];
+            int bytesRead;
+
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+			
+		}catch(Exception e) {
+			log.error("Error writing input stream to file!");
+		}
+		return file;
 	}
 
 	public static boolean isBlank(CharSequence cs) {
