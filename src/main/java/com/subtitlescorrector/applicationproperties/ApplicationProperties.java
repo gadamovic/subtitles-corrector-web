@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
+import com.subtitlescorrector.domain.VariablesEnum;
 import com.subtitlescorrector.util.Util;
 
 /**
@@ -16,6 +17,8 @@ import com.subtitlescorrector.util.Util;
  *
  */
 public class ApplicationProperties {
+
+	private static final String PROD_ENVIRONMENT = "prod";
 
 	private static final Logger log = LoggerFactory.getLogger(ApplicationProperties.class);
 
@@ -31,6 +34,14 @@ public class ApplicationProperties {
 		try {
 			InputStream is = new ClassPathResource("businessProperties.properties").getInputStream();
 			propertyMap = Util.loadPropertiesFileIntoMap(is);
+			
+			String environment = System.getenv(VariablesEnum.APPLICATION_ENVIRONMENT.getName());
+			
+			if(environment.equalsIgnoreCase(PROD_ENVIRONMENT)) {
+				InputStream is2 = new ClassPathResource("businessProperties-prod.properties").getInputStream();
+				propertyMap.putAll(Util.loadPropertiesFileIntoMap(is2));
+			}
+			
 			log.info("Application properties initialized!");
 		} catch (IOException e) {
 			log.error("Error loading business properties!", e);

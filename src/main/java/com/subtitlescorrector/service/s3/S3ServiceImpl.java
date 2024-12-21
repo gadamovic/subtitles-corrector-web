@@ -41,6 +41,7 @@ public class S3ServiceImpl implements S3Service {
 					.build();
 			
 			redis.updateLastS3UploadTimestamp();
+			log.info("Uploaded to s3 with key: {}", key);
 
 			return s3Client.putObject(putObjectRequest, file.toPath());
 		}else {
