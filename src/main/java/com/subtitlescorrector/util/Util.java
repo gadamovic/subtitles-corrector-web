@@ -15,12 +15,19 @@ import java.util.Scanner;
 import org.apache.commons.io.input.BufferedFileChannelInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.google.common.io.Files;
+import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 
+@Component
 public class Util {
 
 	private static final Logger log = LoggerFactory.getLogger(Util.class);
+	
+	@Autowired
+	ApplicationProperties properties;
 	
 	public static String getCurrentTimestampAsString() {
 		return LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyyHHmmssSSS"));
@@ -98,6 +105,11 @@ public class Util {
 
 	public static boolean isNotBlank(CharSequence cs) {
 		return !isBlank(cs);
+	}
+
+	//NON-STATIC method!
+	public String makeFilenameForDownloadFromS3Key(String s3Key) {
+		return properties.getSubtitleCorrectionProcessedFileNamePrefix() + s3Key.substring(s3Key.indexOf('_') + 1);
 	}
 
 }

@@ -28,6 +28,7 @@ public class ApplicationProperties {
 	private static final String REDIS_CONNECTION_PORT_KEY = "redis.connection.port";
 	private static final String REDIS_CONNECTION_HOST_KEY = "redis.connection.host";
 	private static final String S3_UPLOAD_COOLDOWN = "aws.s3.upload.cooldown.minutes";
+	private static final String SUBTITLE_CORRECTION_PROCESSED_FILE_NAME_PREFIX = "subtitle.correction.filename.prefix";
 	
 	public void init() {
 		
@@ -75,4 +76,7 @@ public class ApplicationProperties {
 		return Long.parseLong(getProperty(S3_UPLOAD_COOLDOWN));
 	}
 	
+	public String getSubtitleCorrectionProcessedFileNamePrefix() {
+		return getProperty(SUBTITLE_CORRECTION_PROCESSED_FILE_NAME_PREFIX);
+	}
 }

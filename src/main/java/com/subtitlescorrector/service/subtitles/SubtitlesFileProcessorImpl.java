@@ -65,6 +65,11 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		}
 		
 		File correctedFile = new File(storedFile.getName());
+		
+		if(detectedEncoding != StandardCharsets.UTF_8) {
+			log.info("Updated encoding of: {} to UTF-8!", storedFile.getName());
+		}
+		
 		FileUtil.writeLinesToFile(correctedFile, correctedLines, StandardCharsets.UTF_8);
 		return correctedFile;
 	}

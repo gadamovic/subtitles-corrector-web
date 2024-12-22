@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,6 +21,7 @@ import com.subtitlescorrector.domain.S3BucketNames;
 import com.subtitlescorrector.service.StorageService;
 import com.subtitlescorrector.service.s3.S3Service;
 import com.subtitlescorrector.service.subtitles.SubtitlesFileProcessor;
+import com.subtitlescorrector.util.Util;
 
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
@@ -41,6 +43,9 @@ public class FileUploadController {
 	@Autowired
 	S3Service s3Service;
 	
+	@Autowired
+	Util util;
+	
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
 	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
 		
@@ -52,7 +57,7 @@ public class FileUploadController {
 		String s3Key = s3KeyUUIDPrefix + processedFile.getName();
 		
 		log.info("Attempting upload to s3...");
-		s3Service.uploadFileToS3(s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), processedFile);
+		boolean uploaded = s3Service.uploadFileToS3(s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), processedFile) != null;
 		
 		try {
 			Files.delete(storedFile.toPath());
@@ -61,14 +66,20 @@ public class FileUploadController {
 			log.error("Error deleting files!",e);
 		}
 		
+		if(!uploaded) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
+		}
+		
 		S3Presigner presigner = S3Presigner.create();
 		GetObjectPresignRequest getObjectRequest = GetObjectPresignRequest.builder()
                 .signatureDuration(Duration.ofMinutes(15))
-                .getObjectRequest(r -> r.bucket(S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName()).key(s3Key))
+                .getObjectRequest(r -> r.bucket(S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName())
+                					    .key(s3Key)
+                					    .responseContentDisposition("attachment; filename=\"" + util.makeFilenameForDownloadFromS3Key(s3Key) +"\""))
                 .build();
 
         PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(getObjectRequest);
-
+        
 		return ResponseEntity.ok(presignedRequest.url().toString());
 		
 	}
