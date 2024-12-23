@@ -2,6 +2,8 @@ package com.subtitlescorrector.controller.rest;
 
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -18,8 +20,12 @@ public class CertbotChallengeController {
 	@Autowired
 	ApplicationProperties properties;
 	
+	Logger log = LoggerFactory.getLogger(CertbotChallengeController.class);
+	
 	@RequestMapping(path = "/.well-known/acme-challenge/{filename}")
 	public ResponseEntity<Resource> getChallengeFiles(@PathVariable(name = "filename") String filename) {
+		
+		log.info("Certbot controller executing with filename: " + filename);
 		
 		File file = new File(properties.getCertbotChallengePath(), filename);
         if (file.exists()) {
