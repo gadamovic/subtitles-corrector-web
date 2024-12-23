@@ -1,4 +1,4 @@
-package com.subtitlescorrector.conttroller;
+package com.subtitlescorrector.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +13,7 @@ public class BasicViewController {
 		
 	}
 	
-	@RequestMapping(path="/upload")
+	@RequestMapping(path="/")
 	public String upload() {
 	
 		return "upload";

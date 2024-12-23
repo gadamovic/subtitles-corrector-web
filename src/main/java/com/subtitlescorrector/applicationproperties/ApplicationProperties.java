@@ -29,6 +29,8 @@ public class ApplicationProperties {
 	private static final String REDIS_CONNECTION_HOST_KEY = "redis.connection.host";
 	private static final String S3_UPLOAD_COOLDOWN = "aws.s3.upload.cooldown.minutes";
 	private static final String SUBTITLE_CORRECTION_PROCESSED_FILE_NAME_PREFIX = "subtitle.correction.filename.prefix";
+	private static final String CERTBOT_CHALLENGE_PATH = "tls.certbot.challenge.path";
+	private static final String APPLICATION_CONTEXT_ROOT = "application.context.root";
 	
 	public void init() {
 		
@@ -79,4 +81,14 @@ public class ApplicationProperties {
 	public String getSubtitleCorrectionProcessedFileNamePrefix() {
 		return getProperty(SUBTITLE_CORRECTION_PROCESSED_FILE_NAME_PREFIX);
 	}
+	
+	public String getCertbotChallengePath() {
+		return getProperty(CERTBOT_CHALLENGE_PATH);
+	}
+
+	public String getContextRoot() {
+		return getProperty(APPLICATION_CONTEXT_ROOT);
+	}
+	
+	
 }
