@@ -18,7 +18,7 @@ import com.subtitlescorrector.util.Util;
  */
 public class ApplicationProperties {
 
-	private static final String PROD_ENVIRONMENT = "prod";
+	public static final String PROD_ENVIRONMENT = "prod";
 
 	private static final Logger log = LoggerFactory.getLogger(ApplicationProperties.class);
 
@@ -31,6 +31,7 @@ public class ApplicationProperties {
 	private static final String SUBTITLE_CORRECTION_PROCESSED_FILE_NAME_PREFIX = "subtitle.correction.filename.prefix";
 	private static final String CERTBOT_CHALLENGE_PATH = "tls.certbot.challenge.path";
 	private static final String APPLICATION_CONTEXT_ROOT = "application.context.root";
+	private static final String TLS_KEYSTORE_LOCATION = "tls.keystore.location";
 	
 	public void init() {
 		
@@ -90,5 +91,11 @@ public class ApplicationProperties {
 		return getProperty(APPLICATION_CONTEXT_ROOT);
 	}
 	
+	public String getKeystoreLocation() {
+		return getProperty(TLS_KEYSTORE_LOCATION);
+	}
 	
+	public String getEnvironment() {
+		return System.getenv(VariablesEnum.APPLICATION_ENVIRONMENT.getName());
+	}
 }
