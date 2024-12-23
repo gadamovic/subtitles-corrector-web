@@ -14,6 +14,12 @@ public class ContextRootConfig implements WebServerFactoryCustomizer<TomcatServl
 	
     @Override
     public void customize(TomcatServletWebServerFactory factory) {
-        factory.setContextPath(properties.getContextRoot());
+    	
+    	String contextPath = properties.getContextRoot();
+    	if(contextPath.equals("/")) {
+    		contextPath = "";
+    	}
+    	
+        factory.setContextPath(contextPath);
     }
 }
