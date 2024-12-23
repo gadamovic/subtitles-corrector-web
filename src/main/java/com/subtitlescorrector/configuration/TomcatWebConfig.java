@@ -31,7 +31,7 @@ public class TomcatWebConfig implements WebServerFactoryCustomizer<TomcatServlet
 		factory.setContextPath(contextPath);
 
 		//TLS settings for production
-		if (properties.getEnvironment().equals(ApplicationProperties.PROD_ENVIRONMENT)) {
+		if (properties.getTlsEnabled()) {
 
 			factory.addConnectorCustomizers(connector -> {
 				connector.setScheme(SCHEME);

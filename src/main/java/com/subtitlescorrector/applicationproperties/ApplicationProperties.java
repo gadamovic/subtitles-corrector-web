@@ -32,6 +32,7 @@ public class ApplicationProperties {
 	private static final String CERTBOT_CHALLENGE_PATH = "tls.certbot.challenge.path";
 	private static final String APPLICATION_CONTEXT_ROOT = "application.context.root";
 	private static final String TLS_KEYSTORE_LOCATION = "tls.keystore.location";
+	private static final String TLS_ENABLED = "tls.enabled";
 	
 	public void init() {
 		
@@ -98,4 +99,9 @@ public class ApplicationProperties {
 	public String getEnvironment() {
 		return System.getenv(VariablesEnum.APPLICATION_ENVIRONMENT.getName());
 	}
+	
+	public Boolean getTlsEnabled() {
+		return Boolean.parseBoolean(getProperty(TLS_ENABLED));
+	}
+
 }
