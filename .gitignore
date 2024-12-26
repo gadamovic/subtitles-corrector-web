@@ -32,7 +32,7 @@ build/
 ### VS Code ###
 .vscode/
 
-src/main/resources/static/views/frontend-view
+src/main/resources/static/views/frontend-view/*
 
 
 
