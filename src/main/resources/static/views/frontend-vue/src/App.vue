@@ -28,17 +28,7 @@
           </div>
         </div>
 
-        <div class="field">
-          <div class="control">
-            <button
-              type="submit"
-              class="button is-success is-fullwidth"
-              :disabled="loading"
-            >
-              Upload
-            </button>
-          </div>
-        </div>
+        <GenericButton :loading="loading" button_text="Upload"></GenericButton>
       </form>
 
       <!-- Loading Indicator -->
@@ -63,14 +53,22 @@
       <div class="notification is-danger" v-if="error">
         {{ error }}
       </div>
+
+      <FooterComponent/>
     </div>
   </div>
 </template>
 
 
 <script>
+import GenericButton from './components/GenericButton.vue';
+import FooterComponent from'./components/FooterComponent.vue';
 export default {
   name: "App",
+  components: {
+    GenericButton,
+    FooterComponent,
+  },
   data() {
     return {
       file: null, // Selected file
