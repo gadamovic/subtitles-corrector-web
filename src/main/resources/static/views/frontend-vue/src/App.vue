@@ -55,7 +55,7 @@ export default {
       formData.append("file", this.file);
 
       try {
-        const response = await fetch("/subtitles/api/rest/1.0/upload", {
+        const response = await fetch("api/rest/1.0/upload", {
           method: "POST",
           body: formData,
         });
