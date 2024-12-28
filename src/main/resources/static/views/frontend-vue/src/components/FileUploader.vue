@@ -25,17 +25,6 @@
         <GenericButton :loading="loading" button_text="Upload"></GenericButton>
       </form>
 
-      <!-- Loading Indicator -->
-      <div class="has-text-centered" v-if="loading">
-        <img
-          src="img/icons/loading_icon.gif"
-          id="loading_icon"
-          width="40px"
-          alt="Loading..."
-        />
-        <p class="has-text-white">Processing your file...</p>
-      </div>
-
       <!-- Download Link -->
       <div class="has-text-centered" style="margin-bottom: 24px;" v-if="downloadLink">
         <a :href="downloadLink" class="button is-link is-light">

@@ -4,6 +4,7 @@
       <button
         type="submit"
         class="button is-success is-fullwidth"
+        :class="loading ? 'is-loading' : ''"
         :disabled="loading"
       >
         {{ button_text }}
