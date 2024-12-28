@@ -3,8 +3,8 @@
 <div class="box" style="background-color: #004266;">
 
     <div class="field">
-        <label class="label has-text-white">Noticed a subtitle problem that Subtitles Corrector doesn't fix?
-            Describe a problem to us and we'll try to make Subtitles Corrector able to fix it and inform you if we succeeded!</label>
+        <label class="label has-text-white">Noticed a subtitle problem that Subtitles Corrector doesn't fix? Have a feedback or suggestion?
+            Let us know!</label>
         <input placeholder="Email" class="input" type="email" id="email" name="email"/>
     </div>
 

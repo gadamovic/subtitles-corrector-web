@@ -18,9 +18,9 @@ public class S3ServiceMonitor {
 	@Autowired
 	ApplicationProperties properties;
 	
-	public boolean uploadAllowed() {
+	public boolean uploadAllowed(String userIp) {
 		
-		LocalDateTime lastUploadTimestamp = redisService.getLastS3UploadTimestamp();
+		LocalDateTime lastUploadTimestamp = redisService.getLastS3UploadTimestamp(userIp);
 		
 		LocalDateTime now = LocalDateTime.now();
 		

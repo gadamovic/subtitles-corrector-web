@@ -27,9 +27,9 @@ public class S3ServiceImpl implements S3Service {
 	RedisService redis;
 	
 	@Override
-	public PutObjectResponse uploadFileToS3(String key, String bucket, File file){
+	public PutObjectResponse uploadFileToS3(String key, String bucket, File file, String ip){
 		
-		if(monitor.uploadAllowed()) {
+		if(monitor.uploadAllowed(ip)) {
 			
 			S3Client s3Client = S3Client.builder()
 				    .region(Region.EU_NORTH_1)
@@ -40,7 +40,7 @@ public class S3ServiceImpl implements S3Service {
 					.key(key)
 					.build();
 			
-			redis.updateLastS3UploadTimestamp();
+			redis.updateLastS3UploadTimestamp(ip);
 			log.info("Uploaded to s3 with key: {}", key);
 
 			return s3Client.putObject(putObjectRequest, file.toPath());

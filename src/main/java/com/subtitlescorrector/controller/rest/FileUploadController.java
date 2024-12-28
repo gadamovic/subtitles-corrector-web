@@ -23,6 +23,7 @@ import com.subtitlescorrector.service.s3.S3Service;
 import com.subtitlescorrector.service.subtitles.SubtitlesFileProcessor;
 import com.subtitlescorrector.util.Util;
 
+import jakarta.servlet.http.HttpServletRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
@@ -47,7 +48,7 @@ public class FileUploadController {
 	Util util;
 	
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
-	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		
 		String s3KeyUUIDPrefix = UUID.randomUUID().toString();
 
@@ -57,7 +58,7 @@ public class FileUploadController {
 		String s3Key = s3KeyUUIDPrefix + processedFile.getName();
 		
 		log.info("Attempting upload to s3...");
-		boolean uploaded = s3Service.uploadFileToS3(s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), processedFile) != null;
+		boolean uploaded = s3Service.uploadFileToS3(s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), processedFile, request.getRemoteAddr()) != null;
 		
 		try {
 			Files.delete(storedFile.toPath());
@@ -67,7 +68,7 @@ public class FileUploadController {
 		}
 		
 		if(!uploaded) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
+			return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Users are allowed to process one subtitle every two minutes!");
 		}
 		
 		S3Presigner presigner = S3Presigner.create();

@@ -14,17 +14,17 @@ public class RedisServiceImpl implements RedisService {
 	RedisConnectionProvider redisConnection;
 	
 	@Override
-	public void updateLastS3UploadTimestamp() {
+	public void updateLastS3UploadTimestamp(String ip) {
 	
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
-			jedis.set(RedisSchema.createUserLastPostTimestampKey(), LocalDateTime.now().toString());
+			jedis.set(RedisSchema.createUserLastPostTimestampKey(ip), LocalDateTime.now().toString());
 		}
 		
 	}
 	
-	public LocalDateTime getLastS3UploadTimestamp(){
+	public LocalDateTime getLastS3UploadTimestamp(String ip){
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
-			String strValue = jedis.get(RedisSchema.createUserLastPostTimestampKey());
+			String strValue = jedis.get(RedisSchema.createUserLastPostTimestampKey(ip));
 			if(strValue != null) {
 				LocalDateTime timestamp = LocalDateTime.parse(strValue);
 				return timestamp;

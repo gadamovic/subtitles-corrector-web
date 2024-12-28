@@ -9,10 +9,11 @@ public class RedisSchema {
 
 	/**
 	 * Timestamp of last s3 upload
+	 * @param ip 
 	 * @return
 	 */
-	public static String createUserLastPostTimestampKey() {
-		return RedisKeys.LAST_S3_UPLOAD.getKey();
+	public static String createUserLastPostTimestampKey(String ip) {
+		return RedisKeys.LAST_S3_UPLOAD.getKey() + "_" + ip;
 	}
 	
 }
