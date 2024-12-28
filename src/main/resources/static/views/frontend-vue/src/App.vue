@@ -1,73 +1,28 @@
 <template>
-  <div id="app" class="section">
-    <div class="container">
-      <!-- Title -->
-      <h1 class="title has-text-primary has-text-centered">Subtitle File Upload</h1>
-      <p class="subtitle has-text-centered">
-        Upload subtitle files for correction.
-      </p>
-
-      <!-- Upload Form -->
-      <form
-        @submit.prevent="handleSubmit"
-        enctype="multipart/form-data"
-        class="box"
-        style="background-color: #004266;"
-      >
-        <div class="field">
-          <label class="label has-text-white">Choose a subtitle file:</label>
-          <div class="control">
-            <input
-              class="input"
-              type="file"
-              id="file_upload"
-              name="file"
-              accept=".srt, .sub, .txt"
-              @change="handleFileChange"
-            />
-          </div>
-        </div>
-
-        <GenericButton :loading="loading" button_text="Upload"></GenericButton>
-      </form>
-
-      <!-- Loading Indicator -->
-      <div class="has-text-centered" v-if="loading">
-        <img
-          src="img/icons/loading_icon.gif"
-          id="loading_icon"
-          width="40px"
-          alt="Loading..."
-        />
-        <p class="has-text-white">Processing your file...</p>
-      </div>
-
-      <!-- Download Link -->
-      <div class="has-text-centered" v-if="downloadLink">
-        <a :href="downloadLink" class="button is-link is-light">
-          Download Corrected File
-        </a>
-      </div>
-
-      <!-- Error Message -->
-      <div class="notification is-danger" v-if="error">
-        {{ error }}
-      </div>
-
-      <FooterComponent/>
+  <div id="app">
+    <div  class="section">
+      <HeadingComponent first_line="Subtitles corrector" second_line="Make your subtitle come to life!"/>
+      <FileUploader/>
+      <ContactForm/>
     </div>
+    <FooterComponent/>
   </div>
 </template>
 
 
 <script>
-import GenericButton from './components/GenericButton.vue';
+
+import ContactForm from './components/ContactForm.vue';
+import FileUploader from './components/FileUploader.vue';
 import FooterComponent from'./components/FooterComponent.vue';
+import HeadingComponent from './components/HeadingComponent.vue';
 export default {
   name: "App",
   components: {
-    GenericButton,
+    FileUploader,
     FooterComponent,
+    HeadingComponent,
+    ContactForm,
   },
   data() {
     return {
