@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.controller.rest.FileUploadController;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 import com.subtitlescorrector.producers.SubtitleCorrectionEventProducer;
@@ -24,6 +25,9 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	
 	@Autowired
 	SubtitleCorrectionEventProducer producer;
+	
+	@Autowired
+	ApplicationProperties properties;
 	
 	@Override
 	public File process(File storedFile, String s3KeyUUIDPrefix) {
@@ -84,7 +88,9 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			event.setDetectedEncoding(detectedEncoding.displayName());
 			event.setFileId(s3Key);
 
-			producer.generateCorrectionEvent(event);
+			if(properties.getSubtitlesKafakEnabled()) {
+				producer.generateCorrectionEvent(event);
+			}
 			
 		}
 

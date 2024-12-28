@@ -33,6 +33,7 @@ public class ApplicationProperties {
 	private static final String APPLICATION_CONTEXT_ROOT = "application.context.root";
 	private static final String TLS_KEYSTORE_LOCATION = "tls.keystore.location";
 	private static final String TLS_ENABLED = "tls.enabled";
+	private static final String SUBTITLES_KAFKA_ENABLED = "subtitle.correction.kafka.enabled";
 	
 	public void init() {
 		
@@ -102,6 +103,10 @@ public class ApplicationProperties {
 	
 	public Boolean getTlsEnabled() {
 		return Boolean.parseBoolean(getProperty(TLS_ENABLED));
+	}
+	
+	public Boolean getSubtitlesKafakEnabled() {
+		return Boolean.parseBoolean(SUBTITLES_KAFKA_ENABLED);
 	}
 
 }
