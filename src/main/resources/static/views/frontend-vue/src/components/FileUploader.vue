@@ -121,7 +121,14 @@ export default {
     },
     establishWSConnection() {
 
-      const socket = new SockJS("http://localhost:8080/subtitles/sc-ws-connection-entrypoint"); // WebSocket endpoint
+      let contextRoot = "/subtitles";
+      let hostAddress = "http://localhost:8080";
+      if (process.env.APP_ENVIRONMENT === 'prod') {
+        contextRoot = "";
+        hostAddress = "https://subtitles-corrector.com";
+      }
+
+      const socket = new SockJS(hostAddress + contextRoot + "/sc-ws-connection-entrypoint"); // WebSocket endpoint
       this.stompClient = new Client({
         webSocketFactory: () => socket,
         reconnectDelay: 5000,
