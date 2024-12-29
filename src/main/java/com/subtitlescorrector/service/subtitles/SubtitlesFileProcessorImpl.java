@@ -12,10 +12,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.JsonObject;
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.controller.rest.FileUploadController;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 import com.subtitlescorrector.producers.SubtitleCorrectionEventProducer;
+import com.subtitlescorrector.service.WebSocketMessageBrokerService;
 import com.subtitlescorrector.util.FileUtil;
 
 @Component
@@ -29,41 +31,52 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	@Autowired
 	ApplicationProperties properties;
 	
+	@Autowired
+	WebSocketMessageBrokerService webSocketBrokerService;
+	
 	@Override
 	public File process(File storedFile, String s3KeyUUIDPrefix) {
 		
 		Charset detectedEncoding = FileUtil.detectEncodingOfFile(storedFile);
 		List<String> lines = FileUtil.loadTextFile(storedFile);
 		List<String> correctedLines = new ArrayList<>();
+		int numberOfLines = lines.size();
+		int currentLineNumber = 0;
+		float processedPercentage = 0f;
+		
+		//TODO: Check why number of corrections increase every time you click upload on UI
 		
 		for(String line : lines) {
+			
+			currentLineNumber ++;
+			processedPercentage = ((float) currentLineNumber / (float) numberOfLines) * 100;
 			
 			String tmp = "";
 			String beforeCorrection = line;
 			
 			tmp = line.replace("", "ž");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> ž", detectedEncoding);
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> ž", detectedEncoding, processedPercentage);
 			
 			tmp = beforeCorrection.replace("", "Ž");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> Ž", detectedEncoding);
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> Ž", detectedEncoding, processedPercentage);
 			
 			tmp = beforeCorrection.replace("", "š");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> š", detectedEncoding);
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> š", detectedEncoding, processedPercentage);
 			
 			tmp = beforeCorrection.replace("", "Š");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> Š", detectedEncoding);
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> Š", detectedEncoding, processedPercentage);
 	
 			tmp = beforeCorrection.replace("æ", "ć");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "æ -> Š", detectedEncoding);
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "æ -> Š", detectedEncoding, processedPercentage);
 			
 			tmp = beforeCorrection.replace("Æ", "Ć");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "Æ -> Š", detectedEncoding);
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "Æ -> Š", detectedEncoding, processedPercentage);
 	
 			tmp = beforeCorrection.replace("è", "č");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "è -> Š", detectedEncoding);
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "è -> Š", detectedEncoding, processedPercentage);
 			
 			tmp = beforeCorrection.replace("È", "Č");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "È -> Č", detectedEncoding);
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "È -> Č", detectedEncoding, processedPercentage);
 			
 			correctedLines.add(beforeCorrection);
 		}
@@ -78,7 +91,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		return correctedFile;
 	}
 
-	private String checkForChanges(String s3Key, String afterCorrection, String beforeCorrection, String correctionDescription, Charset detectedEncoding) {
+	private String checkForChanges(String s3Key, String afterCorrection, String beforeCorrection, String correctionDescription, Charset detectedEncoding, float processedPercentage) {
 		if(!afterCorrection.equals(beforeCorrection)) {
 			log.info("Correction applied: " + correctionDescription);
 			
@@ -87,7 +100,14 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			event.setEventTimestamp(Instant.now());
 			event.setDetectedEncoding(detectedEncoding.displayName());
 			event.setFileId(s3Key);
-
+			
+			JsonObject json = new JsonObject();
+			json.addProperty("correctionDescription", correctionDescription);
+			json.addProperty("processedPercentage", String.valueOf(processedPercentage));
+			
+			//TODO: Send last notification with 100% done
+			webSocketBrokerService.sendNotification("/topic/subtitles-processing-log", json.toString());
+			
 			if(properties.getSubtitlesKafakEnabled()) {
 				producer.generateCorrectionEvent(event);
 			}

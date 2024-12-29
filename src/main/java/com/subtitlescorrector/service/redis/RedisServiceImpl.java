@@ -13,11 +13,13 @@ public class RedisServiceImpl implements RedisService {
 	@Autowired
 	RedisConnectionProvider redisConnection;
 	
+	private static final int CACHE_TTL = 3600;
+	
 	@Override
 	public void updateLastS3UploadTimestamp(String ip) {
 	
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
-			jedis.set(RedisSchema.createUserLastPostTimestampKey(ip), LocalDateTime.now().toString());
+			jedis.setex(RedisSchema.createUserLastPostTimestampKey(ip), CACHE_TTL, LocalDateTime.now().toString());
 		}
 		
 	}

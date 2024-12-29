@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div class="content">
     <div  class="section">
       <HeadingComponent first_line="Subtitles corrector" second_line="An app that fixes character encoding and formatting issues in subtitle files, ensuring they're clean and ready for use"/>
       <FileUploader/>
