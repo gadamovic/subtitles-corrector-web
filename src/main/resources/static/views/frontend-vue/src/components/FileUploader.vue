@@ -123,11 +123,11 @@ export default {
 
       let contextRoot = "/subtitles";
       let hostAddress = "http://localhost:8080";
-      if (process.env.APP_ENVIRONMENT === 'prod') {
+      if (process.env.VUE_APP_ENVIRONMENT === 'prod') {
         contextRoot = "";
         hostAddress = "https://subtitles-corrector.com";
       }
-
+      console.log("process.env.VUE_APP_ENVIRONMENT=" + process.env.VUE_APP_ENVIRONMENT);
       console.log("Sock connection: " + hostAddress + contextRoot + "/sc-ws-connection-entrypoint");
       const socket = new SockJS(hostAddress + contextRoot + "/sc-ws-connection-entrypoint"); // WebSocket endpoint
       this.stompClient = new Client({

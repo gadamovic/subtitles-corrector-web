@@ -1,7 +1,7 @@
 const { defineConfig } = require('@vue/cli-service')
 
 var vuePublicPath = '/subtitles/views';
-if (process.env.APP_ENVIRONMENT === 'prod') {
+if (process.env.VUE_APP_ENVIRONMENT === 'prod') {
   vuePublicPath = "/views";
 }
 
