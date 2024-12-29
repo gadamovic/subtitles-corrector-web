@@ -128,6 +128,7 @@ export default {
         hostAddress = "https://subtitles-corrector.com";
       }
 
+      console.log("Sock connection: " + hostAddress + contextRoot + "/sc-ws-connection-entrypoint");
       const socket = new SockJS(hostAddress + contextRoot + "/sc-ws-connection-entrypoint"); // WebSocket endpoint
       this.stompClient = new Client({
         webSocketFactory: () => socket,
