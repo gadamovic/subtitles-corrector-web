@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.subtitlescorrector.domain.S3BucketNames;
+import com.subtitlescorrector.service.S3ServiceMonitor;
 import com.subtitlescorrector.service.StorageService;
 import com.subtitlescorrector.service.redis.RedisService;
 import com.subtitlescorrector.service.s3.S3Service;
@@ -51,8 +52,19 @@ public class FileUploadController {
 	@Autowired
 	Util util;
 	
+	@Autowired
+	S3ServiceMonitor monitor;
+	
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
 	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+		
+		
+		String clientIp = request.getRemoteAddr();
+		if(!monitor.subtitleCorrectionAllowedForUser(clientIp)) {
+			return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Users are allowed to process one subtitle every two minutes!");
+		}else {
+			redisService.updateLastS3UploadTimestamp(clientIp);
+		}
 		
 		String s3KeyUUIDPrefix = UUID.randomUUID().toString();
 		
@@ -65,17 +77,13 @@ public class FileUploadController {
 		String s3Key = s3KeyUUIDPrefix + processedFile.getName();
 		
 		log.info("Attempting upload to s3...");
-		boolean uploaded = s3Service.uploadFileToS3(s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), processedFile, request.getRemoteAddr()) != null;
+		s3Service.uploadFileToS3(s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), processedFile);
 		
 		try {
 			Files.delete(storedFile.toPath());
 			Files.delete(processedFile.toPath());
 		} catch (IOException e) {
 			log.error("Error deleting files!",e);
-		}
-		
-		if(!uploaded) {
-			return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Users are allowed to process one subtitle every two minutes!");
 		}
 		
 		S3Presigner presigner = S3Presigner.create();

@@ -18,7 +18,7 @@ public class S3ServiceMonitor {
 	@Autowired
 	ApplicationProperties properties;
 	
-	public boolean uploadAllowed(String userIp) {
+	public boolean subtitleCorrectionAllowedForUser(String userIp) {
 		
 		LocalDateTime lastUploadTimestamp = redisService.getLastS3UploadTimestamp(userIp);
 		
