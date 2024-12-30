@@ -147,15 +147,18 @@ export default {
       this.stompClient.activate()
     },
     handleMessage(message){
-      let correction = this.fileProcessingLogs[message.correctionDescription];
-        if(correction){
-          correction ++;
-          this.fileProcessingLogs[message.correctionDescription] = correction;
-        }else{
-          this.fileProcessingLogs[message.correctionDescription] = 1;
-        }
 
-        this.processedPercentage = message.processedPercentage;
+      if(message.correctionDescription){
+        let correction = this.fileProcessingLogs[message.correctionDescription];
+          if(correction){
+            correction ++;
+            this.fileProcessingLogs[message.correctionDescription] = correction;
+          }else{
+            this.fileProcessingLogs[message.correctionDescription] = 1;
+          }
+      }
+
+      this.processedPercentage = message.processedPercentage;
     },
     onConnected() {
       console.log("Connected to WebSocket");

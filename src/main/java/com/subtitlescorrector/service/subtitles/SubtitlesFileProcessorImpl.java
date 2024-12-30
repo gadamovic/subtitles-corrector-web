@@ -43,9 +43,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		int numberOfLines = lines.size();
 		int currentLineNumber = 0;
 		float processedPercentage = 0f;
-		
-		//TODO: Check why number of corrections increase every time you click upload on UI
-		
+				
 		for(String line : lines) {
 			
 			currentLineNumber ++;
@@ -81,6 +79,8 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			correctedLines.add(beforeCorrection);
 		}
 		
+		sendProcessingFinishedMessage(webSocketSessionId);
+		
 		File correctedFile = new File(storedFile.getName());
 		
 		if(detectedEncoding != StandardCharsets.UTF_8) {
@@ -89,6 +89,18 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		
 		FileUtil.writeLinesToFile(correctedFile, correctedLines, StandardCharsets.UTF_8);
 		return correctedFile;
+	}
+
+	private void sendProcessingFinishedMessage(String webSocketSessionId) {
+		
+		//wait a bit so this is the last progress update message
+		try {
+			Thread.sleep(20);
+		} catch (InterruptedException e) {}
+		
+		JsonObject json = new JsonObject();
+		json.addProperty("processedPercentage", "100");
+		webSocketBrokerService.sendNotificationToUser(webSocketSessionId, "/subtitles-processing-log", json.toString());
 	}
 
 	private String checkForChanges(String s3Key, String afterCorrection, String beforeCorrection, String correctionDescription, Charset detectedEncoding, float processedPercentage, String webSocketSessionId) {
@@ -104,9 +116,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			JsonObject json = new JsonObject();
 			json.addProperty("correctionDescription", correctionDescription);
 			json.addProperty("processedPercentage", String.valueOf(processedPercentage));
-			
-			//TODO: Send last notification with 100% done
-			//webSocketBrokerService.sendNotification("/topic/subtitles-processing-log", json.toString());
+
 			webSocketBrokerService.sendNotificationToUser(webSocketSessionId, "/subtitles-processing-log", json.toString());
 			
 			if(properties.getSubtitlesKafakEnabled()) {
