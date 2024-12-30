@@ -4,6 +4,6 @@ import java.io.File;
 
 public interface SubtitlesFileProcessor {
 
-	File process(File storedFile, String s3KeyUUIDPrefix);
+	File process(File storedFile, String s3KeyUUIDPrefix, String webSocketSessionId);
 
 }

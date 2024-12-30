@@ -69,6 +69,7 @@ export default {
       error: null, // Error message
       fileProcessingLogs: {},
       processedPercentage: 0,
+      webSocketUserId: crypto.randomUUID(),
     };
   },
   methods: {
@@ -92,9 +93,11 @@ export default {
 
       const formData = new FormData();
       formData.append("file", this.file);
-
-      this.establishWSConnection();
+      formData.append("webSocketUserId", this.webSocketUserId);
       
+      this.fileProcessingLogs = {};
+      this.processedPercentage = 0;
+
       try {
         const response = await fetch("api/rest/1.0/upload", {
           method: "POST",
@@ -119,7 +122,8 @@ export default {
         this.loading = false;
       }
     },
-    establishWSConnection() {
+    
+    establishWSConnection(webSocketUserId) {
 
       let contextRoot = "/subtitles";
       let hostAddress = "http://localhost:8080";
@@ -127,14 +131,17 @@ export default {
         contextRoot = "";
         hostAddress = "https://subtitles-corrector.com";
       }
-      console.log("process.env.VUE_APP_ENVIRONMENT=" + process.env.VUE_APP_ENVIRONMENT);
-      console.log("Sock connection: " + hostAddress + contextRoot + "/sc-ws-connection-entrypoint");
+
+      
+
       const socket = new SockJS(hostAddress + contextRoot + "/sc-ws-connection-entrypoint"); // WebSocket endpoint
+      
       this.stompClient = new Client({
         webSocketFactory: () => socket,
         reconnectDelay: 5000,
         onConnect: this.onConnected,
         onStompError: this.onError,
+        connectHeaders: {'webSocketUserId': webSocketUserId}
       });
 
       this.stompClient.activate()
@@ -152,8 +159,12 @@ export default {
     },
     onConnected() {
       console.log("Connected to WebSocket");
-      //this.sendMessage("test");
-      this.stompClient.subscribe("/topic/subtitles-processing-log", (message) => {
+
+      const regex = /.*\/(.*)\/websocket/
+      let webSocketSessionId = regex.exec(this.stompClient.webSocket._transport.url)[1];
+
+      this.stompClient.subscribe("/user/" + webSocketSessionId + "/subtitles-processing-log", (message) => {
+        
         this.handleMessage(JSON.parse(message.body));
       });
     },
@@ -169,6 +180,11 @@ export default {
       }
     },
   },
+  mounted: function(){
+      //TODO: check if maybe there's no need to create a new socket connection every time user hits upload (but once in a http session)
+      //TODO: also maybe we need await here
+      this.establishWSConnection(this.webSocketUserId);
+  }
 }
 
 </script>

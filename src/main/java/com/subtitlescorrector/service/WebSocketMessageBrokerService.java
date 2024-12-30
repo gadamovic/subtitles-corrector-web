@@ -14,4 +14,8 @@ public class WebSocketMessageBrokerService {
         messagingTemplate.convertAndSend(destination, message);
     }
 	
+    public void sendNotificationToUser(String user, String destination, String message) {
+        messagingTemplate.convertAndSendToUser(user, destination, message);
+    }
+    
 }

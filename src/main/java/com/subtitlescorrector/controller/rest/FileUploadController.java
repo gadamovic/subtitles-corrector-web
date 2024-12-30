@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.subtitlescorrector.domain.S3BucketNames;
 import com.subtitlescorrector.service.StorageService;
+import com.subtitlescorrector.service.redis.RedisService;
 import com.subtitlescorrector.service.s3.S3Service;
 import com.subtitlescorrector.service.subtitles.SubtitlesFileProcessor;
 import com.subtitlescorrector.util.Util;
@@ -45,15 +46,21 @@ public class FileUploadController {
 	S3Service s3Service;
 	
 	@Autowired
+	RedisService redisService;
+	
+	@Autowired
 	Util util;
 	
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
 	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		
 		String s3KeyUUIDPrefix = UUID.randomUUID().toString();
-
+		
 		File storedFile = fileSystemStorageService.store(file);
-		File processedFile = processor.process(storedFile, s3KeyUUIDPrefix);
+		
+		String webSocketSessionId = redisService.getWebSocketSessionIdForUser(request.getParameter("webSocketUserId"));
+		
+		File processedFile = processor.process(storedFile, s3KeyUUIDPrefix, webSocketSessionId);
 
 		String s3Key = s3KeyUUIDPrefix + processedFile.getName();
 		

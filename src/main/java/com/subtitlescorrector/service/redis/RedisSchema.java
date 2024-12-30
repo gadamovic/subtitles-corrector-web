@@ -12,8 +12,12 @@ public class RedisSchema {
 	 * @param ip 
 	 * @return
 	 */
-	public static String createUserLastPostTimestampKey(String ip) {
+	public static String createLastS3UploadForIp(String ip) {
 		return RedisKeys.LAST_S3_UPLOAD.getKey() + "_" + ip;
+	}
+	
+	public static String createWebsocketUserIdWebSocketSessionId(String userId) {
+		return RedisKeys.WEBSOCKET_USER_ID_WEBSOCKET_SESSION_ID.getKey() + ":" + userId;
 	}
 	
 }

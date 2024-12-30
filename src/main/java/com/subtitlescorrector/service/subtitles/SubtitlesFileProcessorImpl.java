@@ -35,7 +35,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	WebSocketMessageBrokerService webSocketBrokerService;
 	
 	@Override
-	public File process(File storedFile, String s3KeyUUIDPrefix) {
+	public File process(File storedFile, String s3KeyUUIDPrefix, String webSocketSessionId) {
 		
 		Charset detectedEncoding = FileUtil.detectEncodingOfFile(storedFile);
 		List<String> lines = FileUtil.loadTextFile(storedFile);
@@ -55,28 +55,28 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			String beforeCorrection = line;
 			
 			tmp = line.replace("", "ž");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> ž", detectedEncoding, processedPercentage);
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> ž", detectedEncoding, processedPercentage, webSocketSessionId);
 			
 			tmp = beforeCorrection.replace("", "Ž");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> Ž", detectedEncoding, processedPercentage);
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> Ž", detectedEncoding, processedPercentage, webSocketSessionId);
 			
 			tmp = beforeCorrection.replace("", "š");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> š", detectedEncoding, processedPercentage);
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> š", detectedEncoding, processedPercentage, webSocketSessionId);
 			
 			tmp = beforeCorrection.replace("", "Š");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> Š", detectedEncoding, processedPercentage);
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> Š", detectedEncoding, processedPercentage, webSocketSessionId);
 	
 			tmp = beforeCorrection.replace("æ", "ć");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "æ -> Š", detectedEncoding, processedPercentage);
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "æ -> Š", detectedEncoding, processedPercentage, webSocketSessionId);
 			
 			tmp = beforeCorrection.replace("Æ", "Ć");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "Æ -> Š", detectedEncoding, processedPercentage);
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "Æ -> Š", detectedEncoding, processedPercentage, webSocketSessionId);
 	
 			tmp = beforeCorrection.replace("è", "č");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "è -> Š", detectedEncoding, processedPercentage);
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "è -> Š", detectedEncoding, processedPercentage, webSocketSessionId);
 			
 			tmp = beforeCorrection.replace("È", "Č");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "È -> Č", detectedEncoding, processedPercentage);
+			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "È -> Č", detectedEncoding, processedPercentage, webSocketSessionId);
 			
 			correctedLines.add(beforeCorrection);
 		}
@@ -91,7 +91,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		return correctedFile;
 	}
 
-	private String checkForChanges(String s3Key, String afterCorrection, String beforeCorrection, String correctionDescription, Charset detectedEncoding, float processedPercentage) {
+	private String checkForChanges(String s3Key, String afterCorrection, String beforeCorrection, String correctionDescription, Charset detectedEncoding, float processedPercentage, String webSocketSessionId) {
 		if(!afterCorrection.equals(beforeCorrection)) {
 			log.info("Correction applied: " + correctionDescription);
 			
@@ -106,7 +106,8 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			json.addProperty("processedPercentage", String.valueOf(processedPercentage));
 			
 			//TODO: Send last notification with 100% done
-			webSocketBrokerService.sendNotification("/topic/subtitles-processing-log", json.toString());
+			//webSocketBrokerService.sendNotification("/topic/subtitles-processing-log", json.toString());
+			webSocketBrokerService.sendNotificationToUser(webSocketSessionId, "/subtitles-processing-log", json.toString());
 			
 			if(properties.getSubtitlesKafakEnabled()) {
 				producer.generateCorrectionEvent(event);
