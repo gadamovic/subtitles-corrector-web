@@ -68,6 +68,7 @@ public class S3ServiceImpl implements S3Service {
 		if(!properties.isProdEnvironment()) {
 			response.setDownloadUrl("https://subtitles-corrector.com");
 			response.setStatus(SubtitlesProcessingStatus.SUCCESS_DEVELOPMENT);
+			return response;
 		}
 		
 		
