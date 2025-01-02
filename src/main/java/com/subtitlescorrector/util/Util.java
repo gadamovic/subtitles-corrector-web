@@ -5,21 +5,22 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.apache.commons.io.input.BufferedFileChannelInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.io.Files;
+import com.google.gson.JsonObject;
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
+import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
+
+import io.micrometer.common.util.StringUtils;
 
 @Component
 public class Util {
@@ -110,6 +111,25 @@ public class Util {
 	//NON-STATIC method!
 	public String makeFilenameForDownloadFromS3Key(String s3Key) {
 		return properties.getSubtitleCorrectionProcessedFileNamePrefix() + s3Key.substring(s3Key.indexOf('_') + 1);
+	}
+	
+	/**
+	 * Custom json serialization of SubtitlesCorrectionEvent because it is an avro-generated class and contains many fields
+	 * @param event
+	 * @return
+	 */
+	public static String subtitleCorrectionEventToJson(SubtitleCorrectionEvent event) {
+		
+		JsonObject json = new JsonObject();
+		if(event.getCorrection() != null) {
+			json.addProperty("correctionDescription", event.getCorrection().toString());
+		}
+		
+		if(event.getProcessedPercentage() != null) {
+			json.addProperty("processedPercentage", event.getProcessedPercentage().toString());
+		}
+		return json.toString();
+		
 	}
 
 }

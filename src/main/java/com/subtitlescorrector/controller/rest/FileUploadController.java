@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.domain.S3BucketNames;
 import com.subtitlescorrector.service.S3ServiceMonitor;
 import com.subtitlescorrector.service.StorageService;
@@ -55,12 +56,15 @@ public class FileUploadController {
 	@Autowired
 	S3ServiceMonitor monitor;
 	
+	@Autowired
+	ApplicationProperties properties;
+	
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
 	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		
 		
 		String clientIp = request.getRemoteAddr();
-		if(!monitor.subtitleCorrectionAllowedForUser(clientIp)) {
+		if(properties.isProdEnvironment() && !monitor.subtitleCorrectionAllowedForUser(clientIp)) {
 			return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Users are allowed to process one subtitle every two minutes!");
 		}else {
 			redisService.updateLastS3UploadTimestamp(clientIp);
@@ -75,6 +79,10 @@ public class FileUploadController {
 		File processedFile = processor.process(storedFile, s3KeyUUIDPrefix, webSocketSessionId);
 
 		String s3Key = s3KeyUUIDPrefix + processedFile.getName();
+		
+		if(!properties.isProdEnvironment()) {
+			return ResponseEntity.ok("http://www.dummyurl.com");
+		}
 		
 		log.info("Attempting upload to s3...");
 		s3Service.uploadFileToS3(s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), processedFile);

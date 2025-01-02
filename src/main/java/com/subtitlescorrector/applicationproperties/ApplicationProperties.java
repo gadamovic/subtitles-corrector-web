@@ -106,7 +106,7 @@ public class ApplicationProperties {
 	}
 	
 	public Boolean getSubtitlesKafakEnabled() {
-		return Boolean.parseBoolean(SUBTITLES_KAFKA_ENABLED);
+		return Boolean.parseBoolean(getProperty(SUBTITLES_KAFKA_ENABLED));
 	}
 	
 	public Boolean isProdEnvironment() {

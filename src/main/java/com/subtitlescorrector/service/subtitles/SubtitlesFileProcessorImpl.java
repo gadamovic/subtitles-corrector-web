@@ -10,6 +10,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonObject;
@@ -18,6 +19,7 @@ import com.subtitlescorrector.controller.rest.FileUploadController;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 import com.subtitlescorrector.producers.SubtitleCorrectionEventProducer;
 import com.subtitlescorrector.service.WebSocketMessageBrokerService;
+import com.subtitlescorrector.util.Constants;
 import com.subtitlescorrector.util.FileUtil;
 
 @Component
@@ -26,13 +28,13 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	Logger log = LoggerFactory.getLogger(FileUploadController.class);
 	
 	@Autowired
-	SubtitleCorrectionEventProducer producer;
-	
-	@Autowired
 	ApplicationProperties properties;
 	
 	@Autowired
 	WebSocketMessageBrokerService webSocketBrokerService;
+	
+	@Autowired
+	KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate;
 	
 	@Override
 	public File process(File storedFile, String s3KeyUUIDPrefix, String webSocketSessionId) {
@@ -98,9 +100,11 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			Thread.sleep(20);
 		} catch (InterruptedException e) {}
 		
-		JsonObject json = new JsonObject();
-		json.addProperty("processedPercentage", "100");
-		webSocketBrokerService.sendNotificationToUser(webSocketSessionId, "/subtitles-processing-log", json.toString());
+		SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
+		event.setWebSocketSessionId(webSocketSessionId);
+		event.setProcessedPercentage("100");
+		kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
+
 	}
 
 	private String checkForChanges(String s3Key, String afterCorrection, String beforeCorrection, String correctionDescription, Charset detectedEncoding, float processedPercentage, String webSocketSessionId) {
@@ -112,15 +116,11 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			event.setEventTimestamp(Instant.now());
 			event.setDetectedEncoding(detectedEncoding.displayName());
 			event.setFileId(s3Key);
-			
-			JsonObject json = new JsonObject();
-			json.addProperty("correctionDescription", correctionDescription);
-			json.addProperty("processedPercentage", String.valueOf(processedPercentage));
-
-			webSocketBrokerService.sendNotificationToUser(webSocketSessionId, "/subtitles-processing-log", json.toString());
+			event.setProcessedPercentage(String.valueOf(processedPercentage));
+			event.setWebSocketSessionId(webSocketSessionId);
 			
 			if(properties.getSubtitlesKafakEnabled()) {
-				producer.generateCorrectionEvent(event);
+				kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
 			}
 			
 		}

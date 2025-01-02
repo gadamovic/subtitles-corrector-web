@@ -11,7 +11,7 @@
         </div>
       </div>
 
-      <GenericButton :loading="loading" button_text="Upload"></GenericButton>
+      <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled"></GenericButton>
     </form>
 
     <!-- Download Link -->
@@ -70,12 +70,27 @@ export default {
       fileProcessingLogs: {},
       processedPercentage: 0,
       webSocketUserId: crypto.randomUUID(),
+      upload_button_enabled: true
     };
   },
   methods: {
     handleFileChange(event) {
       // Capture the selected file
       this.file = event.target.files[0];
+
+      const allowedExtensions = ['.srt', '.sub', '.txt'];
+      const fileName = this.file.name.toLowerCase();
+      const isValid = allowedExtensions.some(ext => fileName.endsWith(ext));
+
+      if (!isValid) {
+        this.error = 'Invalid file type. Please upload a .srt, .sub, or .txt file.';
+        this.upload_button_enabled = false;
+        event.target.value = ''; // Clear the input
+        this.file = null;
+      }else{
+        this.error = '';
+        this.upload_button_enabled = true;
+      }
     },
     async handleSubmit() {
 

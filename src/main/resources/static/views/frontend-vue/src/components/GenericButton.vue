@@ -17,7 +17,8 @@
 export default{
     props: {
         loading: Boolean,
-        button_text: String
+        button_text: String,
+        enabled: Boolean
     },
     name: "GenericButton",
     loading: false, // Loading state

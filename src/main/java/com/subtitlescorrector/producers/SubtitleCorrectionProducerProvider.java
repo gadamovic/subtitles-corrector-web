@@ -12,7 +12,8 @@ import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 
-@Component
+//@Component
+@Deprecated
 public class SubtitleCorrectionProducerProvider {
 
 	private Producer<Long, SubtitleCorrectionEvent> producer = null;

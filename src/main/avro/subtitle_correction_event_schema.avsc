@@ -5,8 +5,9 @@
   "fields": [
     {
       "name": "fileId",
-      "type": "string",
-      "doc": "Id of the subtitles file"
+      "type": ["null","string"],
+      "doc": "Id of the subtitles file",
+      "default": null
     },
     {
    	 "name": "eventTimestamp",
@@ -24,9 +25,21 @@
     },
     {
       "name": "correction",
-      "type": "string",
-      "doc": "Explanation of the correction applied to the subtitle"
+      "type": ["null","string"],
+      "doc": "Explanation of the correction applied to the subtitle",
+      "default": null
+    },
+    {
+    	"name": "processedPercentage",
+    	"type": ["null","string"],
+    	"doc": "What percentage of file is processed with the current correction",
+    	"default": null
+    },
+    {
+    	"name": "webSocketSessionId",
+    	"type": ["null","string"],
+    	"doc": "Web socket session id of the user that started this correction",
+    	"default": null
     }
-     
   ]
 }
