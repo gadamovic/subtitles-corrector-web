@@ -1,10 +1,10 @@
 package com.subtitlescorrector.service.subtitles;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.ArrayList;
+import java.nio.file.Files;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -13,119 +13,86 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import com.google.gson.JsonObject;
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.controller.rest.FileUploadController;
+import com.subtitlescorrector.domain.SubtitlesFileProcessorResponse;
+import com.subtitlescorrector.domain.SubtitlesProcessingStatus;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
-import com.subtitlescorrector.producers.SubtitleCorrectionEventProducer;
-import com.subtitlescorrector.service.WebSocketMessageBrokerService;
+import com.subtitlescorrector.service.CorrectorsManager;
+import com.subtitlescorrector.service.s3.S3Service;
+import com.subtitlescorrector.service.subtitles.corrections.Corrector;
 import com.subtitlescorrector.util.Constants;
 import com.subtitlescorrector.util.FileUtil;
+import com.subtitlescorrector.util.Util;
 
 @Component
 public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 
 	Logger log = LoggerFactory.getLogger(FileUploadController.class);
-	
+
 	@Autowired
 	ApplicationProperties properties;
-	
-	@Autowired
-	WebSocketMessageBrokerService webSocketBrokerService;
-	
+
 	@Autowired
 	KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate;
-	
+
+	@Autowired
+	CorrectorsManager correctorsManager;
+
+	@Autowired
+	S3Service s3Service;
+
+	@Autowired
+	Util util;
+
 	@Override
-	public File process(File storedFile, String s3KeyUUIDPrefix, String webSocketSessionId) {
-		
-		Charset detectedEncoding = FileUtil.detectEncodingOfFile(storedFile);
-		List<String> lines = FileUtil.loadTextFile(storedFile);
-		List<String> correctedLines = new ArrayList<>();
-		int numberOfLines = lines.size();
-		int currentLineNumber = 0;
-		float processedPercentage = 0f;
-				
-		for(String line : lines) {
-			
-			currentLineNumber ++;
-			processedPercentage = ((float) currentLineNumber / (float) numberOfLines) * 100;
-			
-			String tmp = "";
-			String beforeCorrection = line;
-			
-			tmp = line.replace("", "ž");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> ž", detectedEncoding, processedPercentage, webSocketSessionId);
-			
-			tmp = beforeCorrection.replace("", "Ž");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> Ž", detectedEncoding, processedPercentage, webSocketSessionId);
-			
-			tmp = beforeCorrection.replace("", "š");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> š", detectedEncoding, processedPercentage, webSocketSessionId);
-			
-			tmp = beforeCorrection.replace("", "Š");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "\"\" -> Š", detectedEncoding, processedPercentage, webSocketSessionId);
-	
-			tmp = beforeCorrection.replace("æ", "ć");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "æ -> Š", detectedEncoding, processedPercentage, webSocketSessionId);
-			
-			tmp = beforeCorrection.replace("Æ", "Ć");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "Æ -> Š", detectedEncoding, processedPercentage, webSocketSessionId);
-	
-			tmp = beforeCorrection.replace("è", "č");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "è -> Š", detectedEncoding, processedPercentage, webSocketSessionId);
-			
-			tmp = beforeCorrection.replace("È", "Č");
-			beforeCorrection = checkForChanges(s3KeyUUIDPrefix + storedFile.getName(), tmp, beforeCorrection, "È -> Č", detectedEncoding, processedPercentage, webSocketSessionId);
-			
-			correctedLines.add(beforeCorrection);
-		}
-		
-		sendProcessingFinishedMessage(webSocketSessionId);
-		
+	public SubtitlesFileProcessorResponse process(File storedFile, String webSocketSessionId) {
+
 		File correctedFile = new File(storedFile.getName());
-		
-		if(detectedEncoding != StandardCharsets.UTF_8) {
-			log.info("Updated encoding of: {} to UTF-8!", storedFile.getName());
-		}
-		
-		FileUtil.writeLinesToFile(correctedFile, correctedLines, StandardCharsets.UTF_8);
-		return correctedFile;
-	}
+		SubtitlesFileProcessorResponse response = new SubtitlesFileProcessorResponse();
 
-	private void sendProcessingFinishedMessage(String webSocketSessionId) {
-		
-		//wait a bit so this is the last progress update message
 		try {
-			Thread.sleep(20);
-		} catch (InterruptedException e) {}
-		
-		SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
-		event.setWebSocketSessionId(webSocketSessionId);
-		event.setProcessedPercentage("100");
-		kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
 
-	}
+			Charset detectedEncoding = FileUtil.detectEncodingOfFile(storedFile);
+			List<String> lines = FileUtil.loadTextFile(storedFile);
 
-	private String checkForChanges(String s3Key, String afterCorrection, String beforeCorrection, String correctionDescription, Charset detectedEncoding, float processedPercentage, String webSocketSessionId) {
-		if(!afterCorrection.equals(beforeCorrection)) {
-			log.info("Correction applied: " + correctionDescription);
-			
-			SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
-			event.setCorrection(correctionDescription);
-			event.setEventTimestamp(Instant.now());
-			event.setDetectedEncoding(detectedEncoding.displayName());
-			event.setFileId(s3Key);
-			event.setProcessedPercentage(String.valueOf(processedPercentage));
-			event.setWebSocketSessionId(webSocketSessionId);
-			
-			if(properties.getSubtitlesKafakEnabled()) {
-				kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
+			for (Corrector corrector : correctorsManager.getCorrectors()) {
+				lines = corrector.correct(lines, webSocketSessionId);
 			}
-			
+
+			if (detectedEncoding != StandardCharsets.UTF_8) {
+				updateEncoding(storedFile, webSocketSessionId, detectedEncoding);
+			}
+
+			FileUtil.writeLinesToFile(correctedFile, lines, StandardCharsets.UTF_8);
+
+			response = s3Service.uploadAndGetDownloadUrl(correctedFile);
+
+		} catch (Exception e) {
+			log.error("Error processing file!", e);
+		} finally {
+			deleteFiles(storedFile, correctedFile);
 		}
 
-		return afterCorrection;
+		return response;
+	}
+
+	private void deleteFiles(File storedFile, File correctedFile) {
+		try {
+			Files.delete(storedFile.toPath());
+			Files.delete(correctedFile.toPath());
+		} catch (IOException e) {
+			log.error("Error deleting files!", e);
+		}
+	}
+
+	private void updateEncoding(File storedFile, String webSocketSessionId, Charset detectedEncoding) {
+		log.info("Updated encoding of: {} to UTF-8!", storedFile.getName());
+
+		SubtitleCorrectionEvent encodingUpdate = new SubtitleCorrectionEvent();
+		encodingUpdate.setCorrection("Encoding updated: " + detectedEncoding + " -> UTF-8");
+		encodingUpdate.setWebSocketSessionId(webSocketSessionId);
+		kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, encodingUpdate);
 	}
 
 }

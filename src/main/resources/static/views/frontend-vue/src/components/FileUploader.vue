@@ -173,7 +173,9 @@ export default {
           }
       }
 
-      this.processedPercentage = message.processedPercentage;
+      if(message.processedPercentage){
+        this.processedPercentage = message.processedPercentage;
+      }
     },
     onConnected() {
       console.log("Connected to WebSocket");
@@ -199,8 +201,6 @@ export default {
     },
   },
   mounted: function(){
-      //TODO: check if maybe there's no need to create a new socket connection every time user hits upload (but once in a http session)
-      //TODO: also maybe we need await here
       this.establishWSConnection(this.webSocketUserId);
   }
 }

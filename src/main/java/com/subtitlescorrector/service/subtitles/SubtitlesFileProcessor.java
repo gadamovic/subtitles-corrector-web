@@ -2,8 +2,10 @@ package com.subtitlescorrector.service.subtitles;
 
 import java.io.File;
 
+import com.subtitlescorrector.domain.SubtitlesFileProcessorResponse;
+
 public interface SubtitlesFileProcessor {
 
-	File process(File storedFile, String s3KeyUUIDPrefix, String webSocketSessionId);
+	SubtitlesFileProcessorResponse process(File storedFile, String webSocketSessionId);
 
 }

@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.domain.S3BucketNames;
+import com.subtitlescorrector.domain.SubtitlesFileProcessorResponse;
 import com.subtitlescorrector.service.S3ServiceMonitor;
 import com.subtitlescorrector.service.StorageService;
 import com.subtitlescorrector.service.redis.RedisService;
@@ -43,15 +44,9 @@ public class FileUploadController {
 	
 	@Autowired
 	SubtitlesFileProcessor processor;
-	
-	@Autowired
-	S3Service s3Service;
-	
+		
 	@Autowired
 	RedisService redisService;
-	
-	@Autowired
-	Util util;
 	
 	@Autowired
 	S3ServiceMonitor monitor;
@@ -69,42 +64,11 @@ public class FileUploadController {
 		}else {
 			redisService.updateLastS3UploadTimestamp(clientIp);
 		}
-		
-		String s3KeyUUIDPrefix = UUID.randomUUID().toString();
-		
+				
 		File storedFile = fileSystemStorageService.store(file);
-		
 		String webSocketSessionId = redisService.getWebSocketSessionIdForUser(request.getParameter("webSocketUserId"));
-		
-		File processedFile = processor.process(storedFile, s3KeyUUIDPrefix, webSocketSessionId);
-
-		String s3Key = s3KeyUUIDPrefix + processedFile.getName();
-		
-		if(!properties.isProdEnvironment()) {
-			return ResponseEntity.ok("http://www.dummyurl.com");
-		}
-		
-		log.info("Attempting upload to s3...");
-		s3Service.uploadFileToS3(s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), processedFile);
-		
-		try {
-			Files.delete(storedFile.toPath());
-			Files.delete(processedFile.toPath());
-		} catch (IOException e) {
-			log.error("Error deleting files!",e);
-		}
-		
-		S3Presigner presigner = S3Presigner.create();
-		GetObjectPresignRequest getObjectRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(15))
-                .getObjectRequest(r -> r.bucket(S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName())
-                					    .key(s3Key)
-                					    .responseContentDisposition("attachment; filename=\"" + util.makeFilenameForDownloadFromS3Key(s3Key) +"\""))
-                .build();
-
-        PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(getObjectRequest);
-        
-		return ResponseEntity.ok(presignedRequest.url().toString());
+		SubtitlesFileProcessorResponse response = processor.process(storedFile, webSocketSessionId);
+		return ResponseEntity.ok(response.getDownloadUrl());
 		
 	}
 }
