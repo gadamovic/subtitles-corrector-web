@@ -3,12 +3,19 @@
   <div class="container">
 
     <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="box" style="background-color: #004266;">
-      <div class="field">
-        <label class="label has-text-white">Choose a subtitle file:</label>
-        <div class="control">
-          <input class="input" type="file" id="file_upload" name="file" accept=".srt, .sub, .txt"
-            @change="handleFileChange" />
-        </div>
+
+      <label class="label has-text-white">Upload a subtitle file:</label> <br/>
+      <div class="file has-name is-fullwidth">
+        <label class="file-label">
+          <input class="file-input" type="file" name="file" accept=".srt, .sub, .txt" @change="handleFileChange" />
+          <span class="file-cta">
+            <span class="file-icon">
+              <i class="fas fa-upload"></i>
+            </span>
+            <span class="file-label"> Choose a file… </span>
+          </span>
+          <span class="file-name" style="background-color: white;"><div v-if="this.file">{{ this.file.name }}</div></span>
+        </label>
       </div>
 
       <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled"></GenericButton>
@@ -21,10 +28,11 @@
       </a>
     </div>
 
-    <div class="box" style="background-color: #004266; margin-bottom: 24px;" v-if="Object.keys(fileProcessingLogs).length > 0">
+    <div class="box" style="background-color: #004266; margin-bottom: 24px;"
+      v-if="Object.keys(fileProcessingLogs).length > 0">
 
       <div class="label has-text-white">
-          Changes applied:
+        Changes applied:
       </div>
 
       <div class="label" v-for="(value, key) in fileProcessingLogs" :key="key">

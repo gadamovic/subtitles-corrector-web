@@ -1,7 +1,9 @@
 <template>
   <div class="content">
     <div  class="section">
-      <HeadingComponent first_line="Subtitles corrector" second_line="An app that fixes character encoding and formatting issues in subtitle files, ensuring they're clean and ready for use"/>
+      <HeadingComponent first_line="Subtitles corrector" 
+                        second_line="An app that fixes character encoding and formatting issues in subtitle files, ensuring they're clean and ready for use"
+                        heading_link="https://subtitles-corrector.com"/>
       <FileUploader/>
       <ContactForm/>
     </div>
@@ -16,6 +18,7 @@ import ContactForm from './components/ContactForm.vue';
 import FileUploader from './components/FileUploader.vue';
 import FooterComponent from'./components/FooterComponent.vue';
 import HeadingComponent from './components/HeadingComponent.vue';
+import '@fortawesome/fontawesome-free/css/all.css';
 export default {
   name: "App",
   components: {
