@@ -2,7 +2,9 @@ package com.subtitlescorrector.service.redis;
 
 public enum RedisKeys {
 
-	LAST_S3_UPLOAD("cache:last_s3_upload"), WEBSOCKET_USER_ID_WEBSOCKET_SESSION_ID("cache:websocket_user_id_websocket_session_id");
+	LAST_S3_UPLOAD("cache:last_s3_upload"),
+	WEBSOCKET_USER_ID_WEBSOCKET_SESSION_ID("cache:websocket_user_id_websocket_session_id"),
+	NUMBER_OF_EMAILS_PER_HOUR("cache:number_emails_per_hour");
 
 	RedisKeys(String key) {
 		this.key = key;

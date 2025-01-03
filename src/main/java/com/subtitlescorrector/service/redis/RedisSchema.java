@@ -1,5 +1,8 @@
 package com.subtitlescorrector.service.redis;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 /**
  * 
  * @author Gavrilo Adamovic
@@ -18,6 +21,19 @@ public class RedisSchema {
 	
 	public static String createWebsocketUserIdWebSocketSessionId(String userId) {
 		return RedisKeys.WEBSOCKET_USER_ID_WEBSOCKET_SESSION_ID.getKey() + ":" + userId;
+	}
+	
+	public static String createNumberOfEmailsSentInCurrentHour() {
+		return RedisKeys.NUMBER_OF_EMAILS_PER_HOUR.getKey() + "_" + getCurrentDateAndHour();
+	}
+
+	private static String getCurrentDateAndHour() {
+		
+		LocalDateTime now = LocalDateTime.now();
+		
+		String key = now.format(DateTimeFormatter.ofPattern("YYYY-MM-dd-HH"));
+		
+		return key;
 	}
 	
 }

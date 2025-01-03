@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import io.micrometer.common.util.StringUtils;
 import redis.clients.jedis.Jedis;
 
 @Service
@@ -14,7 +15,8 @@ public class RedisServiceImpl implements RedisService {
 	RedisConnectionProvider redisConnection;
 	
 	private static final int S3_LAST_UPLOAD_CACHE_TTL = 3600;
-	private static final int USER_WEBSOCKET_SESSION_CACHE_TTL = 10800;
+	private static final int USER_WEBSOCKET_SESSION_CACHE_TTL = 60 * 60 * 3;
+	private static final int NUMBER_OF_EMAILS_CACHE_TTL = 60 * 60 * 3;
 	
 	@Override
 	public void updateLastS3UploadTimestamp(String ip) {
@@ -47,6 +49,27 @@ public class RedisServiceImpl implements RedisService {
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
 			return jedis.get(RedisSchema.createWebsocketUserIdWebSocketSessionId(userId));
 		}
+	}
+	
+	@Override
+	public Integer getAndIncrementNumberOfEmailsInCurrentHour() {
+		
+		Integer numberOfEmailsInt = null;
+		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
+			String numberOfEmails = jedis.get(RedisSchema.createNumberOfEmailsSentInCurrentHour());
+			
+			if(StringUtils.isNotBlank(numberOfEmails)) {
+				numberOfEmailsInt = Integer.parseInt(numberOfEmails);
+				numberOfEmailsInt++;
+				jedis.setex(RedisSchema.createNumberOfEmailsSentInCurrentHour(), NUMBER_OF_EMAILS_CACHE_TTL, numberOfEmailsInt.toString());
+			}else {
+				jedis.setex(RedisSchema.createNumberOfEmailsSentInCurrentHour(), NUMBER_OF_EMAILS_CACHE_TTL, "1");
+				numberOfEmailsInt = 1;
+			}
+			
+			
+		}
+		return numberOfEmailsInt;
 	}
 	
 }

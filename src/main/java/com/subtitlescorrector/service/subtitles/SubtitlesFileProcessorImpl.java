@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Component;
 
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
@@ -44,6 +46,9 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 
 	@Autowired
 	Util util;
+	
+	@Autowired
+	MailSender mailSender;
 
 	@Override
 	public SubtitlesFileProcessorResponse process(File storedFile, String webSocketSessionId) {

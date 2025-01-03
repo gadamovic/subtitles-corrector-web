@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.domain.S3BucketNames;
 import com.subtitlescorrector.domain.SubtitlesFileProcessorResponse;
+import com.subtitlescorrector.service.EmailService;
 import com.subtitlescorrector.service.S3ServiceMonitor;
 import com.subtitlescorrector.service.StorageService;
 import com.subtitlescorrector.service.redis.RedisService;
@@ -54,11 +55,16 @@ public class FileUploadController {
 	@Autowired
 	ApplicationProperties properties;
 	
+	@Autowired
+	EmailService emailService;
+	
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
 	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		
 		
 		String clientIp = request.getRemoteAddr();
+		emailService.sendEmailOnlyIfProduction("Ip: " + clientIp + "\nFilename: " + file.getOriginalFilename(), properties.getAdminEmailAddress(), "Somebody is uploading a subtitle!");
+		
 		if(properties.isProdEnvironment() && !monitor.subtitleCorrectionAllowedForUser(clientIp)) {
 			return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Users are allowed to process one subtitle every two minutes!");
 		}else {
