@@ -63,7 +63,6 @@ public class FileUploadController {
 		
 		
 		String clientIp = request.getRemoteAddr();
-		emailService.sendEmailOnlyIfProduction("Ip: " + clientIp + "\nFilename: " + file.getOriginalFilename(), properties.getAdminEmailAddress(), "Somebody is uploading a subtitle!");
 		
 		if(properties.isProdEnvironment() && !monitor.subtitleCorrectionAllowedForUser(clientIp)) {
 			return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Users are allowed to process one subtitle every two minutes!");
@@ -74,6 +73,9 @@ public class FileUploadController {
 		File storedFile = fileSystemStorageService.store(file);
 		String webSocketSessionId = redisService.getWebSocketSessionIdForUser(request.getParameter("webSocketUserId"));
 		SubtitlesFileProcessorResponse response = processor.process(storedFile, webSocketSessionId);
+
+		emailService.sendEmailOnlyIfProduction("Ip: " + clientIp + "\nFilename: " + file.getOriginalFilename(), properties.getAdminEmailAddress(), "Somebody is uploading a subtitle!");
+
 		return ResponseEntity.ok(response.getDownloadUrl());
 		
 	}

@@ -184,9 +184,15 @@ export default {
     onConnected() {
       console.log("Connected to WebSocket");
 
+      
       const regex = /.*\/(.*)\/websocket/
-      let webSocketSessionId = regex.exec(this.stompClient.webSocket._transport.url)[1];
-
+      let webSocketSessionId = "";
+      try{
+        webSocketSessionId = regex.exec(this.stompClient.webSocket._transport.url)[1];
+      }catch(errormsg){
+        console.error(errormsg);
+        console.log(this.stompClient.webSocket._transport.url);
+      }
       this.stompClient.subscribe("/user/" + webSocketSessionId + "/subtitles-processing-log", (message) => {
         
         this.handleMessage(JSON.parse(message.body));
