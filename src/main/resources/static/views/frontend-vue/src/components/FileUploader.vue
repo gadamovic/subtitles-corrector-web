@@ -1,7 +1,5 @@
 <template>
 
-  <div class="container">
-
     <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="box" style="background-color: #004266;">
 
       <label class="label has-text-white">Upload a subtitle file:</label> <br/>
@@ -53,8 +51,6 @@
     <div class="notification is-danger" style="margin-bottom: 24px;" v-if="error">
       {{ error }}
     </div>
-
-  </div>
 
 </template>
 

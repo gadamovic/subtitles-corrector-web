@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <div  class="section">
+    <div class="section">
       <HeadingComponent first_line="Subtitles corrector" 
                         second_line="An app that fixes character encoding and formatting issues in subtitle files, ensuring they're clean and ready for use"
                         heading_link="https://subtitles-corrector.com"/>
@@ -38,11 +38,23 @@ export default {
   text-align: center;
 }
 
-img {
-  margin: 10px auto;
+body:after{
+  content: "beta";
+  position: fixed;
+  width: 80px;
+  height: 25px;
+  background: #004266;
+  top: 7px;
+  left: -20px;
+  text-align: center;
+  font-size: 13px;
+  font-family: sans-serif;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: #fff;
+  line-height: 27px;
+  transform:rotate(-45deg);
 }
 
-form {
-  margin-bottom: 20px;
-}
+
 </style>
