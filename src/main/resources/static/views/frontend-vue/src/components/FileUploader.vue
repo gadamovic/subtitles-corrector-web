@@ -2,7 +2,7 @@
 
     <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="box" style="background-color: #004266;">
 
-      <label class="label has-text-white">Upload a subtitle file:</label> <br/>
+      <label class="label has-text-white">Upload a subtitle file (srt, sub or txt):</label> <br/>
       <div class="file has-name is-fullwidth field">
         <label class="file-label">
           <input class="file-input" type="file" name="file" accept=".srt, .sub, .txt" @change="handleFileChange" />
