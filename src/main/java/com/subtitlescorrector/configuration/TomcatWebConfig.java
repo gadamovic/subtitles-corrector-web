@@ -2,6 +2,7 @@ package com.subtitlescorrector.configuration;
 
 import java.io.File;
 
+import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.Ssl;
@@ -43,10 +44,12 @@ public class TomcatWebConfig implements WebServerFactoryCustomizer<TomcatServlet
 				connector.setPort(TLS_PORT);
 			});
 			
-			factory.addConnectorCustomizers(connector -> {
-				connector.setScheme(HTTP_SCHEME);
-				connector.setPort(NON_TLS_PORT);
-			});
+	        Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
+	        connector.setScheme(HTTP_SCHEME);
+	        connector.setPort(NON_TLS_PORT);
+	        connector.setSecure(false);
+			
+			factory.addAdditionalTomcatConnectors();
 
 			Ssl ssl = new Ssl();
 			ssl.setKeyStore(new File(properties.getKeystoreLocation()).getAbsolutePath());
