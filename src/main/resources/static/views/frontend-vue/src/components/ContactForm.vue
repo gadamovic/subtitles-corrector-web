@@ -5,11 +5,11 @@
         <div class="field">
             <label class="label has-text-white">Noticed a subtitle problem that Subtitles Corrector doesn't fix? Have a feedback or suggestion?
                 Let us know!</label> <br/>
-            <input placeholder="Email" class="input" type="email" id="email" name="email" @change="handleEmailChange"/>
+            <input placeholder="Email" class="input" type="email" id="email" name="email" @change="handleEmailChange" required/>
         </div>
 
         <div class="field">
-            <textarea class="textarea" placeholder = "Description" type="text" id="description" name="description" @change="handleDescriptionChange"></textarea>
+            <textarea class="textarea" placeholder = "Description" type="text" id="description" name="description" @change="handleDescriptionChange" required></textarea>
         </div>
 
         <GenericButton button_text="Submit" :loading="this.loading"/>
