@@ -44,12 +44,12 @@ public class TomcatWebConfig implements WebServerFactoryCustomizer<TomcatServlet
 				connector.setPort(TLS_PORT);
 			});
 			
-	        Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
-	        connector.setScheme(HTTP_SCHEME);
-	        connector.setPort(NON_TLS_PORT);
-	        connector.setSecure(false);
+	        Connector httpConnector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
+	        httpConnector.setScheme(HTTP_SCHEME);
+	        httpConnector.setPort(NON_TLS_PORT);
+	        httpConnector.setSecure(false);
 			
-			factory.addAdditionalTomcatConnectors();
+			factory.addAdditionalTomcatConnectors(httpConnector);
 
 			Ssl ssl = new Ssl();
 			ssl.setKeyStore(new File(properties.getKeystoreLocation()).getAbsolutePath());
