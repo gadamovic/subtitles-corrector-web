@@ -15,8 +15,12 @@ import com.subtitlescorrector.domain.VariablesEnum;
 public class TomcatWebConfig implements WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
 
 	private static final int TLS_PORT = 8443;
-	private static final String SCHEME = "https";
+	private static final String HTTPS_SCHEME = "https";
 	private static final String PKCS12_KEYSTORE_TYPE = "PKCS12";
+	
+	private static final int NON_TLS_PORT = 8080;
+	private static final String HTTP_SCHEME = "http";
+	
 	@Autowired
 	ApplicationProperties properties;
 
@@ -34,9 +38,14 @@ public class TomcatWebConfig implements WebServerFactoryCustomizer<TomcatServlet
 		if (properties.getTlsEnabled()) {
 
 			factory.addConnectorCustomizers(connector -> {
-				connector.setScheme(SCHEME);
+				connector.setScheme(HTTPS_SCHEME);
 				connector.setSecure(true);
 				connector.setPort(TLS_PORT);
+			});
+			
+			factory.addConnectorCustomizers(connector -> {
+				connector.setScheme(HTTP_SCHEME);
+				connector.setPort(NON_TLS_PORT);
 			});
 
 			Ssl ssl = new Ssl();
