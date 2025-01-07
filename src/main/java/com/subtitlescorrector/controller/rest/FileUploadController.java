@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
+import java.util.List;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -59,13 +60,13 @@ public class FileUploadController {
 	EmailService emailService;
 	
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
-	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+	public ResponseEntity<List<String>> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		
 		
 		String clientIp = request.getRemoteAddr();
 		
 		if(properties.isProdEnvironment() && !monitor.subtitleCorrectionAllowedForUser(clientIp)) {
-			return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Users are allowed to process one subtitle every two minutes!");
+			return null;//ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Users are allowed to process one subtitle every two minutes!");
 		}else {
 			redisService.updateLastS3UploadTimestamp(clientIp);
 		}
@@ -76,7 +77,7 @@ public class FileUploadController {
 
 		emailService.sendEmailOnlyIfProduction("Ip: " + clientIp + "\nFilename: " + file.getOriginalFilename(), properties.getAdminEmailAddress(), "Somebody is uploading a subtitle!");
 
-		return ResponseEntity.ok(response.getDownloadUrl());
+		return ResponseEntity.ok(response.getLines());
 		
 	}
 }

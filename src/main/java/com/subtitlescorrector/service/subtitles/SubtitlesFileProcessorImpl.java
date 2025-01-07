@@ -72,8 +72,9 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			FileUtil.writeLinesToFile(correctedFile, lines, StandardCharsets.UTF_8);
 
 			response = s3Service.uploadAndGetDownloadUrl(correctedFile);
-
-		} catch (Exception e) {
+			response.setLines(lines);
+			
+		}catch (Exception e) {
 			log.error("Error processing file!", e);
 		} finally {
 			deleteFiles(storedFile, correctedFile);

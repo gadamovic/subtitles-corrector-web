@@ -1,5 +1,7 @@
 <template>
 
+  <ModalComponent :content="lines" :modalActive="showModal" @closeModal="onCloseModal" @showModal="onShowModal"></ModalComponent>
+
     <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="box" style="background-color: #004266;">
 
       <label class="label has-text-white">Upload a subtitle file (srt, sub or txt):</label> <br/>
@@ -59,11 +61,12 @@
 import GenericButton from './GenericButton.vue';
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
+import ModalComponent from './ModalComponent.vue';
 
 export default {
   name: "FileUploader",
   components: {
-    GenericButton,
+    GenericButton, ModalComponent
   },
   data() {
     return {
@@ -71,6 +74,8 @@ export default {
       loading: false, // Loading state
       downloadLink: "", // Link for download
       error: null, // Error message
+      lines: String,
+      showModal: false,
       fileProcessingLogs: {},
       processedPercentage: 0,
       webSocketUserId: crypto.randomUUID(),
@@ -126,6 +131,12 @@ export default {
         if (response.ok) {
           const result = await response.text();
           this.downloadLink = result;
+          this.lines = result;
+          setTimeout(()=>{
+            this.showModal = true;
+             this.loading = false;
+          }, 3000);
+          
         } else {
           const result = await response.text();
           if (result) {
@@ -133,11 +144,11 @@ export default {
           } else {
             this.error = "Submission failed!";
           }
+          this.loading = false;
         }
       } catch (err) {
         console.error("Error:", err);
         this.error = "An error occurred!";
-      } finally {
         this.loading = false;
       }
     },
@@ -209,6 +220,12 @@ export default {
         });
       }
     },
+    onCloseModal(){
+      this.showModal = false;
+    },
+    onShowModal(){
+      this.showModal = true;
+    }
   },
   mounted: function(){
       this.establishWSConnection(this.webSocketUserId);
