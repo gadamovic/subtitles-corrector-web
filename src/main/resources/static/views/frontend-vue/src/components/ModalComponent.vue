@@ -12,7 +12,10 @@
         <button class="delete" aria-label="close" @click="closeModal"></button>
       </header>
       <section class="modal-card-body">
-        {{ content }}
+
+        <AppliedChanges :fileProcessingLogs="fileProcessingLogs" :processedPercentage="processedPercentage"></AppliedChanges>
+        <SubtitleContentComponent :content="lines" v-if="lastFileProcessingLogReceived"></SubtitleContentComponent>
+
       </section>
       <footer class="modal-card-foot">
         <div class="buttons">
@@ -25,14 +28,24 @@
 </template>
 
 <script>
+import AppliedChanges from './AppliedChanges.vue';
+import SubtitleContentComponent from './SubtitleContentComponent.vue';
+
 export default {
   name: "ModalComponent",
+  components: {
+    AppliedChanges, SubtitleContentComponent
+  },
   props: {
     content: String,
     modalActive: { //toggleing of the modal is controlled from the parent
       type: Boolean,
       default: false
     },
+    processedPercentage: Number,
+    fileProcessingLogs: Object,
+    lines: String,
+    lastFileProcessingLogReceived: Boolean
   },
   data() {
     return {

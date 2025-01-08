@@ -1,6 +1,16 @@
 <template>
 
-  <ModalComponent :content="lines" :modalActive="showModal" @closeModal="onCloseModal" @showModal="onShowModal"></ModalComponent>
+  <ModalComponent 
+    :content="lines"
+    :modalActive="showModal"
+    @closeModal="onCloseModal"
+    @showModal="onShowModal"
+    :fileProcessingLogs="fileProcessingLogs"
+    :processedPercentage="processedPercentage"
+    :lines="lines"
+    :lastFileProcessingLogReceived="lastFileProcessingLogReceived">
+  
+  </ModalComponent>
 
     <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="box" style="background-color: #004266;">
 
@@ -26,27 +36,6 @@
       <a :href="downloadLink" class="button is-link is-light">
         Download Corrected File
       </a>
-    </div>
-
-    <div class="box" style="background-color: #004266; margin-bottom: 24px;"
-      v-if="Object.keys(fileProcessingLogs).length > 0">
-
-      <div class="label has-text-white">
-        Changes applied:
-      </div>
-
-      <div class="label" v-for="(value, key) in fileProcessingLogs" :key="key">
-
-        <div class="label has-text-white" v-if="value == 1">
-          {{ key }}
-        </div>
-
-        <div class="label has-text-white" v-if="value != 1">
-          {{ key }} &nbsp; x{{ value }}
-        </div>
-
-      </div>
-      <progress class="progress is-success" :value="this.processedPercentage" max="100">{{ processedPercentage }}</progress>
     </div>
 
     <!-- Error Message -->
@@ -79,7 +68,8 @@ export default {
       fileProcessingLogs: {},
       processedPercentage: 0,
       webSocketUserId: crypto.randomUUID(),
-      upload_button_enabled: true
+      upload_button_enabled: true,
+      lastFileProcessingLogReceived: false
     };
   },
   methods: {
@@ -105,12 +95,14 @@ export default {
 
       this.fileProcessingLogs = {};
       this.processingProgress = 0;
+      this.lastFileProcessingLogReceived = false;
 
       if (!this.file) {
         this.error = "Please select a file.";
         return;
       }
 
+      this.showModal = true;
       this.error = null;
       this.loading = true;
       this.downloadLink = "";
@@ -132,10 +124,7 @@ export default {
           const result = await response.text();
           this.downloadLink = result;
           this.lines = result;
-          setTimeout(()=>{
-            this.showModal = true;
-             this.loading = false;
-          }, 3000);
+          this.loading = false;
           
         } else {
           const result = await response.text();
@@ -190,6 +179,10 @@ export default {
 
       if(message.processedPercentage){
         this.processedPercentage = message.processedPercentage;
+      }
+
+      if(message.processedPercentage == '100'){
+        this.lastFileProcessingLogReceived = true;
       }
     },
     onConnected() {

@@ -62,7 +62,7 @@ public class FileUploadController {
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
 	public ResponseEntity<List<String>> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		
-		
+		//TODO: mark somehow corrected lines in text that is sent to the client
 		String clientIp = request.getRemoteAddr();
 		
 		if(properties.isProdEnvironment() && !monitor.subtitleCorrectionAllowedForUser(clientIp)) {
