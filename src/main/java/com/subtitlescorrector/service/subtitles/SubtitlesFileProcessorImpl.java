@@ -21,6 +21,7 @@ import com.subtitlescorrector.domain.SubtitlesFileProcessorResponse;
 import com.subtitlescorrector.domain.SubtitlesProcessingStatus;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 import com.subtitlescorrector.service.CorrectorsManager;
+import com.subtitlescorrector.service.SubtitleLinesToSubtitleUnitDataConverter;
 import com.subtitlescorrector.service.s3.S3Service;
 import com.subtitlescorrector.service.subtitles.corrections.Corrector;
 import com.subtitlescorrector.util.Constants;
@@ -49,6 +50,9 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	
 	@Autowired
 	MailSender mailSender;
+	
+	@Autowired
+	SubtitleLinesToSubtitleUnitDataConverter converter;
 
 	@Override
 	public SubtitlesFileProcessorResponse process(File storedFile, String webSocketSessionId) {
@@ -72,7 +76,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			FileUtil.writeLinesToFile(correctedFile, lines, StandardCharsets.UTF_8);
 
 			response = s3Service.uploadAndGetDownloadUrl(correctedFile);
-			response.setLines(lines);
+			response.setLines(converter.convert(lines));
 			
 		}catch (Exception e) {
 			log.error("Error processing file!", e);

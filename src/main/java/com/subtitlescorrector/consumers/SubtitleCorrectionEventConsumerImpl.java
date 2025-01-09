@@ -23,7 +23,6 @@ public class SubtitleCorrectionEventConsumerImpl implements SubtitleCorrectionEv
 	public void consumeCorrections(List<SubtitleCorrectionEvent> events) {
 		for(SubtitleCorrectionEvent event : events) {
 			webSocketService.sendSubtitleCorrectionEventToUser(event);
-			log.info("Consumed event: " + event.toString());
 		}
 	}
 

@@ -1,7 +1,7 @@
 <template>
 
-    <div>
-        {{ content }}
+    <div v-for="(subtitle, key) in content" :key="key">
+        <input class="input" :value="subtitle.text"/>
     </div>
 
 </template>
@@ -12,7 +12,7 @@ export default {
 
     name:"SubtitleContentComponent",
     props: {
-        content: String
+        content: Object
     }
 
 }

@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.domain.S3BucketNames;
+import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.domain.SubtitlesFileProcessorResponse;
 import com.subtitlescorrector.service.EmailService;
 import com.subtitlescorrector.service.S3ServiceMonitor;
@@ -60,7 +61,7 @@ public class FileUploadController {
 	EmailService emailService;
 	
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
-	public ResponseEntity<List<String>> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+	public ResponseEntity<List<SubtitleUnitData>> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		
 		//TODO: mark somehow corrected lines in text that is sent to the client
 		String clientIp = request.getRemoteAddr();

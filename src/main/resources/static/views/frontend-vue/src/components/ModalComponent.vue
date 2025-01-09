@@ -44,7 +44,7 @@ export default {
     },
     processedPercentage: Number,
     fileProcessingLogs: Object,
-    lines: String,
+    lines: Object,
     lastFileProcessingLogReceived: Boolean
   },
   data() {

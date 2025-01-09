@@ -63,7 +63,7 @@ export default {
       loading: false, // Loading state
       downloadLink: "", // Link for download
       error: null, // Error message
-      lines: String,
+      lines: Object,
       showModal: false,
       fileProcessingLogs: {},
       processedPercentage: 0,
@@ -121,7 +121,7 @@ export default {
         });
 
         if (response.ok) {
-          const result = await response.text();
+          const result = await response.json();
           this.downloadLink = result;
           this.lines = result;
           this.loading = false;
