@@ -1,5 +1,8 @@
 package com.subtitlescorrector.configuration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -28,13 +31,15 @@ public class WebSocketMessageBrokerConfiguration implements WebSocketMessageBrok
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		
-		String allowedOrigins = "http://localhost:8080";
+		List<String> allowedOrigins = new ArrayList<>();
+		allowedOrigins.add("http://localhost:8080");
 		if(properties.isProdEnvironment()) {
-			allowedOrigins = "https://subtitles-corrector.com";
+			allowedOrigins.add("https://subtitles-corrector.com");
+			allowedOrigins.add("https://www.subtitles-corrector.com");
 		}
 		
 		registry.addEndpoint("/sc-ws-connection-entrypoint")
-        .setAllowedOriginPatterns(allowedOrigins) // Allow requests from any origin (adjust for production)
+        .setAllowedOriginPatterns((String[]) allowedOrigins.toArray()) // Allow requests from any origin (adjust for production)
         .withSockJS(); // Enable SockJS fallback options
 		
 	}
