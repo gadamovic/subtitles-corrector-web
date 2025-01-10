@@ -39,7 +39,7 @@ public class WebSocketMessageBrokerConfiguration implements WebSocketMessageBrok
 		}
 		
 		registry.addEndpoint("/sc-ws-connection-entrypoint")
-        .setAllowedOriginPatterns((String[]) allowedOrigins.toArray()) // Allow requests from any origin (adjust for production)
+        .setAllowedOriginPatterns(allowedOrigins.toArray(new String[0]))
         .withSockJS(); // Enable SockJS fallback options
 		
 	}
