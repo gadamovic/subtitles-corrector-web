@@ -9,6 +9,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
+import com.subtitlescorrector.service.CustomWebSocketHandler;
 import com.subtitlescorrector.service.WebSocketMessageBrokerService;
 
 @Service
@@ -19,10 +20,14 @@ public class SubtitleCorrectionEventConsumerImpl implements SubtitleCorrectionEv
 	@Autowired
 	WebSocketMessageBrokerService webSocketService;
 	
+	@Autowired
+	CustomWebSocketHandler webSocketHandler;
+	
 	@KafkaListener(id = "subtitlesCorrectionListenerContainer", topics = "subtitlesCorrections", containerFactory = "kafkaListenerContainerFactory")
 	public void consumeCorrections(List<SubtitleCorrectionEvent> events) {
 		for(SubtitleCorrectionEvent event : events) {
-			webSocketService.sendSubtitleCorrectionEventToUser(event);
+			//webSocketService.sendSubtitleCorrectionEventToUser(event);
+				webSocketHandler.sendMessage(event);
 		}
 	}
 

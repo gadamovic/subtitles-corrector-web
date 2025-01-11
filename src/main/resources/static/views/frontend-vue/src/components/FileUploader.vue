@@ -1,55 +1,51 @@
 <template>
 
-  <ModalComponent 
-    :content="lines"
-    :modalActive="showModal"
-    @closeModal="onCloseModal"
-    @showModal="onShowModal"
-    :fileProcessingLogs="fileProcessingLogs"
-    :processedPercentage="processedPercentage"
-    :lines="lines"
+  <ModalComponent :content="lines" :modalActive="showModal" @closeModal="onCloseModal" @showModal="onShowModal"
+    :fileProcessingLogs="fileProcessingLogs" :processedPercentage="processedPercentage" :lines="lines"
     :lastFileProcessingLogReceived="lastFileProcessingLogReceived">
-  
+
   </ModalComponent>
 
-    <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="box" style="background-color: #004266;">
+  <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="box" style="background-color: #004266;">
 
-      <label class="label has-text-white">Upload a subtitle file (srt, sub or txt):</label> <br/>
-      <div class="file has-name is-fullwidth field">
-        <label class="file-label">
-          <input class="file-input" type="file" name="file" accept=".srt, .sub, .txt" @change="handleFileChange" />
-          <span class="file-cta">
-            <span class="file-icon">
-              <i class="fas fa-upload"></i>
-            </span>
-            <span class="file-label"> Choose a file… </span>
+    <label class="label has-text-white">Upload a subtitle file (srt, sub or txt):</label> <br />
+    <div class="file has-name is-fullwidth field">
+      <label class="file-label">
+        <input class="file-input" type="file" name="file" accept=".srt, .sub, .txt" @change="handleFileChange" />
+        <span class="file-cta">
+          <span class="file-icon">
+            <i class="fas fa-upload"></i>
           </span>
-          <span class="file-name" style="background-color: white;"><div v-if="this.file">{{ this.file.name }}</div></span>
-        </label>
-      </div>
+          <span class="file-label"> Choose a file… </span>
+        </span>
+        <span class="file-name" style="background-color: white;">
+          <div v-if="this.file">{{ this.file.name }}</div>
+        </span>
+      </label>
+    </div>
 
-      <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled"></GenericButton>
-    </form>
+    <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled"></GenericButton>
+  </form>
 
-    <!-- Download Link -->
+  <!-- Download Link (CURRENTLY HIDDEN) -->
+  <div v-if="false">
     <div class="has-text-centered" style="margin-bottom: 24px;" v-if="downloadLink">
       <a :href="downloadLink" class="button is-link is-light">
         Download Corrected File
       </a>
     </div>
+  </div>
 
-    <!-- Error Message -->
-    <div class="notification is-danger" style="margin-bottom: 24px;" v-if="error">
-      {{ error }}
-    </div>
+  <!-- Error Message -->
+  <div class="notification is-danger" style="margin-bottom: 24px;" v-if="error">
+    {{ error }}
+  </div>
 
 </template>
 
 <script>
 
 import GenericButton from './GenericButton.vue';
-import { Client } from "@stomp/stompjs";
-import SockJS from "sockjs-client";
 import ModalComponent from './ModalComponent.vue';
 
 export default {
@@ -69,7 +65,8 @@ export default {
       processedPercentage: 0,
       webSocketUserId: crypto.randomUUID(),
       upload_button_enabled: true,
-      lastFileProcessingLogReceived: false
+      lastFileProcessingLogReceived: false,
+      user_acked: false
     };
   },
   methods: {
@@ -86,12 +83,19 @@ export default {
         this.upload_button_enabled = false;
         event.target.value = ''; // Clear the input
         this.file = null;
-      }else{
+      } else {
         this.error = '';
         this.upload_button_enabled = true;
       }
     },
     async handleSubmit() {
+
+      //wait for the server to ack the client
+      let i = 0;
+      while (!this.user_acked && i < 100) {
+        i++;
+        setTimeout(() => { }, 10);
+      }
 
       this.fileProcessingLogs = {};
       this.processingProgress = 0;
@@ -102,7 +106,6 @@ export default {
         return;
       }
 
-      this.showModal = true;
       this.error = null;
       this.loading = true;
       this.downloadLink = "";
@@ -110,7 +113,7 @@ export default {
       const formData = new FormData();
       formData.append("file", this.file);
       formData.append("webSocketUserId", this.webSocketUserId);
-      
+
       this.fileProcessingLogs = {};
       this.processedPercentage = 0;
 
@@ -125,7 +128,7 @@ export default {
           this.downloadLink = result;
           this.lines = result;
           this.loading = false;
-          
+
         } else {
           const result = await response.text();
           if (result) {
@@ -141,87 +144,88 @@ export default {
         this.loading = false;
       }
     },
-    
-    establishWSConnection(webSocketUserId) {
+
+
+    establishWSConnection() {
+
 
       let contextRoot = "/subtitles";
-      let hostAddress = "http://localhost:8080";
+      let hostAddress = "ws://localhost:8080";
       if (process.env.VUE_APP_ENVIRONMENT === 'prod') {
         contextRoot = "";
-        hostAddress = "https://subtitles-corrector.com";
+        hostAddress = "ws://subtitles-corrector.com";
       }
+      const socket = new WebSocket(hostAddress + contextRoot + "/sc-ws-connection-entrypoint");
 
-      
+      // Handle connection open
+      socket.onopen = () => {
+        console.log("WebSocket connected");
+        socket.send("USER_ID<" + this.webSocketUserId + ">");
+      };
 
-      const socket = new SockJS(hostAddress + contextRoot + "/sc-ws-connection-entrypoint"); // WebSocket endpoint
-      
-      this.stompClient = new Client({
-        webSocketFactory: () => socket,
-        reconnectDelay: 5000,
-        onConnect: this.onConnected,
-        onStompError: this.onError,
-        connectHeaders: {'webSocketUserId': webSocketUserId}
-      });
+      // Handle messages
+      socket.onmessage = (event) => {
 
-      this.stompClient.activate()
+        if (this.isJson(event.data)) {
+          this.handleMessage(JSON.parse(event.data))
+        } else if (event.data === 'USER_ACK') {
+          this.user_acked = true;
+        } else {
+          console.log("Message: " + event.data);
+        }
+      };
+
+      // Handle connection close
+      socket.onclose = () => {
+        console.log("WebSocket disconnected");
+      };
     },
-    handleMessage(message){
 
-      if(message.correctionDescription){
+    handleMessage(message) {
+      
+      //when first log message arrives, show the modal
+      if (message.correctionDescription || message.processedPercentage){
+        this.showModal = true;
+      }
+      
+      if (message.correctionDescription) {
+
+
         let correction = this.fileProcessingLogs[message.correctionDescription];
-          if(correction){
-            correction ++;
-            this.fileProcessingLogs[message.correctionDescription] = correction;
-          }else{
-            this.fileProcessingLogs[message.correctionDescription] = 1;
-          }
+        if (correction) {
+          correction++;
+          this.fileProcessingLogs[message.correctionDescription] = correction;
+        } else {
+          this.fileProcessingLogs[message.correctionDescription] = 1;
+        }
       }
 
-      if(message.processedPercentage){
+      if (message.processedPercentage) {
         this.processedPercentage = message.processedPercentage;
       }
 
-      if(message.processedPercentage == '100'){
+      if (message.processedPercentage == '100') {
         this.lastFileProcessingLogReceived = true;
       }
     },
-    onConnected() {
-      console.log("Connected to WebSocket");
-
-      
-      const regex = /.*\/(.*)\/websocket/
-      let webSocketSessionId = "";
-      try{
-        webSocketSessionId = regex.exec(this.stompClient.webSocket._transport.url)[1];
-      }catch(errormsg){
-        console.error(errormsg);
-        console.log(this.stompClient.webSocket._transport.url);
-      }
-      this.stompClient.subscribe("/user/" + webSocketSessionId + "/subtitles-processing-log", (message) => {
-        
-        this.handleMessage(JSON.parse(message.body));
-      });
-    },
-    onError(error) {
-      console.error("WebSocket error:", error);
-    },
-    sendMessage(message) {
-      if (this.stompClient && this.stompClient.connected) {
-        this.stompClient.publish({
-          destination: "/app/ws/1.0/upload",
-          body: JSON.stringify({ message }),
-        });
-      }
-    },
-    onCloseModal(){
+    onCloseModal() {
       this.showModal = false;
     },
-    onShowModal(){
+    onShowModal() {
       this.showModal = true;
+    },
+    isJson(str) {
+      try {
+        JSON.parse(str);
+        return true;
+      } catch (err) {
+        return false;
+      }
     }
   },
-  mounted: function(){
-      this.establishWSConnection(this.webSocketUserId);
+  mounted: function () {
+    //this.establishWSConnection(this.webSocketUserId);
+    this.establishWSConnection();
   }
 }
 

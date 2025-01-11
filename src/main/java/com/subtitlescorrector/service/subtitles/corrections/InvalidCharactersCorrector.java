@@ -79,7 +79,7 @@ public class InvalidCharactersCorrector implements Corrector{
 
 	private String checkForChanges(String afterCorrection, String beforeCorrection, String correctionDescription, float processedPercentage, String webSocketSessionId) {
 		if(!afterCorrection.equals(beforeCorrection)) {
-			log.info("Correction applied: " + correctionDescription);
+			//log.info("Correction applied: " + correctionDescription);
 			
 			SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
 			event.setCorrection(correctionDescription);
@@ -87,7 +87,7 @@ public class InvalidCharactersCorrector implements Corrector{
 
 			event.setProcessedPercentage(String.valueOf(processedPercentage));
 			event.setWebSocketSessionId(webSocketSessionId);
-			
+						
 			if(properties.getSubtitlesKafakEnabled()) {
 				kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
 			}

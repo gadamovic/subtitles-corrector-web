@@ -3,6 +3,8 @@ package com.subtitlescorrector.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.domain.SubtitleUnitData;
@@ -11,6 +13,8 @@ import io.micrometer.common.util.StringUtils;
 
 @Service
 public class SubtitleLinesToSubtitleUnitDataConverterImpl implements SubtitleLinesToSubtitleUnitDataConverter {
+
+	Logger log = LoggerFactory.getLogger(SubtitleLinesToSubtitleUnitDataConverterImpl.class);
 
 	@Override
 	public List<SubtitleUnitData> convert(List<String> lines){
