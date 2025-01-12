@@ -17,33 +17,40 @@ public class SubtitleLinesToSubtitleUnitDataConverterImpl implements SubtitleLin
 	Logger log = LoggerFactory.getLogger(SubtitleLinesToSubtitleUnitDataConverterImpl.class);
 
 	@Override
-	public List<SubtitleUnitData> convert(List<String> lines){
+	public List<SubtitleUnitData> convertToSubtitleUnits(List<String> lines){
 		
 		List<SubtitleUnitData> dataList = new ArrayList<>();
+		SubtitleUnitData data = null;
+
 		for(String line : lines) {
 			
-			SubtitleUnitData data = new SubtitleUnitData();
-			data.setFormat("srt");
 			
 			Integer number = toInteger(line);
-			if(number != null) {
+			if(number != null && data == null) {
+				data = new SubtitleUnitData();
 				data.setNumber(number);
+				data.setFormat("srt");
 				continue;
 			}
 			
 			if(line.contains("-->")) {
-				data.setTimestampFrom(line.substring(0, line.indexOf("-->")));
-				data.setTimestampFrom(line.substring((line.lastIndexOf(" ") + 1), line.length() - 1));
+				data.setTimestampFrom(line.substring(0, line.indexOf("-->") - 1));
+				data.setTimestampTo(line.substring((line.lastIndexOf(" ") + 1), line.length()));
 				continue;
 			}
 			
 			if(StringUtils.isNotBlank(line)) {
-				data.setText(line);
+				if(StringUtils.isNotBlank(data.getText())) {
+					data.setText(data.getText() + "\n" + line);
+				}else {
+					data.setText(line);
+				}
 			}else {
-				continue;
+				//end of subtitle
+				dataList.add(data);
+				data = null;
 			}
 			
-			dataList.add(data);
 			
 		}
 		
@@ -52,11 +59,26 @@ public class SubtitleLinesToSubtitleUnitDataConverterImpl implements SubtitleLin
 
 	public Integer toInteger(String candidate) {
 		try {
-			Integer i = Integer.parseInt(candidate);
+			Integer i = Integer.parseInt(candidate.trim());
 			return i;
 		} catch (NumberFormatException nfe) {
 			return null;
 		}
+	}
+	
+	public List<String> convertToListOfStrings(List<SubtitleUnitData> lines){
+		
+		List<String> stringList = new ArrayList<String>(); 
+		
+		for(SubtitleUnitData subtitle : lines) {
+			stringList.add(subtitle.getNumber().toString());
+			stringList.add(subtitle.getTimestampFrom() + " --> " + subtitle.getTimestampTo());
+			stringList.add(subtitle.getText());
+			stringList.add("");
+		}
+		
+		return stringList;
+		
 	}
 
 }

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.controller.rest.FileUploadController;
+import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitlesFileProcessorResponse;
 import com.subtitlescorrector.domain.SubtitlesProcessingStatus;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
@@ -76,7 +77,11 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			FileUtil.writeLinesToFile(correctedFile, lines, StandardCharsets.UTF_8);
 
 			response = s3Service.uploadAndGetDownloadUrl(correctedFile);
-			response.setLines(converter.convert(lines));
+			
+			SubtitleFileData data = new SubtitleFileData();
+			data.setFilename(correctedFile.getName());
+			data.setLines(converter.convertToSubtitleUnits(lines));
+			response.setData(data);
 			
 		}catch (Exception e) {
 			log.error("Error processing file!", e);

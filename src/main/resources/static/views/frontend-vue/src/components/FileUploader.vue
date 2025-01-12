@@ -1,14 +1,20 @@
 <template>
 
-  <ModalComponent :content="lines" :modalActive="showModal" @closeModal="onCloseModal" @showModal="onShowModal"
-    :fileProcessingLogs="fileProcessingLogs" :processedPercentage="processedPercentage" :lines="lines"
-    :lastFileProcessingLogReceived="lastFileProcessingLogReceived">
+  <ModalComponent :modalActive="showModal" @closeModal="onCloseModal" @showModal="onShowModal"
+    @saveClicked="saveModalClicked" :fileProcessingLogs="fileProcessingLogs"
+    :processedPercentage="processedPercentage" :subtitleData="subtitleData"
+    :lastFileProcessingLogReceived="lastFileProcessingLogReceived" :userId="userId">
 
   </ModalComponent>
 
+  <div class="notification is-success" v-if="showSaved">
+    <button class="delete" @click="() => {this.showSaved = false}"></button>
+    Changes saved
+  </div>
+
   <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="box" style="background-color: #004266;">
 
-    <label class="label has-text-white">Upload a subtitle file (srt, sub or txt):</label> <br />
+    <label class="label has-text-white">Upload a subtitle file:</label> <br />
     <div class="file has-name is-fullwidth field">
       <label class="file-label">
         <input class="file-input" type="file" name="file" accept=".srt, .sub, .txt" @change="handleFileChange" />
@@ -27,15 +33,11 @@
     <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled"></GenericButton>
   </form>
 
-  <!-- Download Link (CURRENTLY HIDDEN) -->
-  <div v-if="false">
-    <div class="has-text-centered" style="margin-bottom: 24px;" v-if="downloadLink">
-      <a :href="downloadLink" class="button is-link is-light">
-        Download Corrected File
-      </a>
-    </div>
+  <div class="notification is-link" v-if="this.subtitleFilename && this.showDownloadLink">
+    <a @click="downloadFile" class="">
+      Download {{this.subtitleFilename}}
+    </a>
   </div>
-
   <!-- Error Message -->
   <div class="notification is-danger" style="margin-bottom: 24px;" v-if="error">
     {{ error }}
@@ -57,16 +59,17 @@ export default {
     return {
       file: null, // Selected file
       loading: false, // Loading state
-      downloadLink: "", // Link for download
       error: null, // Error message
-      lines: Object,
+      subtitleData: Object,
       showModal: false,
       fileProcessingLogs: {},
       processedPercentage: 0,
-      webSocketUserId: crypto.randomUUID(),
+      userId: crypto.randomUUID(),
       upload_button_enabled: true,
       lastFileProcessingLogReceived: false,
-      user_acked: false
+      user_acked: false,
+      showSaved: false,
+      showDownloadLink: false
     };
   },
   methods: {
@@ -74,12 +77,13 @@ export default {
       // Capture the selected file
       this.file = event.target.files[0];
 
-      const allowedExtensions = ['.srt', '.sub', '.txt'];
+      const allowedExtensions = ['.srt'/*, '.sub', '.txt'*/];
       const fileName = this.file.name.toLowerCase();
       const isValid = allowedExtensions.some(ext => fileName.endsWith(ext));
 
       if (!isValid) {
-        this.error = 'Invalid file type. Please upload a .srt, .sub, or .txt file.';
+        this.error = 'Invalid file type. Please upload a .srt file.';
+        //this.error = 'Invalid file type. Please upload a .srt, .sub, or .txt file.';
         this.upload_button_enabled = false;
         event.target.value = ''; // Clear the input
         this.file = null;
@@ -112,7 +116,7 @@ export default {
 
       const formData = new FormData();
       formData.append("file", this.file);
-      formData.append("webSocketUserId", this.webSocketUserId);
+      formData.append("webSocketUserId", this.userId);
 
       this.fileProcessingLogs = {};
       this.processedPercentage = 0;
@@ -125,8 +129,7 @@ export default {
 
         if (response.ok) {
           const result = await response.json();
-          this.downloadLink = result;
-          this.lines = result;
+          this.subtitleData = result;
           this.loading = false;
 
         } else {
@@ -160,7 +163,7 @@ export default {
       // Handle connection open
       socket.onopen = () => {
         console.log("WebSocket connected");
-        socket.send("USER_ID<" + this.webSocketUserId + ">");
+        socket.send("USER_ID<" + this.userId + ">");
       };
 
       // Handle messages
@@ -182,12 +185,12 @@ export default {
     },
 
     handleMessage(message) {
-      
+
       //when first log message arrives, show the modal
-      if (message.correctionDescription || message.processedPercentage){
+      if (message.correctionDescription || message.processedPercentage) {
         this.showModal = true;
       }
-      
+
       if (message.correctionDescription) {
 
 
@@ -221,11 +224,54 @@ export default {
       } catch (err) {
         return false;
       }
+    },
+    async downloadFile() {
+      const response = await fetch("api/rest/1.0/downloadFile?userId=" + this.userId, {
+        method: "GET"
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+
+        a.href = url;
+        a.download = this.subtitleData.filename.substr(this.subtitleData.filename.indexOf("_") + 1, this.subtitleData.filename.length);
+        document.body.appendChild(a);
+        a.click();
+
+        // Clean up
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      }
+    },
+    saveModalClicked() {
+
+      //show notification
+      setTimeout(() => {this.showSaved = true}, 300);
+      setTimeout(() => {this.showSaved = false}, 2500);
+
+      this.showDownloadLink = true;
     }
   },
   mounted: function () {
     //this.establishWSConnection(this.webSocketUserId);
     this.establishWSConnection();
+  },
+  computed: {
+    downloadLinkForUser() {
+      return "api/rest/1.0/downloadFile?userId=" + this.userId;
+    },
+    subtitleFilename(){
+      if(this.subtitleData.filename){
+        return this.subtitleData.filename.substr(this.subtitleData.filename.indexOf("_") + 1, this.subtitleData.filename.length);
+      }else{
+        return "";
+      }
+    }
+
+
   }
 }
 

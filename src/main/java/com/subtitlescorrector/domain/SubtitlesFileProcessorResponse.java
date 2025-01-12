@@ -8,7 +8,7 @@ public class SubtitlesFileProcessorResponse {
 	SubtitlesProcessingStatus status;
 	String downloadUrl;
 	File file;
-	List<SubtitleUnitData> lines;
+	SubtitleFileData data;
 	
 	public SubtitlesProcessingStatus getStatus() {
 		return status;
@@ -28,11 +28,11 @@ public class SubtitlesFileProcessorResponse {
 	public void setFile(File file) {
 		this.file = file;
 	}
-	public List<SubtitleUnitData> getLines() {
-		return lines;
+	public SubtitleFileData getData() {
+		return data;
 	}
-	public void setLines(List<SubtitleUnitData> list) {
-		this.lines = list;
+	public void setData(SubtitleFileData data) {
+		this.data = data;
 	}
 
 }

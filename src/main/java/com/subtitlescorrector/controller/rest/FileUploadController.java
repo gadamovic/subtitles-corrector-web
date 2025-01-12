@@ -20,11 +20,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.domain.S3BucketNames;
+import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.domain.SubtitlesFileProcessorResponse;
 import com.subtitlescorrector.service.EmailService;
 import com.subtitlescorrector.service.S3ServiceMonitor;
 import com.subtitlescorrector.service.StorageService;
+import com.subtitlescorrector.service.SubtitleLinesToSubtitleUnitDataConverter;
 import com.subtitlescorrector.service.redis.RedisService;
 import com.subtitlescorrector.service.s3.S3Service;
 import com.subtitlescorrector.service.subtitles.SubtitlesFileProcessor;
@@ -61,7 +63,7 @@ public class FileUploadController {
 	EmailService emailService;
 	
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
-	public ResponseEntity<List<SubtitleUnitData>> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+	public ResponseEntity<SubtitleFileData> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		
 		//TODO: mark somehow corrected lines in text that is sent to the client
 		String clientIp = request.getRemoteAddr();
@@ -76,9 +78,12 @@ public class FileUploadController {
 		String webSocketSessionId = redisService.getWebSocketSessionIdForUser(request.getParameter("webSocketUserId"));
 		SubtitlesFileProcessorResponse response = processor.process(storedFile, webSocketSessionId);
 
+		//save uploaded and server-corrected version as the first version
+		redisService.addUserSubtitleCurrentVersion(response.getData(), request.getParameter("webSocketUserId"));
+		
 		emailService.sendEmailOnlyIfProduction("Ip: " + clientIp + "\nFilename: " + file.getOriginalFilename(), properties.getAdminEmailAddress(), "Somebody is uploading a subtitle!");
 
-		return ResponseEntity.ok(response.getLines());
+		return ResponseEntity.ok(response.getData());
 		
 	}
 }

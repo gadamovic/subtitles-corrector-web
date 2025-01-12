@@ -1,9 +1,14 @@
 package com.subtitlescorrector.service.redis;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.subtitlescorrector.domain.SubtitleFileData;
+import com.subtitlescorrector.domain.SubtitleUnitData;
+import com.subtitlescorrector.util.Util;
 
 import io.micrometer.common.util.StringUtils;
 import redis.clients.jedis.Jedis;
@@ -17,6 +22,7 @@ public class RedisServiceImpl implements RedisService {
 	private static final int S3_LAST_UPLOAD_CACHE_TTL = 3600;
 	private static final int USER_WEBSOCKET_SESSION_CACHE_TTL = 60 * 60 * 3;
 	private static final int NUMBER_OF_EMAILS_CACHE_TTL = 60 * 60 * 3;
+	private static final int USER_SUBTITLE_CURRENT_VERSION_CACHE_TTL = 60 * 60 * 3;
 	
 	@Override
 	public void updateLastS3UploadTimestamp(String ip) {
@@ -70,6 +76,22 @@ public class RedisServiceImpl implements RedisService {
 			
 		}
 		return numberOfEmailsInt;
+	}
+	
+	public void addUserSubtitleCurrentVersion(SubtitleFileData data, String userId) {
+		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
+			
+			jedis.setex(RedisSchema.createUserSubtitleCurrentVersionKey(userId), USER_SUBTITLE_CURRENT_VERSION_CACHE_TTL, Util.subtitleUnitDataListToJson(data));
+			
+		}
+	}
+	
+	public SubtitleFileData getUserSubtitleCurrentVersion(String userId) {
+		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
+			
+			String jsonResult = jedis.get(RedisSchema.createUserSubtitleCurrentVersionKey(userId));
+			return Util.jsonToSubtitleUnitDataList(jsonResult);
+		}
 	}
 	
 }

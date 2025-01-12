@@ -4,10 +4,13 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -16,11 +19,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
+import com.subtitlescorrector.domain.SubtitleFileData;
+import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 
-import io.micrometer.common.util.StringUtils;
 
 @Component
 public class Util {
@@ -130,6 +137,27 @@ public class Util {
 		}
 		return json.toString();
 		
+	}
+	
+	public static String subtitleUnitDataListToJson(SubtitleFileData data) {
+		ObjectMapper obj = new ObjectMapper();
+		try {
+			return obj.writeValueAsString(data);
+		} catch (JsonProcessingException e) {
+			log.error("Error converting saying subtitleUnitData list to json", e);
+			return null;
+		}
+	}
+	
+	public static SubtitleFileData jsonToSubtitleUnitDataList(String json) {
+		ObjectMapper obj = new ObjectMapper();
+
+		try {
+			return obj.readValue(json, SubtitleFileData.class);
+		} catch (IOException e) {
+			log.error("Error deserializing saying: " + json, e);
+			return null;
+		}
 	}
 
 }

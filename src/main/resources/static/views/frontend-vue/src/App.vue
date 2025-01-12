@@ -2,7 +2,7 @@
   <div class="content">
     <div class="section">
       <HeadingComponent first_line="Subtitles corrector" 
-                        second_line="An app that fixes character encoding and formatting issues in subtitle files, ensuring they're clean and ready for use"
+                        second_line="Easily fix character encoding, formatting issues, and edit subtitles, ensuring your subtitle files are clean, accurate, and ready for use."
                         heading_link="https://subtitles-corrector.com"/>
       <FileUploader/>
       <ContactForm/>

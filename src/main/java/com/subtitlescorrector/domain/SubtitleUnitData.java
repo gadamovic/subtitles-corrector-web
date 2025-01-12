@@ -38,7 +38,10 @@ public class SubtitleUnitData {
 	public void setText(String text) {
 		this.text = text;
 	}
-	
-	
+	@Override
+	public String toString() {
+		return "SubtitleUnitData [format=" + format + ", number=" + number + ", timestampFrom=" + timestampFrom
+				+ ", timestampTo=" + timestampTo + ", text=" + text + "]";
+	}
 	
 }

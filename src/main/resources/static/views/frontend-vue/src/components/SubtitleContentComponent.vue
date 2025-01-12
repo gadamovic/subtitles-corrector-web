@@ -1,7 +1,7 @@
 <template>
 
-    <div v-for="(subtitle, key) in content" :key="key">
-        <input class="input" :value="subtitle.text"/>
+    <div v-for="(subtitle, key) in subtitleData.lines" :key="key">
+        <textarea class="textarea" rows="2" v-model="subtitle.text" style="resize:none;"></textarea>
     </div>
 
 </template>
@@ -12,8 +12,8 @@ export default {
 
     name:"SubtitleContentComponent",
     props: {
-        content: Object
-    }
+        subtitleData: Object
+    },
 
 }
 
