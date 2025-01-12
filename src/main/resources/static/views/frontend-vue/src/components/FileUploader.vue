@@ -237,7 +237,7 @@ export default {
         const a = document.createElement("a");
 
         a.href = url;
-        a.download = this.subtitleData.filename.substr(this.subtitleData.filename.indexOf("_") + 1, this.subtitleData.filename.length);
+        a.download = 'Subtitle-Corrector_' + this.subtitleData.filename.substr(this.subtitleData.filename.indexOf("_") + 1, this.subtitleData.filename.length);
         document.body.appendChild(a);
         a.click();
 
