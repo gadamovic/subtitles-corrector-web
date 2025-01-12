@@ -156,7 +156,7 @@ export default {
       let hostAddress = "ws://localhost:8080";
       if (process.env.VUE_APP_ENVIRONMENT === 'prod') {
         contextRoot = "";
-        hostAddress = "ws://subtitles-corrector.com";
+        hostAddress = "wss://subtitles-corrector.com";
       }
       const socket = new WebSocket(hostAddress + contextRoot + "/sc-ws-connection-entrypoint");
 
