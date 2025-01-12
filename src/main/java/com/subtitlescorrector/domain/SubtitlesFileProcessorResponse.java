@@ -1,12 +1,14 @@
 package com.subtitlescorrector.domain;
 
 import java.io.File;
+import java.util.List;
 
 public class SubtitlesFileProcessorResponse {
 
 	SubtitlesProcessingStatus status;
 	String downloadUrl;
 	File file;
+	SubtitleFileData data;
 	
 	public SubtitlesProcessingStatus getStatus() {
 		return status;
@@ -26,7 +28,11 @@ public class SubtitlesFileProcessorResponse {
 	public void setFile(File file) {
 		this.file = file;
 	}
-	
-	
-	
+	public SubtitleFileData getData() {
+		return data;
+	}
+	public void setData(SubtitleFileData data) {
+		this.data = data;
+	}
+
 }

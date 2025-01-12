@@ -12,8 +12,9 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 
-@Configuration
-@EnableWebSocketMessageBroker
+//@Configuration
+//@EnableWebSocketMessageBroker
+@Deprecated
 public class WebSocketMessageBrokerConfiguration implements WebSocketMessageBrokerConfigurer{
 
 	@Autowired
@@ -25,6 +26,7 @@ public class WebSocketMessageBrokerConfiguration implements WebSocketMessageBrok
 	
 		//registry.enableSimpleBroker("/topic");
 		registry.setApplicationDestinationPrefixes("/app");
+		registry.setPreservePublishOrder(true);
 		//registry.setUserDestinationPrefix("/user"); //with this enabled, messages are not being transmitted correctly
 	}
 

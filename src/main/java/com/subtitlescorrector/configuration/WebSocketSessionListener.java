@@ -9,7 +9,8 @@ import org.springframework.web.socket.messaging.SessionConnectedEvent;
 
 import com.subtitlescorrector.service.redis.RedisService;
 
-@Component
+//@Component
+@Deprecated
 public class WebSocketSessionListener {
 
 	@Autowired

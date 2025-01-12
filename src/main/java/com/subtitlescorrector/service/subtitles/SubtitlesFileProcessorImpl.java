@@ -17,10 +17,12 @@ import org.springframework.stereotype.Component;
 
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.controller.rest.FileUploadController;
+import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitlesFileProcessorResponse;
 import com.subtitlescorrector.domain.SubtitlesProcessingStatus;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 import com.subtitlescorrector.service.CorrectorsManager;
+import com.subtitlescorrector.service.SubtitleLinesToSubtitleUnitDataConverter;
 import com.subtitlescorrector.service.s3.S3Service;
 import com.subtitlescorrector.service.subtitles.corrections.Corrector;
 import com.subtitlescorrector.util.Constants;
@@ -49,6 +51,9 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	
 	@Autowired
 	MailSender mailSender;
+	
+	@Autowired
+	SubtitleLinesToSubtitleUnitDataConverter converter;
 
 	@Override
 	public SubtitlesFileProcessorResponse process(File storedFile, String webSocketSessionId) {
@@ -72,8 +77,13 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			FileUtil.writeLinesToFile(correctedFile, lines, StandardCharsets.UTF_8);
 
 			response = s3Service.uploadAndGetDownloadUrl(correctedFile);
-
-		} catch (Exception e) {
+			
+			SubtitleFileData data = new SubtitleFileData();
+			data.setFilename(correctedFile.getName());
+			data.setLines(converter.convertToSubtitleUnits(lines));
+			response.setData(data);
+			
+		}catch (Exception e) {
 			log.error("Error processing file!", e);
 		} finally {
 			deleteFiles(storedFile, correctedFile);

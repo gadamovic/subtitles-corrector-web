@@ -36,4 +36,8 @@ public class RedisSchema {
 		return key;
 	}
 	
+	public static String createUserSubtitleCurrentVersionKey(String userId) {
+		return RedisKeys.USER_SUBTITLE_CURRENT_VERSION.getKey() + ":" + userId;
+	}
+	
 }

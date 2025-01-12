@@ -7,6 +7,9 @@
         >CC BY-NC 4.0</a
       >.
     </p>
+    <p>
+      Source code: <a target="_blank" href="https://github.com/gadamovic/subtitles-corrector-web">Github</a>
+    </p>
   </div>
 </footer>
 </template>
