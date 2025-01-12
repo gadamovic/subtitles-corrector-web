@@ -8,7 +8,7 @@
       >.
     </p>
     <p>
-      Source code: <a target="_blank" href="https://github.com/gadamovic/subtitles-corrector-web">Github</a>
+      Source code: <a target="_blank" href="https://github.com/gadamovic/subtitles-corrector-web">GitHub</a>
     </p>
   </div>
 </footer>
