@@ -69,7 +69,9 @@ public class FileUploadController {
 		String clientIp = request.getRemoteAddr();
 		
 		if(properties.isProdEnvironment() && !monitor.subtitleCorrectionAllowedForUser(clientIp)) {
-			ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Users are allowed to process one subtitle every two minutes!");
+			SubtitleFileData data = new SubtitleFileData();
+			data.setHttpResponseMessage("Users are allowed to process one subtitle every two minutes!");  
+			return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(data);
 		}else {
 			redisService.updateLastS3UploadTimestamp(clientIp);
 		}

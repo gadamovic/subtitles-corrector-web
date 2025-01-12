@@ -133,9 +133,9 @@ export default {
           this.loading = false;
 
         } else {
-          const result = await response.text();
-          if (result) {
-            this.error = result;
+          const result = await response.json();
+          if (result.httpResponseMessage) {
+            this.error = result.httpResponseMessage;
           } else {
             this.error = "Submission failed!";
           }

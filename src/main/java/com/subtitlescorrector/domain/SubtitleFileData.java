@@ -10,6 +10,8 @@ public class SubtitleFileData implements Serializable{
 	String filename;
 	
 	List<SubtitleUnitData> lines;
+	
+	String httpResponseMessage;
 
 	public String getFilename() {
 		return filename;
@@ -26,8 +28,13 @@ public class SubtitleFileData implements Serializable{
 	public void setLines(List<SubtitleUnitData> lines) {
 		this.lines = lines;
 	}
-	
-	
-	
-	
+
+	public String getHttpResponseMessage() {
+		return httpResponseMessage;
+	}
+
+	public void setHttpResponseMessage(String httpResponseMessage) {
+		this.httpResponseMessage = httpResponseMessage;
+	}
+
 }
