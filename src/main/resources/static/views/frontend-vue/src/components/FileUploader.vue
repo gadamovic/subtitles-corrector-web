@@ -1,6 +1,6 @@
 <template>
 
-  <ModalComponent :modalActive="showModal" @closeModal="onCloseModal" @showModal="onShowModal"
+  <ModalComponent :modalActive="showModal" @closeModal="onCloseModal"
     @saveClicked="saveModalClicked" :fileProcessingLogs="fileProcessingLogs"
     :processedPercentage="processedPercentage" :subtitleData="subtitleData"
     :lastFileProcessingLogReceived="lastFileProcessingLogReceived" :userId="userId">
@@ -12,7 +12,7 @@
     Changes saved
   </div>
 
-  <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="box" style="background-color: #004266;">
+  <form @submit.prevent enctype="multipart/form-data" class="box" style="background-color: #004266;">
 
     <label class="label has-text-white">Upload a subtitle file:</label> <br />
     <div class="file has-name is-fullwidth field">
@@ -30,7 +30,10 @@
       </label>
     </div>
 
-    <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled"></GenericButton>
+    <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled" @click="handleSubmit"></GenericButton>
+    <GenericButton :loading="false" button_text="Continue editing" :enabled="true" v-if="showDownloadLink" @click="showModalMethod"></GenericButton>
+    
+
   </form>
 
   <div class="notification is-link" v-if="this.subtitleFilename && this.showDownloadLink">
@@ -38,6 +41,7 @@
       Download {{this.subtitleFilename}}
     </a>
   </div>
+  
   <!-- Error Message -->
   <div class="notification is-danger" style="margin-bottom: 24px;" v-if="error">
     {{ error }}
@@ -104,6 +108,7 @@ export default {
       this.fileProcessingLogs = {};
       this.processingProgress = 0;
       this.lastFileProcessingLogReceived = false;
+      this.showDownloadLink = false;
 
       if (!this.file) {
         this.error = "Please select a file.";
@@ -188,7 +193,7 @@ export default {
 
       //when first log message arrives, show the modal
       if (message.correctionDescription || message.processedPercentage) {
-        this.showModal = true;
+        this.showModalMethod();
       }
 
       if (message.correctionDescription) {
@@ -214,7 +219,7 @@ export default {
     onCloseModal() {
       this.showModal = false;
     },
-    onShowModal() {
+    showModalMethod(){
       this.showModal = true;
     },
     isJson(str) {
@@ -249,11 +254,11 @@ export default {
     saveModalClicked() {
 
       //show notification
-      setTimeout(() => {this.showSaved = true}, 300);
-      setTimeout(() => {this.showSaved = false}, 2500);
-
-      this.showDownloadLink = true;
-    }
+      //setTimeout(() => {this.showSaved = true}, 300);
+      //setTimeout(() => {this.showSaved = false}, 2500);
+      setTimeout(() => {this.showDownloadLink = true}, 700);
+      
+    },
   },
   mounted: function () {
     //this.establishWSConnection(this.webSocketUserId);

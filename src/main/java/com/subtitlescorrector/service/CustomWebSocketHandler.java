@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,16 +55,21 @@ public class CustomWebSocketHandler extends TextWebSocketHandler {
 	
 	
 	public void sendMessage(SubtitleCorrectionEvent event) {
-		
-		WebSocketSession session = webSocketUserService.findUserSession(event.getWebSocketSessionId().toString(), sessions);
-		
-		if(session != null) {
-			try {
-				session.sendMessage(new TextMessage(Util.subtitleCorrectionEventToJson(event)));
-			} catch (IOException e) {
-				log.error("Error sending message to websocket!", e);
+
+		if (StringUtils.isNotBlank(event.getWebSocketSessionId())) {
+			WebSocketSession session = webSocketUserService.findUserSession(event.getWebSocketSessionId().toString(),
+					sessions);
+
+			if (session != null) {
+				try {
+					session.sendMessage(new TextMessage(Util.subtitleCorrectionEventToJson(event)));
+				} catch (IOException e) {
+					log.error("Error sending message to websocket!", e);
+				}
 			}
+
+		} else {
+			log.error("Message not sent, WebSocket session not found!");
 		}
-		
 	}
 }

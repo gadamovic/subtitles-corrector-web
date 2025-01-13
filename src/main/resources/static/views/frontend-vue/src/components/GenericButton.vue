@@ -2,7 +2,7 @@
 <div class="field">
     <div class="control">
       <button
-        type="submit"
+        type="button"
         class="button is-success is-fullwidth"
         :class="loading ? 'is-loading' : ''"
         :disabled="loading"

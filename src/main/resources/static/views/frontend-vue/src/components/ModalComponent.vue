@@ -49,9 +49,6 @@ export default {
     };
   },
   methods: {
-    openModal() {
-      this.$emit("showModal");
-    },
     closeModal() {
       this.$emit("closeModal");
     },
@@ -75,7 +72,7 @@ export default {
     },
     cancel(){
       this.closeModal();
-    }
+    },
 
   },
   computed: {

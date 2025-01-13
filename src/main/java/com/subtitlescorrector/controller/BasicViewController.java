@@ -17,7 +17,7 @@ public class BasicViewController {
 	@RequestMapping(path="/")
 	public String upload(HttpServletRequest request) {
 		
-		log.info("Client ip: " + request.getRemoteAddr());
+		log.info("Client ip: " + request.getRemoteAddr() + ". Request url: " + request.getRequestURL().toString());
 		return "index";
 		
 	}

@@ -1,11 +1,11 @@
 <template>
   <div class="content">
     <div class="section">
-      <HeadingComponent first_line="Subtitles corrector" 
-                        second_line="Easily fix character encoding, formatting issues, and edit subtitles, ensuring your subtitle files are clean, accurate, and ready for use."
-                        heading_link="https://subtitles-corrector.com"/>
-      <FileUploader/>
-      <ContactForm/>
+      <HeadingComponent first_line="Subtitles corrector"
+        second_line="Easily fix character encoding, formatting issues, and edit subtitles, ensuring your subtitle files are clean, accurate, and ready for use."
+        heading_link="https://subtitles-corrector.com" />
+      <FileUploader />
+      <ContactForm />
     </div>
     <FooterComponent />
   </div>
@@ -29,30 +29,29 @@ export default {
   },
   mounted: async function () {
 
-
-    const response = await fetch("https://hutils.loxal.net/whois", {
-      method: "GET"
-    });
-
-    if (response.ok) {
-
-      const whoIsResult = await response.json();
-      fetch("api/rest/1.0/logUser", {
-        method: "POST",
-        body: JSON.stringify(whoIsResult),
-        headers: new Headers({
-          'Content-Type': 'application/json'
-        }),
+    if (process.env.VUE_APP_ENVIRONMENT === 'prod') {
+      const response = await fetch("https://hutils.loxal.net/whois", {
+        method: "GET"
       });
 
-    }
+      if (response.ok) {
 
+        const whoIsResult = await response.json();
+        fetch("api/rest/1.0/logUser", {
+          method: "POST",
+          body: JSON.stringify(whoIsResult),
+          headers: new Headers({
+            'Content-Type': 'application/json'
+          }),
+        });
+
+      }
+    }
   },
 };
 </script>
 
 <style>
-
 #app {
   max-width: 600px;
   margin: auto;
