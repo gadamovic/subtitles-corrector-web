@@ -23,19 +23,18 @@ export default {
         return {
             subtitleDataStore: useSubtitleDataStore(),
             isLoading: true,
-            tickCounter: 1
         }
     },
     methods: {
 
     },
     mounted: function () {
-        nextTick(() => {
-            console.log("Tick counter: " + this.tickCounter)
-            this.tickCounter++;
-            this.isLoading = false; // Hide loader after rendering
+        requestAnimationFrame(() => {
+            nextTick(() => {
+                this.isLoading = false; // Hide loader after rendering
 
-        });
+            });
+        })
     }
 
 }
