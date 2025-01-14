@@ -2,7 +2,7 @@
 
   <ModalComponent :modalActive="showModal" @closeModal="onCloseModal"
     @saveClicked="saveModalClicked" :fileProcessingLogs="fileProcessingLogs"
-    :processedPercentage="processedPercentage" :subtitleData="subtitleData"
+    :processedPercentage="processedPercentage"
     :lastFileProcessingLogReceived="lastFileProcessingLogReceived" :userId="userId">
 
   </ModalComponent>
@@ -53,6 +53,7 @@
 
 import GenericButton from './GenericButton.vue';
 import ModalComponent from './ModalComponent.vue';
+import { useSubtitleDataStore } from '@/stores/subtitleDataStore';
 
 export default {
   name: "FileUploader",
@@ -64,7 +65,7 @@ export default {
       file: null, // Selected file
       loading: false, // Loading state
       error: null, // Error message
-      subtitleData: Object,
+      subtitleDataStore: useSubtitleDataStore(),
       showModal: false,
       fileProcessingLogs: {},
       processedPercentage: 0,
@@ -73,7 +74,7 @@ export default {
       lastFileProcessingLogReceived: false,
       user_acked: false,
       showSaved: false,
-      showDownloadLink: false
+      showDownloadLink: false,
     };
   },
   methods: {
@@ -134,7 +135,9 @@ export default {
 
         if (response.ok) {
           const result = await response.json();
-          this.subtitleData = result;
+
+          this.subtitleDataStore.setSubtitleData(result)
+          this.subtitleDataStore.setSubtitleDataTmp(result)
           this.loading = false;
 
         } else {
@@ -242,7 +245,9 @@ export default {
         const a = document.createElement("a");
 
         a.href = url;
-        a.download = 'Subtitle-Corrector_' + this.subtitleData.filename.substr(this.subtitleData.filename.indexOf("_") + 1, this.subtitleData.filename.length);
+        const subtitleDataObj = this.subtitleDataStore.subtitleData;
+
+        a.download = 'Subtitle-Corrector_' + subtitleDataObj.filename.substr(subtitleDataObj.filename.indexOf("_") + 1, subtitleDataObj.filename.length);
         document.body.appendChild(a);
         a.click();
 
@@ -253,15 +258,11 @@ export default {
     },
     saveModalClicked() {
 
-      //show notification
-      //setTimeout(() => {this.showSaved = true}, 300);
-      //setTimeout(() => {this.showSaved = false}, 2500);
       setTimeout(() => {this.showDownloadLink = true}, 700);
       
     },
   },
   mounted: function () {
-    //this.establishWSConnection(this.webSocketUserId);
     this.establishWSConnection();
   },
   computed: {
@@ -269,8 +270,11 @@ export default {
       return "api/rest/1.0/downloadFile?userId=" + this.userId;
     },
     subtitleFilename(){
-      if(this.subtitleData.filename){
-        return this.subtitleData.filename.substr(this.subtitleData.filename.indexOf("_") + 1, this.subtitleData.filename.length);
+
+      const subtitleDataObj = this.subtitleDataStore.subtitleData;
+
+      if(subtitleDataObj.filename){
+        return subtitleDataObj.filename.substr(subtitleDataObj.filename.indexOf("_") + 1, subtitleDataObj.filename.length);
       }else{
         return "";
       }

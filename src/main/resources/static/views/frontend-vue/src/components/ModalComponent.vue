@@ -10,13 +10,13 @@
       <section class="modal-card-body">
 
         <AppliedChanges :fileProcessingLogs="fileProcessingLogs" :processedPercentage="processedPercentage"></AppliedChanges>
-        <SubtitleContentComponent :subtitleData="subtitleData" v-if="lastFileProcessingLogReceived"></SubtitleContentComponent>
+        <SubtitleContentComponent v-if="lastFileProcessingLogReceived"></SubtitleContentComponent>
 
       </section>
       <footer class="modal-card-foot">
         <div class="buttons">
           <button class="button is-success" :class="this.loading ? 'is-loading' : ''" @click="save">Save changes</button>
-          <button class="button" @click="cancel">Cancel</button>
+          <button class="button" @click="closeModal">Cancel</button>
         </div>
       </footer>
     </div>
@@ -26,6 +26,7 @@
 <script>
 import AppliedChanges from './AppliedChanges.vue';
 import SubtitleContentComponent from './SubtitleContentComponent.vue';
+import { useSubtitleDataStore } from '@/stores/subtitleDataStore';
 
 export default {
   name: "ModalComponent",
@@ -33,7 +34,6 @@ export default {
     AppliedChanges, SubtitleContentComponent
   },
   props: {
-    subtitleData: Object,
     modalActive: { //toggleing of the modal is controlled from the parent
       type: Boolean,
       default: false
@@ -45,12 +45,14 @@ export default {
   },
   data() {
     return {
-      loading: false
+      loading: false,
+      subtitleDataStore: useSubtitleDataStore()
     };
   },
   methods: {
     closeModal() {
       this.$emit("closeModal");
+      this.subtitleDataStore.setSubtitleDataTmp(this.subtitleDataStore.subtitleData)
     },
     async save(){
 
@@ -58,7 +60,7 @@ export default {
 
       let response = await fetch(("api/rest/1.0/save?userId=" + this.userId), {
           method: "POST",
-          body: JSON.stringify(this.subtitleData),
+          body: JSON.stringify(this.subtitleDataStore.subtitleData),
           headers: new Headers({'Content-Type': 'application/json'})
         });
 
@@ -69,16 +71,15 @@ export default {
         }
 
         this.$emit("saveClicked");
-    },
-    cancel(){
-      this.closeModal();
+        this.subtitleDataStore.setSubtitleData(this.subtitleDataStore.subtitleDataTmp);
     },
 
   },
   computed: {
     subtitleFilename(){
-      if(this.subtitleData.filename){
-        return this.subtitleData.filename.substr(this.subtitleData.filename.indexOf("_") + 1, this.subtitleData.filename.length);
+      const subtitleDataTemp = this.subtitleDataStore.subtitleData;
+      if(subtitleDataTemp.filename){
+        return subtitleDataTemp.filename.substr(subtitleDataTemp.filename.indexOf("_") + 1, subtitleDataTemp.filename.length);
       }else{
         return "";
       }

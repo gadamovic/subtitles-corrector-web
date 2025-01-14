@@ -51,9 +51,6 @@ public class SaveSubtitleController {
 
 	@RequestMapping(path = "/downloadFile")
 	public void download(@RequestParam("userId") String userId, HttpServletResponse response) {
-
-		//TODO: Sredi ime fajla koji se skida
-		//TODO: Download dugme da bude ime fajla i klik za download
 		
 		SubtitleFileData data = redisService.getUserSubtitleCurrentVersion(userId);
 
