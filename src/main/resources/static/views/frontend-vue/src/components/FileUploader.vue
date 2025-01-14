@@ -136,8 +136,8 @@ export default {
         if (response.ok) {
           const result = await response.json();
 
-          this.subtitleDataStore.setSubtitleData(result)
-          this.subtitleDataStore.setSubtitleDataTmp(result)
+          this.subtitleDataStore.setSubtitleData(JSON.parse(JSON.stringify(result)))
+          this.subtitleDataStore.setSubtitleDataTmp(JSON.parse(JSON.stringify(result)))
           this.loading = false;
 
         } else {

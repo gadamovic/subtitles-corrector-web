@@ -10,20 +10,14 @@ module.exports = defineConfig({
   publicPath: vuePublicPath,
   devServer: {
     proxy: {
-      '/api': {
+      '/api/rest/1.0': {
         target:
           process.env.VUE_APP_ENVIRONMENT === 'prod'
             ? 'https://subtitles-corrector.com'
-            : 'http://localhost:8080', // Backend server
+            : 'http://localhost:8080/', // Backend server
         changeOrigin: true,
         pathRewrite: {
-          '^/api': '', // Remove `/api` from the request before sending it to the backend
-        },
-        onProxyReq: (proxyReq, req) => {
-          console.log(`Proxying request: ${req.url}`);
-        },
-        onProxyRes: (proxyRes, req) => {
-          console.log(`Received response for: ${req.url}`);
+          '^/subtitles/views': '/subtitles', // Remove `//subtitles` from the request before sending it to the backend
         },
       },
     },

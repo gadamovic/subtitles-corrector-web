@@ -52,7 +52,7 @@ export default {
   methods: {
     closeModal() {
       this.$emit("closeModal");
-      this.subtitleDataStore.setSubtitleDataTmp(this.subtitleDataStore.subtitleData)
+      this.subtitleDataStore.setSubtitleDataTmp(JSON.parse(JSON.stringify(this.subtitleDataStore.subtitleData)))
     },
     async save(){
 
@@ -67,11 +67,12 @@ export default {
         this.loading = false;
 
         if(response.ok){
-          this.closeModal();
+          this.$emit("closeModal");
         }
-
+        
         this.$emit("saveClicked");
-        this.subtitleDataStore.setSubtitleData(this.subtitleDataStore.subtitleDataTmp);
+        
+        this.subtitleDataStore.setSubtitleData(JSON.parse(JSON.stringify(this.subtitleDataStore.subtitleDataTmp))); //deep copy subtitleDataTmp
     },
 
   },
