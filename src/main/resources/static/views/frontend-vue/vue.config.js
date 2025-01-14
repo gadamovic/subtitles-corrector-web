@@ -11,10 +11,7 @@ module.exports = defineConfig({
   devServer: {
     proxy: {
       '/api/rest/1.0': {
-        target:
-          process.env.VUE_APP_ENVIRONMENT === 'prod'
-            ? 'https://subtitles-corrector.com'
-            : 'http://localhost:8080/', // Backend server
+        target: 'http://localhost:8080/', // Backend server
         changeOrigin: true,
         pathRewrite: {
           '^/subtitles/views': '/subtitles', // Remove `//subtitles` from the request before sending it to the backend

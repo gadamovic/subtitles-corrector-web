@@ -76,16 +76,6 @@ export default {
     },
 
   },
-  computed: {
-    subtitleFilename(){
-      const subtitleDataTemp = this.subtitleDataStore.subtitleData;
-      if(subtitleDataTemp.filename){
-        return subtitleDataTemp.filename.substr(subtitleDataTemp.filename.indexOf("_") + 1, subtitleDataTemp.filename.length);
-      }else{
-        return "";
-      }
-    },
-  }
 }
 
 </script>
