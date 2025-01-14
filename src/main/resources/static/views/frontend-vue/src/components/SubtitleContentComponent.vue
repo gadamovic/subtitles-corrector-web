@@ -1,6 +1,6 @@
 <template>
 
-    <LoaderComponent v-if="isLoading" isActive="true"></LoaderComponent>
+    <LoaderComponent v-if="isLoading" :isActive="true"></LoaderComponent>
 
     <div v-for="(subtitle, key) in subtitleDataStore.subtitleDataTmp.lines" :key="key">
         <textarea class="textarea" rows="2" v-model="subtitle.text" @change="updateData"
@@ -22,7 +22,8 @@ export default {
     data() {
         return {
             subtitleDataStore: useSubtitleDataStore(),
-            isLoading: true
+            isLoading: true,
+            tickCounter: 1
         }
     },
     methods: {
@@ -30,7 +31,10 @@ export default {
     },
     mounted: function () {
         nextTick(() => {
+            console.log("Tick counter: " + this.tickCounter)
+            this.tickCounter++;
             this.isLoading = false; // Hide loader after rendering
+
         });
     }
 

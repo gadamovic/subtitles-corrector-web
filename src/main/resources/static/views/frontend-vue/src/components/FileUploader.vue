@@ -212,10 +212,10 @@ export default {
       }
 
       if (message.processedPercentage) {
-        this.processedPercentage = message.processedPercentage;
+        this.processedPercentage = Number(message.processedPercentage);
       }
 
-      if (message.processedPercentage == '100') {
+      if (message.processedPercentage == 100) {
         this.lastFileProcessingLogReceived = true;
       }
     },

@@ -19,9 +19,6 @@ import com.subtitlescorrector.util.Constants;
 public class InvalidCharactersCorrector implements Corrector{
 
 	Logger log = LoggerFactory.getLogger(InvalidCharactersCorrector.class);
-
-	@Autowired
-	WebSocketMessageBrokerService webSocketBrokerService;
 	
 	@Autowired
 	KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate;
@@ -79,7 +76,6 @@ public class InvalidCharactersCorrector implements Corrector{
 
 	private String checkForChanges(String afterCorrection, String beforeCorrection, String correctionDescription, float processedPercentage, String webSocketSessionId) {
 		if(!afterCorrection.equals(beforeCorrection)) {
-			//log.info("Correction applied: " + correctionDescription);
 			
 			SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
 			event.setCorrection(correctionDescription);
