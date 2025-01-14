@@ -1,6 +1,6 @@
 <template>
 
-    <LoaderComponent v-if="isLoading" :isActive="true"></LoaderComponent>
+    <LoaderComponent v-if="loaderStore.isLoading" :isActive="true"></LoaderComponent>
 
     <div v-for="(subtitle, key) in subtitleDataStore.subtitleDataTmp.lines" :key="key">
         <textarea class="textarea" rows="2" v-model="subtitle.text" @change="updateData"
@@ -12,7 +12,7 @@
 <script>
 
 import { useSubtitleDataStore } from '@/stores/subtitleDataStore';
-import { nextTick } from 'vue';
+import { useLoaderStore } from '@/stores/subtitleContentComponentLoaderStore';
 import LoaderComponent from './LoaderComponent.vue';
 
 export default {
@@ -22,20 +22,12 @@ export default {
     data() {
         return {
             subtitleDataStore: useSubtitleDataStore(),
-            isLoading: true,
+            loaderStore: useLoaderStore(),
         }
     },
     methods: {
 
     },
-    mounted: function () {
-        requestAnimationFrame(() => {
-            nextTick(() => {
-                this.isLoading = false; // Hide loader after rendering
-
-            });
-        })
-    }
 
 }
 

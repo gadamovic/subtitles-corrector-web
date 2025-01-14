@@ -51,6 +51,7 @@
 
 <script>
 
+import { useLoaderStore } from '@/stores/subtitleContentComponentLoaderStore';
 import GenericButton from './GenericButton.vue';
 import ModalComponent from './ModalComponent.vue';
 import { useSubtitleDataStore } from '@/stores/subtitleDataStore';
@@ -75,6 +76,7 @@ export default {
       user_acked: false,
       showSaved: false,
       showDownloadLink: false,
+      loaderStore: useLoaderStore(),
     };
   },
   methods: {
@@ -106,26 +108,16 @@ export default {
         setTimeout(() => { }, 10);
       }
 
-      this.fileProcessingLogs = {};
-      this.processingProgress = 0;
-      this.lastFileProcessingLogReceived = false;
-      this.showDownloadLink = false;
-
       if (!this.file) {
         this.error = "Please select a file.";
         return;
       }
 
-      this.error = null;
-      this.loading = true;
-      this.downloadLink = "";
+      this.initBeforeUpload();
 
       const formData = new FormData();
       formData.append("file", this.file);
       formData.append("webSocketUserId", this.userId);
-
-      this.fileProcessingLogs = {};
-      this.processedPercentage = 0;
 
       try {
         const response = await fetch("api/rest/1.0/upload", {
@@ -154,9 +146,26 @@ export default {
         this.error = "An error occurred!";
         this.loading = false;
       }
+
+      this.loaderStore.setIsLoading(false)
+      
     },
+    initBeforeUpload(){
+      this.fileProcessingLogs = {};
+      this.processedPercentage = 0;
+      this.loaderStore.setIsLoading(true)
+      this.subtitleDataStore.setSubtitleData(new Object())
+      this.subtitleDataStore.setSubtitleDataTmp(new Object())
 
+      this.error = null;
+      this.loading = true;
+      this.downloadLink = "";
 
+      this.fileProcessingLogs = {};
+      this.processingProgress = 0;
+      this.lastFileProcessingLogReceived = false;
+      this.showDownloadLink = false;
+    },
     establishWSConnection() {
 
 
@@ -273,7 +282,7 @@ export default {
 
       const subtitleDataObj = this.subtitleDataStore.subtitleData;
 
-      if(subtitleDataObj.filename){
+      if(subtitleDataObj != null && subtitleDataObj.filename){
         return subtitleDataObj.filename.substr(subtitleDataObj.filename.indexOf("_") + 1, subtitleDataObj.filename.length);
       }else{
         return "";
