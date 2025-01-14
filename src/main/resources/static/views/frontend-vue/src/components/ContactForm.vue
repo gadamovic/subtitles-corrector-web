@@ -1,7 +1,7 @@
 <template>
 
 <div class="container" style="margin-bottom: 24px;">
-    <form @submit.prevent="submitContactForm()" class="box" style="background-color: #004266;">
+    <form ref="contact-form" class="box" style="background-color: #004266;">
         <div class="field">
             <label class="label has-text-white">Noticed a subtitle problem that Subtitles Corrector doesn't fix? Have a feedback or suggestion?
                 Let us know!</label> <br/>
@@ -12,7 +12,7 @@
             <textarea class="textarea" placeholder = "Description" type="text" id="description" name="description" @change="handleDescriptionChange" required></textarea>
         </div>
 
-        <GenericButton button_text="Submit" :loading="this.loading"/>
+        <GenericButton @click="submitContactForm" button_text="Submit" :loading="this.loading"/>
     </form>
 
 </div>
@@ -48,7 +48,12 @@ export default{
         handleDescriptionChange(event){
             this.description = event.target.value;
         },
+
         async submitContactForm() {
+
+            if(!this.$refs['contact-form'].reportValidity()){
+                return
+            }
 
             try {
                 
