@@ -3,6 +3,7 @@ package com.subtitlescorrector.service.subtitles.corrections;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
+import com.subtitlescorrector.domain.SubtitleFileData;
+import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 import com.subtitlescorrector.service.WebSocketMessageBrokerService;
 import com.subtitlescorrector.util.Constants;
@@ -27,14 +30,15 @@ public class InvalidCharactersCorrector implements Corrector{
 	ApplicationProperties properties;
 	
 	@Override
-	public List<String> correct(List<String> lines, String webSocketSessionId) {
+	public SubtitleFileData correct(SubtitleFileData data, String webSocketSessionId) {
 
-		List<String> correctedLines = new ArrayList<>();
-		int numberOfLines = lines.size();
+		int numberOfLines = data.getLines().size();
 		int currentLineNumber = 0;
 		float processedPercentage = 0f;
-				
-		for(String line : lines) {
+		
+		for(SubtitleUnitData subUnitData : data.getLines()) {
+			
+			String line = subUnitData.getText();
 			
 			currentLineNumber ++;
 			processedPercentage = ((float) currentLineNumber / (float) numberOfLines) * 100;
@@ -66,12 +70,12 @@ public class InvalidCharactersCorrector implements Corrector{
 			tmp = beforeCorrection.replace("È", "Č");
 			beforeCorrection = checkForChanges(tmp, beforeCorrection, "È -> Č", processedPercentage, webSocketSessionId);
 			
-			correctedLines.add(beforeCorrection);
+			subUnitData.setText(beforeCorrection);
 		}
 		
 		sendProcessingFinishedMessage(webSocketSessionId);
 
-		return correctedLines;
+		return data;
 	}
 
 	private String checkForChanges(String afterCorrection, String beforeCorrection, String correctionDescription, float processedPercentage, String webSocketSessionId) {
@@ -87,6 +91,8 @@ public class InvalidCharactersCorrector implements Corrector{
 			if(properties.getSubtitlesKafakEnabled()) {
 				kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
 			}
+			
+			afterCorrection = "<span style='color: red;'>časdasda </span>" + afterCorrection;
 			
 		}
 

@@ -3,8 +3,7 @@
     <LoaderComponent v-if="loaderStore.isLoading" :isActive="true"></LoaderComponent>
 
     <div v-for="(subtitle, key) in subtitleDataStore.subtitleDataTmp.lines" :key="key">
-        <textarea class="textarea" rows="2" v-model="subtitle.text" @change="updateData"
-            style="resize:none;"></textarea>
+        <textarea class="textarea" rows="2" v-model="subtitle.text" style="resize:none;"></textarea>
     </div>
 
 </template>

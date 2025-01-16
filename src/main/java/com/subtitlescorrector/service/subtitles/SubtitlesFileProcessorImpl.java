@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.controller.rest.FileUploadController;
+import com.subtitlescorrector.domain.S3BucketNames;
 import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitlesFileProcessorResponse;
 import com.subtitlescorrector.domain.SubtitlesProcessingStatus;
@@ -56,40 +57,38 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	SubtitleLinesToSubtitleUnitDataConverter converter;
 
 	@Override
-	public SubtitlesFileProcessorResponse process(File storedFile, String webSocketSessionId) {
+	public SubtitleFileData process(File storedFile, String webSocketSessionId) {
 
+		SubtitleFileData data = new SubtitleFileData();
 		File correctedFile = new File(storedFile.getName());
-		SubtitlesFileProcessorResponse response = new SubtitlesFileProcessorResponse();
 
 		try {
 
 			Charset detectedEncoding = FileUtil.detectEncodingOfFile(storedFile);
 			List<String> lines = FileUtil.loadTextFile(storedFile);
 
+			data.setFilename(correctedFile.getName());
+			data.setLines(converter.convertToSubtitleUnits(lines));
+			
 			for (Corrector corrector : correctorsManager.getCorrectors()) {
-				lines = corrector.correct(lines, webSocketSessionId);
+				data = corrector.correct(data, webSocketSessionId);
 			}
 
 			if (detectedEncoding != StandardCharsets.UTF_8) {
 				updateEncoding(storedFile, webSocketSessionId, detectedEncoding);
 			}
 
-			FileUtil.writeLinesToFile(correctedFile, lines, StandardCharsets.UTF_8);
+			FileUtil.writeLinesToFile(correctedFile, converter.convertToListOfStrings(data.getLines()), StandardCharsets.UTF_8);
 
-			response = s3Service.uploadAndGetDownloadUrl(correctedFile);
-			
-			SubtitleFileData data = new SubtitleFileData();
-			data.setFilename(correctedFile.getName());
-			data.setLines(converter.convertToSubtitleUnits(lines));
-			response.setData(data);
-			
+			s3Service.uploadFileToS3(null, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), correctedFile);
+
 		}catch (Exception e) {
 			log.error("Error processing file!", e);
 		} finally {
 			deleteFiles(storedFile, correctedFile);
 		}
 
-		return response;
+		return data;
 	}
 
 	private void deleteFiles(File storedFile, File correctedFile) {

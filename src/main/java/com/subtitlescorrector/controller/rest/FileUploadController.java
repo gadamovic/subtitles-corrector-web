@@ -65,14 +65,14 @@ public class FileUploadController {
 				
 		File storedFile = fileSystemStorageService.store(file);
 		String webSocketSessionId = redisService.getWebSocketSessionIdForUser(request.getParameter("webSocketUserId"));
-		SubtitlesFileProcessorResponse response = processor.process(storedFile, webSocketSessionId);
+		SubtitleFileData data = processor.process(storedFile, webSocketSessionId);
 
 		//save uploaded and server-corrected version as the first version
-		redisService.addUserSubtitleCurrentVersion(response.getData(), request.getParameter("webSocketUserId"));
+		redisService.addUserSubtitleCurrentVersion(data, request.getParameter("webSocketUserId"));
 		
 		emailService.sendEmailOnlyIfProduction("Ip: " + clientIp + "\nFilename: " + file.getOriginalFilename(), properties.getAdminEmailAddress(), "Somebody is uploading a subtitle!");
 
-		return ResponseEntity.ok(response.getData());
+		return ResponseEntity.ok(data);
 		
 	}
 }
