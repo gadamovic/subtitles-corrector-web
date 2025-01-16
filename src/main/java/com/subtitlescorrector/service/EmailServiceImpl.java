@@ -31,7 +31,7 @@ public class EmailServiceImpl implements EmailService {
 	@Async
 	public EmailSendStatus sendEmail(String text, String to, String subject) {
 		
-		if(redisService.getAndIncrementNumberOfEmailsInCurrentHour() <= Constants.EMAILS_SENT_PER_HOUR_LIMIT) {
+		if(redisService.incrementAndGetNumberOfEmailsInCurrentHour() <= Constants.EMAILS_SENT_PER_HOUR_LIMIT) {
 			
 			log.info("Sending email to: " + to + "...");
 			SimpleMailMessage message = new SimpleMailMessage();

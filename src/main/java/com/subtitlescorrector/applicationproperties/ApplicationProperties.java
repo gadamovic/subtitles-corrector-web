@@ -43,6 +43,8 @@ public class ApplicationProperties {
 	private static final String MAIL_SENDER_PROPERTIES_SMTP_ENABLE_STARTTLS_KEY = "mailSender.properties.mail.smtp.starttls.enable";
 	private static final String MAIL_SENDER_PROPERTIES_SMTP_DEBUG_KEY = "mailSender.properties.mail.smtp.debug";
 	private static final String MAIL_SENDER_PROPERTIES_SMTP_SSL_TRUST_KEY = "mailSender.properties.mail.smtp.ssl.trust";
+
+	private static final String SUBTITLES_PER_USER_PER_TIME_INTERVAL_LIMIT_KEY = "subtitles.subtitles_per_user_per_time_interval_limit_key";
 	
 	public void init() {
 		
@@ -165,6 +167,10 @@ public class ApplicationProperties {
 	
 	public String getAdminEmailAddress() {
 		return System.getenv(VariablesEnum.ADMIN_EMAIL_ADDRESS.getName());
+	}
+
+	public Integer getSubtitlesPerUserPerTimeIntervalLimit() {
+		return Integer.parseInt(getProperty(SUBTITLES_PER_USER_PER_TIME_INTERVAL_LIMIT_KEY));
 	}
 	
 }

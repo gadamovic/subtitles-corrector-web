@@ -57,7 +57,7 @@ public class FileUploadController {
 		
 		if(properties.isProdEnvironment() && !monitor.subtitleCorrectionAllowedForUser(clientIp)) {
 			SubtitleFileData data = new SubtitleFileData();
-			data.setHttpResponseMessage("Users are allowed to process one subtitle every two minutes!");  
+			data.setHttpResponseMessage("The limit for processed subtitle files has been reached. Please try again later");
 			return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(data);
 		}else {
 			redisService.updateLastS3UploadTimestamp(clientIp);

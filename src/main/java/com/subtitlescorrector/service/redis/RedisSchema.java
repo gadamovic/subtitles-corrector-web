@@ -26,12 +26,32 @@ public class RedisSchema {
 	public static String createNumberOfEmailsSentInCurrentHour() {
 		return RedisKeys.NUMBER_OF_EMAILS_PER_HOUR.getKey() + "_" + getCurrentDateAndHour();
 	}
+	
+	public static String createNumberOfSubtitlesPerUserPerTimeIntervalKey(String userId) {
+		return RedisKeys.NUMBER_OF_PROCESSED_SUBTITLES_PER_USER.getKey() + "_" + userId + getCurrentDateAndHourAndMinute(5);
+	}
 
 	private static String getCurrentDateAndHour() {
 		
 		LocalDateTime now = LocalDateTime.now();
 		
 		String key = now.format(DateTimeFormatter.ofPattern("YYYY-MM-dd-HH"));
+		
+		return key;
+	}
+	
+	/**
+	 * Creates a key that is changing every "numberOfMinutes" minutes
+	 * @param numberOfMinutes
+	 * @return
+	 */
+	private static String getCurrentDateAndHourAndMinute(int numberOfMinutes) {
+		
+		LocalDateTime now = LocalDateTime.now();
+		
+		String key = now.format(DateTimeFormatter.ofPattern("YYYY-MM-dd-HH"));
+		int minutes = now.getMinute() / numberOfMinutes;
+		key += ("-" + String.valueOf(minutes));
 		
 		return key;
 	}

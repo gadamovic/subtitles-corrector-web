@@ -23,6 +23,7 @@ public class RedisServiceImpl implements RedisService {
 	private static final int USER_WEBSOCKET_SESSION_CACHE_TTL = 60 * 60 * 3;
 	private static final int NUMBER_OF_EMAILS_CACHE_TTL = 60 * 60 * 3;
 	private static final int USER_SUBTITLE_CURRENT_VERSION_CACHE_TTL = 60 * 60 * 3;
+	private static final int NUMBER_OF_PROCESSED_SUBTITLES_PER_USER_TTL = 60 * 60;
 	
 	@Override
 	public void updateLastS3UploadTimestamp(String ip) {
@@ -58,7 +59,7 @@ public class RedisServiceImpl implements RedisService {
 	}
 	
 	@Override
-	public Integer getAndIncrementNumberOfEmailsInCurrentHour() {
+	public Integer incrementAndGetNumberOfEmailsInCurrentHour() {
 		
 		Integer numberOfEmailsInt = null;
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
@@ -76,6 +77,27 @@ public class RedisServiceImpl implements RedisService {
 			
 		}
 		return numberOfEmailsInt;
+	}
+	
+	public Integer incrementAndGetNumberOfSubtitlesProcessedByUserInCurrentTimeInterval(String userId) {
+		
+		String key = RedisSchema.createNumberOfSubtitlesPerUserPerTimeIntervalKey(userId);
+		Integer numberOfSubtitlesInt = null;
+		
+		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
+			
+			String numberOfSubtitles = jedis.get(key);
+			if(StringUtils.isNotBlank(numberOfSubtitles)) {
+				numberOfSubtitlesInt = Integer.valueOf(numberOfSubtitles) + 1;
+				jedis.setex(key, NUMBER_OF_PROCESSED_SUBTITLES_PER_USER_TTL, numberOfSubtitlesInt.toString());
+			}else {
+				jedis.setex(key, NUMBER_OF_PROCESSED_SUBTITLES_PER_USER_TTL, "1");
+				numberOfSubtitlesInt = 1;
+			}
+			
+		}
+		
+		return numberOfSubtitlesInt;
 	}
 	
 	public void addUserSubtitleCurrentVersion(SubtitleFileData data, String userId) {
