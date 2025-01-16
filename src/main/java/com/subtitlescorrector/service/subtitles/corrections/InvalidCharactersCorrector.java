@@ -1,9 +1,6 @@
 package com.subtitlescorrector.service.subtitles.corrections;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +12,6 @@ import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
-import com.subtitlescorrector.service.WebSocketMessageBrokerService;
 import com.subtitlescorrector.util.Constants;
 
 @Service
@@ -91,8 +87,6 @@ public class InvalidCharactersCorrector implements Corrector{
 			if(properties.getSubtitlesKafakEnabled()) {
 				kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
 			}
-			
-			afterCorrection = "<span style='color: red;'>časdasda </span>" + afterCorrection;
 			
 		}
 
