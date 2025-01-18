@@ -25,6 +25,7 @@ public class CertbotChallengeController {
 	@RequestMapping(path = "/.well-known/acme-challenge/{filename}")
 	public ResponseEntity<Resource> getChallengeFiles(@PathVariable(name = "filename") String filename) {
 		
+		//TODO: Try to enable TLS for https://13.61.96.166/
 		log.info("Certbot controller executing with filename: " + filename);
 		
 		File file = new File(properties.getCertbotChallengePath(), filename);

@@ -16,9 +16,6 @@ import com.subtitlescorrector.service.WebSocketMessageBrokerService;
 public class SubtitleCorrectionEventConsumerImpl implements SubtitleCorrectionEventConsumer {
 
 	Logger log = LoggerFactory.getLogger(SubtitleCorrectionEventConsumerImpl.class);
-
-	@Autowired
-	WebSocketMessageBrokerService webSocketService;
 	
 	@Autowired
 	CustomWebSocketHandler webSocketHandler;
@@ -26,8 +23,8 @@ public class SubtitleCorrectionEventConsumerImpl implements SubtitleCorrectionEv
 	@KafkaListener(id = "subtitlesCorrectionListenerContainer", topics = "subtitlesCorrections", containerFactory = "kafkaListenerContainerFactory")
 	public void consumeCorrections(List<SubtitleCorrectionEvent> events) {
 		for(SubtitleCorrectionEvent event : events) {
-			//webSocketService.sendSubtitleCorrectionEventToUser(event);
 				webSocketHandler.sendMessage(event);
+				log.info(event.toString());
 		}
 	}
 

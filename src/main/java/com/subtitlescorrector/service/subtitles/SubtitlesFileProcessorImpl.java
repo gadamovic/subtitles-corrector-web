@@ -17,15 +17,17 @@ import org.springframework.stereotype.Component;
 
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.controller.rest.FileUploadController;
+import com.subtitlescorrector.domain.EditOperation;
+import com.subtitlescorrector.domain.EditOperation.OperationType;
 import com.subtitlescorrector.domain.S3BucketNames;
 import com.subtitlescorrector.domain.SubtitleFileData;
+import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.domain.SubtitlesFileProcessorResponse;
 import com.subtitlescorrector.domain.SubtitlesProcessingStatus;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
-import com.subtitlescorrector.service.CorrectorsManager;
-import com.subtitlescorrector.service.SubtitleLinesToSubtitleUnitDataConverter;
 import com.subtitlescorrector.service.s3.S3Service;
 import com.subtitlescorrector.service.subtitles.corrections.Corrector;
+import com.subtitlescorrector.service.subtitles.corrections.CorrectorsManager;
 import com.subtitlescorrector.util.Constants;
 import com.subtitlescorrector.util.FileUtil;
 import com.subtitlescorrector.util.Util;
@@ -55,6 +57,9 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	
 	@Autowired
 	SubtitleLinesToSubtitleUnitDataConverter converter;
+	
+	@Autowired
+	EditDistanceService levenshteinDistance;
 
 	@Override
 	public SubtitleFileData process(File storedFile, String webSocketSessionId) {
@@ -63,7 +68,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		File correctedFile = new File(storedFile.getName());
 
 		try {
-
+			
 			Charset detectedEncoding = FileUtil.detectEncodingOfFile(storedFile);
 			List<String> lines = FileUtil.loadTextFile(storedFile);
 
@@ -73,14 +78,17 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			for (Corrector corrector : correctorsManager.getCorrectors()) {
 				data = corrector.correct(data, webSocketSessionId);
 			}
+			
+			calculateEditOperationsAfterCorrections(data);
 
 			if (detectedEncoding != StandardCharsets.UTF_8) {
 				updateEncoding(storedFile, webSocketSessionId, detectedEncoding);
 			}
 
+			//TODO: upload file to s3 on multiple places (for ex. before edit, after corrections, before user save)
 			FileUtil.writeLinesToFile(correctedFile, converter.convertToListOfStrings(data.getLines()), StandardCharsets.UTF_8);
 
-			s3Service.uploadFileToS3(null, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), correctedFile);
+			s3Service.uploadFileToS3IfProd(null, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), correctedFile);
 
 		}catch (Exception e) {
 			log.error("Error processing file!", e);
@@ -89,6 +97,29 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		}
 
 		return data;
+	}
+
+	private void calculateEditOperationsAfterCorrections(SubtitleFileData data) {
+		for(SubtitleUnitData subData : data.getLines()) {
+			
+			String original = subData.getTextBeforeCorrection();
+			String corrected = subData.getText();
+			
+			List<EditOperation> operations = levenshteinDistance.getEditOperations(original, corrected);
+			
+			boolean allKeep = true;
+			for(EditOperation operation : operations) {
+				if(operation.getType() != OperationType.KEEP) {
+					allKeep = false;
+					break;
+				}
+			}
+			
+			if(!allKeep) {
+				subData.setEditOperations(Util.groupConsecutiveEditOperations(operations));
+			}
+			
+		}
 	}
 
 	private void deleteFiles(File storedFile, File correctedFile) {

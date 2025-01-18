@@ -12,6 +12,7 @@ import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
+import com.subtitlescorrector.service.subtitles.EditDistanceService;
 import com.subtitlescorrector.util.Constants;
 
 @Service
@@ -35,6 +36,7 @@ public class InvalidCharactersCorrector implements Corrector{
 		for(SubtitleUnitData subUnitData : data.getLines()) {
 			
 			String line = subUnitData.getText();
+			subUnitData.setTextBeforeCorrection(line);
 			
 			currentLineNumber ++;
 			processedPercentage = ((float) currentLineNumber / (float) numberOfLines) * 100;
@@ -42,6 +44,7 @@ public class InvalidCharactersCorrector implements Corrector{
 			String tmp = "";
 			String beforeCorrection = line;
 			
+			//NOTE: there are characters in this empty-looking quotes, but some editors doesn't print them
 			tmp = line.replace("", "ž");
 			beforeCorrection = checkForChanges(tmp, beforeCorrection, "\"\" -> ž", processedPercentage, webSocketSessionId);
 			
@@ -54,6 +57,12 @@ public class InvalidCharactersCorrector implements Corrector{
 			tmp = beforeCorrection.replace("", "Š");
 			beforeCorrection = checkForChanges(tmp, beforeCorrection, "\"\" -> Š", processedPercentage, webSocketSessionId);
 	
+			tmp = beforeCorrection.replace("", "");
+			beforeCorrection = checkForChanges(tmp, beforeCorrection, "Removed \"\"", processedPercentage, webSocketSessionId);
+			
+			tmp = beforeCorrection.replace("", "");
+			beforeCorrection = checkForChanges(tmp, beforeCorrection, "Removed \"\"", processedPercentage, webSocketSessionId);
+			
 			tmp = beforeCorrection.replace("æ", "ć");
 			beforeCorrection = checkForChanges(tmp, beforeCorrection, "æ -> ć", processedPercentage, webSocketSessionId);
 			
@@ -65,6 +74,11 @@ public class InvalidCharactersCorrector implements Corrector{
 			
 			tmp = beforeCorrection.replace("È", "Č");
 			beforeCorrection = checkForChanges(tmp, beforeCorrection, "È -> Č", processedPercentage, webSocketSessionId);
+			
+			tmp = beforeCorrection.replace("<b>", "");
+			beforeCorrection = checkForChanges(tmp, beforeCorrection, "Removed <b>", processedPercentage, webSocketSessionId);
+			
+			beforeCorrection = beforeCorrection.replace("\n", "<br/>");
 			
 			subUnitData.setText(beforeCorrection);
 		}

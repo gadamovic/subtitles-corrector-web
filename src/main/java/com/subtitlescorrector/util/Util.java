@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
+import com.subtitlescorrector.domain.EditOperation;
 import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
@@ -160,4 +162,37 @@ public class Util {
 		}
 	}
 
+	public static String generateS3Key(String postfix) {
+		
+		String s3KeyUUIDPrefix = UUID.randomUUID().toString();
+		String key = s3KeyUUIDPrefix + postfix;
+		return key;
+		
+	}	
+	
+	public static List<List<EditOperation>> groupConsecutiveEditOperations(List<EditOperation> operations) {
+		
+		List<List<EditOperation>> result = new ArrayList<>();
+		
+		List<EditOperation> currentGroup = new ArrayList<>();
+		
+		for(EditOperation operation : operations) {
+			
+			if(currentGroup.size() == 0 || currentGroup.get(0).getType() == operation.getType()) {
+				currentGroup.add(operation);
+			}else {
+				result.add(currentGroup);
+				currentGroup = new ArrayList<>();
+				currentGroup.add(operation);
+			}
+			
+		}
+		
+		if(currentGroup.size() > 0) {
+			result.add(currentGroup);
+		}
+		
+		return result;
+	}
+	
 }

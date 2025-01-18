@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitleUnitData;
-import com.subtitlescorrector.service.SubtitleLinesToSubtitleUnitDataConverter;
 import com.subtitlescorrector.service.redis.RedisService;
+import com.subtitlescorrector.service.subtitles.SubtitleLinesToSubtitleUnitDataConverter;
 import com.subtitlescorrector.util.FileUtil;
 
 import jakarta.servlet.http.HttpServletResponse;

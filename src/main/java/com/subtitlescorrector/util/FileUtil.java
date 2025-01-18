@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -31,6 +32,13 @@ public class FileUtil {
 			log.info("Detected encoding: " + detectedEncoding.displayName());
 			
 			Scanner scanner = new Scanner(file, detectedEncoding.displayName());
+			
+			if(file.length() > 0 && !scanner.hasNext()) {
+				//try another encoding
+				log.warn("Not able to read from file: <" + file.getName() + "> with encoding: " + detectedEncoding.displayName() + ". Trying again with UTF-8");
+				scanner.close();
+				scanner = new Scanner(file, StandardCharsets.ISO_8859_1.displayName());
+			}
 			
 			while (scanner.hasNext()) {
 				content.add(scanner.nextLine());

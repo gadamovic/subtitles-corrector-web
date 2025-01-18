@@ -10,4 +10,5 @@ public interface S3Service {
 
 	PutObjectResponse uploadFileToS3(String key, String bucket, File file);
 	String uploadAndGetDownloadUrl(File correctedFile);
+	PutObjectResponse uploadFileToS3IfProd(String key, String bucket, File file);
 }

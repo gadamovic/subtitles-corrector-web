@@ -1,4 +1,4 @@
-package com.subtitlescorrector.service;
+package com.subtitlescorrector.service.subtitles;
 
 import java.util.List;
 

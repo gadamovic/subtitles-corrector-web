@@ -58,6 +58,16 @@ public class S3ServiceImpl implements S3Service {
 		
 	}
 	
+	public PutObjectResponse uploadFileToS3IfProd(String key, String bucket, File file) {
+		
+		if(properties.isProdEnvironment()) {
+			return uploadFileToS3(key, bucket, file);
+		}else {
+			return null;
+		}
+		
+	}
+	
 	public String uploadAndGetDownloadUrl(File correctedFile) {
 		
 		String s3KeyUUIDPrefix = UUID.randomUUID().toString();
