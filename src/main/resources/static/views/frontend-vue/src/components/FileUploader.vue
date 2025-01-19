@@ -155,7 +155,6 @@ export default {
       
     },
     initBeforeUpload(){
-      this.fileProcessingLogs = {};
       this.processedPercentage = 0;
       this.loaderStore.setIsLoading(true)
       this.subtitleDataStore.setSubtitleData(new Object())
