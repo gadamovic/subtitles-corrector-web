@@ -6,14 +6,14 @@
         <div class="navbar-brand">
           <a class="navbar-item" href="#">
           </a>
-          <a class="navbar-menu-open navbar-burger" role="button" type="button" data-toggle="side-menu">
+          <a class="navbar-menu-open navbar-burger" role="button" type="button" data-toggle="side-menu" v-if="false">
             <!-- This part is visible on narrow screens -->
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
           </a>
         </div>
-        <div class="navbar-menu">
+        <div class="navbar-menu" v-if="false">
           <div class="navbar-end">
             <ul class="navbar-item">
               <li><a class="navbar-item" href="#">About</a></li>
