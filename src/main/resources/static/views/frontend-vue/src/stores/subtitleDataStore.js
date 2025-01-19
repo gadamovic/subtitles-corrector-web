@@ -14,6 +14,12 @@ export const useSubtitleDataStore = defineStore('subtitleDataStore', {
     },
     setSubtitleDataTmp(newValue){
         this.subtitleDataTmp = newValue;
+    },
+    updateSubtitleDataTmpCompositeEditOperationsAtIndex(newValue, index){
+      this.subtitleDataTmp.lines[index].compEditOperations = newValue;
+    },
+    updateSubtitleDataTmpLineTextAtIndex(newValue, index){
+      this.subtitleDataTmp.lines[index].text = newValue;
     }
   }
 })

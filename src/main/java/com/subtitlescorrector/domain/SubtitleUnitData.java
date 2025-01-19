@@ -12,6 +12,7 @@ public class SubtitleUnitData {
 	String textBeforeCorrection;
 	
 	List<List<EditOperation>> editOperations;
+	List<CompositeEditOperation> compEditOperations;
 	
 	public String getFormat() {
 		return format;
@@ -57,6 +58,12 @@ public class SubtitleUnitData {
 		this.textBeforeCorrection = textBeforeCorrection;
 	}
 	
+	public List<CompositeEditOperation> getCompEditOperations() {
+		return compEditOperations;
+	}
+	public void setCompEditOperations(List<CompositeEditOperation> compEditOperations) {
+		this.compEditOperations = compEditOperations;
+	}
 	@Override
 	public String toString() {
 		return "SubtitleUnitData [format=" + format + ", number=" + number + ", timestampFrom=" + timestampFrom

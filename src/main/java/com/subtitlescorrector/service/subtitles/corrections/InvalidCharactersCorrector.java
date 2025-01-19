@@ -78,8 +78,6 @@ public class InvalidCharactersCorrector implements Corrector{
 			tmp = beforeCorrection.replace("<b>", "");
 			beforeCorrection = checkForChanges(tmp, beforeCorrection, "Removed <b>", processedPercentage, webSocketSessionId);
 			
-			beforeCorrection = beforeCorrection.replace("\n", "<br/>");
-			
 			subUnitData.setText(beforeCorrection);
 		}
 		

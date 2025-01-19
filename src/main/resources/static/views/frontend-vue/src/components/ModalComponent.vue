@@ -46,7 +46,7 @@ export default {
   data() {
     return {
       loading: false,
-      subtitleDataStore: useSubtitleDataStore()
+      subtitleDataStore: useSubtitleDataStore(),
     };
   },
   methods: {
@@ -58,6 +58,8 @@ export default {
 
       this.loading = true;
 
+      this.subtitleDataStore.setSubtitleData(JSON.parse(JSON.stringify(this.subtitleDataStore.subtitleDataTmp))); //deep copy subtitleDataTmp
+      
       let response = await fetch(("api/rest/1.0/save?userId=" + this.userId), {
           method: "POST",
           body: JSON.stringify(this.subtitleDataStore.subtitleData),
@@ -72,7 +74,6 @@ export default {
         
         this.$emit("saveClicked");
         
-        this.subtitleDataStore.setSubtitleData(JSON.parse(JSON.stringify(this.subtitleDataStore.subtitleDataTmp))); //deep copy subtitleDataTmp
     },
 
   },

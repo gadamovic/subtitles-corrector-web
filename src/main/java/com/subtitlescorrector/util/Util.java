@@ -25,20 +25,20 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
+import com.subtitlescorrector.domain.CompositeEditOperation;
 import com.subtitlescorrector.domain.EditOperation;
 import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 
-
 @Component
 public class Util {
 
 	private static final Logger log = LoggerFactory.getLogger(Util.class);
-	
+
 	@Autowired
 	ApplicationProperties properties;
-	
+
 	public static String getCurrentTimestampAsString() {
 		return LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyyHHmmssSSS"));
 	}
@@ -46,11 +46,11 @@ public class Util {
 	public static Map<String, String> loadPropertiesFileIntoMap(InputStream is) {
 
 		File file = inputStreamToFile(is);
-		
+
 		Map<String, String> propsMap = new HashMap<String, String>();
 
 		Scanner scanner = null;
-		
+
 		try {
 			scanner = new Scanner(file);
 		} catch (FileNotFoundException e) {
@@ -74,24 +74,24 @@ public class Util {
 		}
 
 		scanner.close();
-		
+
 		file.delete();
 		return propsMap;
 	}
-	
-	public static File inputStreamToFile(InputStream inputStream) {
-		
-		File file = new File("temp" + getCurrentTimestampAsString() + ".properties");
-		try(BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))){
-			
-			byte[] buffer = new byte[1024];
-            int bytesRead;
 
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
-			
-		}catch(Exception e) {
+	public static File inputStreamToFile(InputStream inputStream) {
+
+		File file = new File("temp" + getCurrentTimestampAsString() + ".properties");
+		try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
+
+			byte[] buffer = new byte[1024];
+			int bytesRead;
+
+			while ((bytesRead = inputStream.read(buffer)) != -1) {
+				outputStream.write(buffer, 0, bytesRead);
+			}
+
+		} catch (Exception e) {
 			log.error("Error writing input stream to file!");
 		}
 		return file;
@@ -117,30 +117,32 @@ public class Util {
 		return !isBlank(cs);
 	}
 
-	//NON-STATIC method!
+	// NON-STATIC method!
 	public String makeFilenameForDownloadFromS3Key(String s3Key) {
 		return properties.getSubtitleCorrectionProcessedFileNamePrefix() + s3Key.substring(s3Key.indexOf('_') + 1);
 	}
-	
+
 	/**
-	 * Custom json serialization of SubtitlesCorrectionEvent because it is an avro-generated class and contains many fields
+	 * Custom json serialization of SubtitlesCorrectionEvent because it is an
+	 * avro-generated class and contains many fields
+	 * 
 	 * @param event
 	 * @return
 	 */
 	public static String subtitleCorrectionEventToJson(SubtitleCorrectionEvent event) {
-		
+
 		JsonObject json = new JsonObject();
-		if(event.getCorrection() != null) {
+		if (event.getCorrection() != null) {
 			json.addProperty("correctionDescription", event.getCorrection().toString());
 		}
-		
-		if(event.getProcessedPercentage() != null) {
+
+		if (event.getProcessedPercentage() != null) {
 			json.addProperty("processedPercentage", event.getProcessedPercentage().toString());
 		}
 		return json.toString();
-		
+
 	}
-	
+
 	public static String subtitleUnitDataListToJson(SubtitleFileData data) {
 		ObjectMapper obj = new ObjectMapper();
 		try {
@@ -150,7 +152,7 @@ public class Util {
 			return null;
 		}
 	}
-	
+
 	public static SubtitleFileData jsonToSubtitleUnitDataList(String json) {
 		ObjectMapper obj = new ObjectMapper();
 
@@ -163,36 +165,65 @@ public class Util {
 	}
 
 	public static String generateS3Key(String postfix) {
-		
+
 		String s3KeyUUIDPrefix = UUID.randomUUID().toString();
 		String key = s3KeyUUIDPrefix + postfix;
 		return key;
-		
-	}	
-	
+
+	}
+
 	public static List<List<EditOperation>> groupConsecutiveEditOperations(List<EditOperation> operations) {
-		
+
 		List<List<EditOperation>> result = new ArrayList<>();
-		
+
 		List<EditOperation> currentGroup = new ArrayList<>();
-		
-		for(EditOperation operation : operations) {
-			
-			if(currentGroup.size() == 0 || currentGroup.get(0).getType() == operation.getType()) {
+
+		for (EditOperation operation : operations) {
+
+			if (currentGroup.size() == 0 || currentGroup.get(0).getType() == operation.getType()) {
 				currentGroup.add(operation);
-			}else {
+			} else {
 				result.add(currentGroup);
 				currentGroup = new ArrayList<>();
 				currentGroup.add(operation);
 			}
-			
+
 		}
-		
-		if(currentGroup.size() > 0) {
+
+		if (currentGroup.size() > 0) {
 			result.add(currentGroup);
 		}
-		
+
 		return result;
 	}
-	
+
+	public static List<CompositeEditOperation> groupConsecutiveEditOperations2(List<EditOperation> operations) {
+
+		List<List<EditOperation>> grouped = groupConsecutiveEditOperations(operations);
+
+		List<CompositeEditOperation> composite = new ArrayList<>();
+
+		for (List<EditOperation> group : grouped) {
+
+			CompositeEditOperation comp = new CompositeEditOperation();
+			comp.setType(group.get(0).getType());
+			
+			for (EditOperation operation : group) {
+
+				if (operation.getChar1() != null) {
+					comp.appendToString1(operation.getChar1());
+				}
+
+				if (operation.getChar2() != null) {
+					comp.appendToString2(operation.getChar2());
+				}
+
+			}
+
+			composite.add(comp);
+
+		}
+		return composite;
+	}
+
 }

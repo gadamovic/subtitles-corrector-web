@@ -1,99 +1,69 @@
 <template>
 
-    <div v-if="subtitle.editOperations">
+    <div v-if="!lineVisibleFlagsStore.isVisibleFlags[lineIndex]">
+
+        <span v-if="subtitle.editOperations">
+
+            <span v-for="(operation, key) in subtitle.compEditOperations" :key="key">
 
 
-    <span v-for="(operationGroup, key2) in subtitle.editOperations" :key="key2">
+                <span v-if="operation.type == 'REPLACE'" style="display: inline-flex;">
+
+                    <span style="color: red"><del v-html="operation.str1"></del></span>
+                    <span style="color: green" v-html="operation.str2"></span>
+
+                </span>
+
+                <span v-if="operation.type == 'DELETE'">
+
+                    <del style="color: red" v-html="operation.str1"></del>
+
+                </span>
 
 
-        <!-- Replace operation strikethrough (all consecutive characters) -->
-        <span v-for="(operation, key) in operationGroup" :key="key">
+                <span v-if="operation.type == 'ADD'">
 
-            <span v-if="operation.type == 'REPLACE'" style="display: inline-flex;">
+                    <span style="color: green" v-html="operation.str1"></span>
 
-                <span style="color: red"><del v-html="operation.char1"></del></span>
+                </span>
 
+
+                <span v-if="operation.type == 'KEEP'">
+
+                    <span v-html="operation.str1"></span>
+
+                </span>
             </span>
-
+            <i class="fas fa-edit" @click="lineVisibleFlagsStore.toggleFlag(lineIndex)"></i>
         </span>
 
-
-        <!-- Replace operation replaced characters (all consecutive characters) -->
-        <span v-for="(operation, key) in operationGroup" :key="key">
-
-            <span v-if="operation.type == 'REPLACE'" style="display: inline-flex;">
-
-                <span style="color: green" v-html="operation.char2"></span>
-
+        <div v-else>
+            <span>
+                <span v-html="subtitle.text"></span>
+                <i class="fas fa-edit" @click="lineVisibleFlagsStore.toggleFlag(lineIndex)"></i>
             </span>
-
-        </span>
-
-        <span v-for="(operation, key) in operationGroup" :key="key">
-            <span v-if="operation.type == 'DELETE'">
-
-                <span style="color: red" v-html="operation.char1"></span>
-
-            </span>
-
-
-            <span v-if="operation.type == 'ADD'">
-
-                <span style="color: green" v-html="operation.char1"></span>
-
-            </span>
-
-
-            <span v-if="operation.type == 'KEEP'">
-
-                <span v-html="operation.char1"></span>
-
-            </span>
-
-
-        </span>
-    </span>
-
+        </div>
+        
     </div>
-
-    <div v-else>
-    <p v-html="subtitle.text"></p>
-    </div>
-
 </template>
 
 <script>
-export default{
+
+import { useLineVisibleFlagsStore } from '@/stores/subtitleLineVisibleFlagsStore'
+
+export default {
     name: "SubtitleLine",
     props: {
-        subtitle: Object
+        subtitle: Object,
+        lineIndex: Number
     },
-    data: function() {
-        return{
-
+    data: function () {
+        return {
+            lineVisibleFlagsStore: useLineVisibleFlagsStore()
         }
     },
-    computed:{
-        // subtitleComp(){
-
-        //     let subtitleObj = this.subtitle;
-        //     let text = subtitleObj.text;
-        //     let i = 0;
-        //     for(let editOperationGroup in subtitleObj.editOperations){
-                
-        //         if(editOperationGroup[0].type == 'REPLACE'){
-        //             text.
-        //         }
-
-        //         if(editOperationGroup[0].type == 'KEEP'){
-        //             i++;
-        //         }
-
-        //         i++;
-        //     }
-
-        //     return "";
-        // }
+    methods: {
+       
     }
 
 

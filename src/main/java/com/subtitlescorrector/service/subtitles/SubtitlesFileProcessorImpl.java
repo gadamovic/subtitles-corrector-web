@@ -25,6 +25,8 @@ import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.domain.SubtitlesFileProcessorResponse;
 import com.subtitlescorrector.domain.SubtitlesProcessingStatus;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
+import com.subtitlescorrector.service.processors.PreProcessor;
+import com.subtitlescorrector.service.processors.PreProcessorsManager;
 import com.subtitlescorrector.service.s3.S3Service;
 import com.subtitlescorrector.service.subtitles.corrections.Corrector;
 import com.subtitlescorrector.service.subtitles.corrections.CorrectorsManager;
@@ -45,6 +47,9 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 
 	@Autowired
 	CorrectorsManager correctorsManager;
+	
+	@Autowired
+	PreProcessorsManager preProcessorsManager;
 
 	@Autowired
 	S3Service s3Service;
@@ -71,9 +76,14 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			
 			Charset detectedEncoding = FileUtil.detectEncodingOfFile(storedFile);
 			List<String> lines = FileUtil.loadTextFile(storedFile);
-
+			
+			
 			data.setFilename(correctedFile.getName());
 			data.setLines(converter.convertToSubtitleUnits(lines));
+			
+			for (PreProcessor preProcessor : preProcessorsManager.getPreProcessors()) {
+				data = preProcessor.process(data);
+			}
 			
 			for (Corrector corrector : correctorsManager.getCorrectors()) {
 				data = corrector.correct(data, webSocketSessionId);
@@ -117,6 +127,8 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			
 			if(!allKeep) {
 				subData.setEditOperations(Util.groupConsecutiveEditOperations(operations));
+				subData.setCompEditOperations(Util.groupConsecutiveEditOperations2(operations));
+				
 			}
 			
 		}

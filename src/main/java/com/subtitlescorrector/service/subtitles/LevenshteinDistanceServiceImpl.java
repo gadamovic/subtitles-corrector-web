@@ -7,13 +7,15 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.subtitlescorrector.domain.CompositeEditOperation;
 import com.subtitlescorrector.domain.EditOperation;
 import com.subtitlescorrector.domain.EditOperation.OperationType;
 import com.subtitlescorrector.util.Util;
 
 /**
- * Service that utilizes Levenshtein distance algorithm to calculate differences between strings
- * https://en.wikipedia.org/wiki/Levenshtein_distance
+ * Service that utilizes Levenshtein distance algorithm to calculate differences
+ * between strings https://en.wikipedia.org/wiki/Levenshtein_distance
+ * 
  * @author Gavrilo Adamovic
  *
  */
@@ -21,18 +23,20 @@ import com.subtitlescorrector.util.Util;
 public class LevenshteinDistanceServiceImpl implements EditDistanceService {
 
 	/**
-	 * Returns all edit operations including 'keep' (no change) operation resulting in the entire target string
+	 * Returns all edit operations including 'keep' (no change) operation resulting
+	 * in the entire target string
+	 * 
 	 * @param source
 	 * @param target
 	 * @return
 	 */
 	@Override
-	public List<EditOperation> getEditOperations(String source, String target){
+	public List<EditOperation> getEditOperations(String source, String target) {
 
 		List<EditOperation> editOperations = new ArrayList<>();
-		
+
 		int[][] dpTable = generateLevenshteinDpTable(source, target);
-		//print(dpTable, source.length(), target.length());
+		// print(dpTable, source.length(), target.length());
 
 		int i = source.length();
 		int j = target.length();
@@ -62,7 +66,7 @@ public class LevenshteinDistanceServiceImpl implements EditDistanceService {
 
 			if (replacementOrNoChange == smallest) {
 
-				if (source.charAt(strI) != target.charAt(strJ)) {					
+				if (source.charAt(strI) != target.charAt(strJ)) {
 					addOperationToList(editOperations, source.charAt(strI), target.charAt(strJ), OperationType.REPLACE);
 				} else {
 					addOperationToList(editOperations, source.charAt(strI), null, OperationType.KEEP);
@@ -89,8 +93,9 @@ public class LevenshteinDistanceServiceImpl implements EditDistanceService {
 		return editOperations;
 	}
 
-	private void addOperationToList(List<EditOperation> editOperations, Character char1, Character char2, OperationType operationType) {
-		
+	private void addOperationToList(List<EditOperation> editOperations, Character char1, Character char2,
+			OperationType operationType) {
+
 		EditOperation operation = new EditOperation();
 		operation.setChar1(char1);
 		operation.setChar2(char2);
@@ -167,26 +172,32 @@ public class LevenshteinDistanceServiceImpl implements EditDistanceService {
 
 		return table;
 	}
-	
+
 	public static void main(String args[]) {
-		
+
 		LevenshteinDistanceServiceImpl service = new LevenshteinDistanceServiceImpl();
 		List<EditOperation> operations = service.getEditOperations("<b>text</b>", "tekst");
-		
+
 		List<List<EditOperation>> grouped = Util.groupConsecutiveEditOperations(operations);
+		List<CompositeEditOperation> composite = Util.groupConsecutiveEditOperations2(operations);
 		
-		for(int i=0; i<grouped.size(); i++) {
-			
-			List<EditOperation> innerList = grouped.get(i);
-			
-			for(int j=0; j<innerList.size(); j++) {
-				System.out.println(innerList.get(j));
-			}
-			
-			System.out.println();
-			
+//		for (int i = 0; i < grouped.size(); i++) {
+//
+//			List<EditOperation> innerList = grouped.get(i);
+//
+//			for (int j = 0; j < innerList.size(); j++) {
+//				System.out.println(innerList.get(j));
+//			}
+//
+//			System.out.println();
+//
+//		}
+
+		for(CompositeEditOperation comp : composite) {
+			System.out.println(comp);
 		}
 		
+		
 	}
-	
+
 }

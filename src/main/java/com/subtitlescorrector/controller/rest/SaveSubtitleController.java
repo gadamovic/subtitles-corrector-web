@@ -44,7 +44,15 @@ public class SaveSubtitleController {
 
 	@RequestMapping(path = "/save")
 	public void save(@RequestBody SubtitleFileData subtitleData, @RequestParam("userId") String userId) {
-
+		
+		//for html line breaks are represented as <br> tags, so put them back to \n
+		for(SubtitleUnitData data : subtitleData.getLines()) {
+			
+			data.setText(data.getText().replace("<br/>", "\n"));
+			data.setTextBeforeCorrection(data.getTextBeforeCorrection().replace("<br\\>", "\n"));
+			
+		}
+		
 		redisService.addUserSubtitleCurrentVersion(subtitleData, userId);
 
 	}

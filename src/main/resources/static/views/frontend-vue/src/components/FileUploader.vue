@@ -52,6 +52,7 @@
 <script>
 
 import { useLoaderStore } from '@/stores/subtitleContentComponentLoaderStore';
+import { useLineVisibleFlagsStore } from '@/stores/subtitleLineVisibleFlagsStore'
 import GenericButton from './GenericButton.vue';
 import ModalComponent from './ModalComponent.vue';
 import { useSubtitleDataStore } from '@/stores/subtitleDataStore';
@@ -77,6 +78,7 @@ export default {
       showSaved: false,
       showDownloadLink: false,
       loaderStore: useLoaderStore(),
+      lineVisibleFlagsStore: useLineVisibleFlagsStore()
     };
   },
   methods: {
@@ -130,6 +132,8 @@ export default {
 
           this.subtitleDataStore.setSubtitleData(JSON.parse(JSON.stringify(result)))
           this.subtitleDataStore.setSubtitleDataTmp(JSON.parse(JSON.stringify(result)))
+          this.lineVisibleFlagsStore.setValue(Array(result.lines.length - 1).fill(false));
+
           this.loading = false;
 
         } else {
