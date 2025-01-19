@@ -9,28 +9,28 @@
 
                 <span v-if="operation.type == 'REPLACE'" style="display: inline-flex;">
 
-                    <span style="color: red"><del v-html="operation.str1"></del></span>
-                    <span style="color: green" v-html="operation.str2"></span>
+                    <span class="has-text-danger"><del v-html="operation.str1"></del></span>
+                    <span class="has-text-success" v-html="operation.str2"></span>
 
                 </span>
 
                 <span v-if="operation.type == 'DELETE'">
 
-                    <del style="color: red" v-html="operation.str1"></del>
+                    <del class="has-text-danger" v-html="operation.str1"></del>
 
                 </span>
 
 
                 <span v-if="operation.type == 'ADD'">
 
-                    <span style="color: green" v-html="operation.str1"></span>
+                    <span class="has-text-success" v-html="operation.str1"></span>
 
                 </span>
 
 
                 <span v-if="operation.type == 'KEEP'">
 
-                    <span v-html="operation.str1"></span>
+                    <span class="has-text-grey" v-html="operation.str1"></span>
 
                 </span>
             </span>
