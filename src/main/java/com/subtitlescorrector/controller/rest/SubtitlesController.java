@@ -23,7 +23,7 @@ public class SubtitlesController {
 	public List<CompositeEditOperation> getStringDifferences(@RequestParam("s1") String s1, @RequestParam("s2") String s2){
 	
 		List<EditOperation> editOperations = levenshteinDistance.getEditOperations(s1, s2);
-		List<CompositeEditOperation> compEditOperations = Util.groupConsecutiveEditOperations2(editOperations);
+		List<CompositeEditOperation> compEditOperations = Util.convertToCompositeEditOperations(editOperations);
 		
 		return compEditOperations;
 	}

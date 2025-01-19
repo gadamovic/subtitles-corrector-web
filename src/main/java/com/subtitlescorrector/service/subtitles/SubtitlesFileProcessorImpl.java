@@ -81,6 +81,8 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			data.setFilename(correctedFile.getName());
 			data.setLines(converter.convertToSubtitleUnits(lines));
 			
+			//preprocessors are not considered as subtitle corrections and won't be reported to the user as corrections
+			//this are preparations of the content of the uploaded file
 			for (PreProcessor preProcessor : preProcessorsManager.getPreProcessors()) {
 				data = preProcessor.process(data);
 			}
@@ -117,19 +119,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			
 			List<EditOperation> operations = levenshteinDistance.getEditOperations(original, corrected);
 			
-			boolean allKeep = true;
-			for(EditOperation operation : operations) {
-				if(operation.getType() != OperationType.KEEP) {
-					allKeep = false;
-					break;
-				}
-			}
-			
-			if(!allKeep) {
-				subData.setEditOperations(Util.groupConsecutiveEditOperations(operations));
-				subData.setCompEditOperations(Util.groupConsecutiveEditOperations2(operations));
-				
-			}
+			subData.setCompEditOperations(Util.convertToCompositeEditOperations(operations));
 			
 		}
 	}

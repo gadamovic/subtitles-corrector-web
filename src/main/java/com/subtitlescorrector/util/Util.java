@@ -197,7 +197,7 @@ public class Util {
 		return result;
 	}
 
-	public static List<CompositeEditOperation> groupConsecutiveEditOperations2(List<EditOperation> operations) {
+	public static List<CompositeEditOperation> convertToCompositeEditOperations(List<EditOperation> operations) {
 
 		List<List<EditOperation>> grouped = groupConsecutiveEditOperations(operations);
 

@@ -1,8 +1,8 @@
 <template>
 
-    <div v-if="!lineVisibleFlagsStore.isVisibleFlags[lineIndex]">
+    <div v-if="!lineVisibleFlagsStore.isVisibleFlags[lineIndex]" class="box">
 
-        <span v-if="subtitle.editOperations">
+        <span v-if="subtitle.compEditOperations">
 
             <span v-for="(operation, key) in subtitle.compEditOperations" :key="key">
 
@@ -34,22 +34,23 @@
 
                 </span>
             </span>
-            <i class="fas fa-edit" @click="lineVisibleFlagsStore.toggleFlag(lineIndex)"></i>
         </span>
-
-        <div v-else>
-            <span>
-                <span v-html="subtitle.text"></span>
-                <i class="fas fa-edit" @click="lineVisibleFlagsStore.toggleFlag(lineIndex)"></i>
-            </span>
+        <div class="mt-2">
+            <button class="button is-small is-primary is-light" @click="editSubtitle(lineIndex)">
+                <span class="icon">
+                    <i class="fas fa-edit"></i>
+                </span>
+                <span>Edit</span>
+            </button>
         </div>
-        
+
     </div>
 </template>
 
 <script>
 
 import { useLineVisibleFlagsStore } from '@/stores/subtitleLineVisibleFlagsStore'
+import { useSubtitleDataStore } from '@/stores/subtitleDataStore';
 
 export default {
     name: "SubtitleLine",
@@ -59,11 +60,18 @@ export default {
     },
     data: function () {
         return {
-            lineVisibleFlagsStore: useLineVisibleFlagsStore()
+            lineVisibleFlagsStore: useLineVisibleFlagsStore(),
+            subtitleDataStore: useSubtitleDataStore(),
         }
     },
     methods: {
-       
+        editSubtitle(lineIndex) {
+
+            this.lineVisibleFlagsStore.toggleFlag(lineIndex);
+            let textValue = this.subtitleDataStore.subtitleDataTmp.lines[lineIndex].text;
+            textValue = textValue.replaceAll("<br>", "\n");
+            this.subtitleDataStore.updateSubtitleDataTmpLineTextAtIndex(textValue, lineIndex)
+        }
     }
 
 

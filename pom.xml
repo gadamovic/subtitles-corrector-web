@@ -68,48 +68,56 @@
 			<artifactId>kafka-avro-serializer</artifactId>
 			<version>${confluent.version}</version>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3 -->
 		<dependency>
-		    <groupId>software.amazon.awssdk</groupId>
-		    <artifactId>s3</artifactId>
-		    <version>2.20.27</version> <!-- or latest version -->
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3</artifactId>
+			<version>2.20.27</version> <!-- or latest version -->
 		</dependency>
 
-	<dependency>
-		<groupId>redis.clients</groupId>
-		<artifactId>jedis</artifactId>
-	</dependency>
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+		</dependency>
 
-	<dependency>
-		<groupId>com.github.albfernandez</groupId>
-		<artifactId>juniversalchardet</artifactId>
-		<version>2.5.0</version>
-	</dependency>
-	
-	<dependency>
-    	<groupId>org.springframework.boot</groupId>
-    	<artifactId>spring-boot-starter-websocket</artifactId>
-	</dependency>
+		<dependency>
+			<groupId>com.github.albfernandez</groupId>
+			<artifactId>juniversalchardet</artifactId>
+			<version>2.5.0</version>
+		</dependency>
 
-	<dependency>
-		<groupId>org.springframework.kafka</groupId>
-		<artifactId>spring-kafka</artifactId>
-	</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
 
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-mail</artifactId>
-	</dependency>
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+		</dependency>
 
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-actuator</artifactId>
-	</dependency>
-	<dependency>
-		<groupId>io.micrometer</groupId>
-		<artifactId>micrometer-registry-prometheus</artifactId>
-	</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.18.3</version>
+		</dependency>
+
 
 	</dependencies>
 

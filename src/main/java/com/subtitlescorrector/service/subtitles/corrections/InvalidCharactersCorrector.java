@@ -75,9 +75,6 @@ public class InvalidCharactersCorrector implements Corrector{
 			tmp = beforeCorrection.replace("È", "Č");
 			beforeCorrection = checkForChanges(tmp, beforeCorrection, "È -> Č", processedPercentage, webSocketSessionId);
 			
-			tmp = beforeCorrection.replace("<b>", "");
-			beforeCorrection = checkForChanges(tmp, beforeCorrection, "Removed <b>", processedPercentage, webSocketSessionId);
-			
 			subUnitData.setText(beforeCorrection);
 		}
 		

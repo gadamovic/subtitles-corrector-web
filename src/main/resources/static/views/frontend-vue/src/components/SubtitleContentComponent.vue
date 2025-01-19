@@ -2,16 +2,33 @@
 
     <LoaderComponent v-if="loaderStore.isLoading" :isActive="true"></LoaderComponent>
 
-    <div v-for="(subtitle, key) in subtitleDataStore.subtitleDataTmp.lines" :key="key">
+    <div v-for="(subtitle, key) in subtitleDataStore.subtitleDataTmp.lines" :key="key" class="mb-3">
 
-        <SubtitleLine :subtitle="subtitle" :lineIndex="key"></SubtitleLine> <br />
+        <SubtitleLine :subtitle="subtitle" :lineIndex="key"></SubtitleLine>
 
-        <div v-if="lineVisibleFlagsStore.isVisibleFlags[key]">
-            <textarea :id="'ta-' + key" class="textarea" rows="2" :value="subtitle.text"
-                style="resize:none;"></textarea>
-            <i class="fas fa-save" @click="saveSubtitleLine(subtitle.textBeforeCorrection, key)"></i>
-        </div>
+        <transition name="fade">
+            <div v-if="lineVisibleFlagsStore.isVisibleFlags[key]" class="box">
 
+                <!-- Textarea and Save Button -->
+                <div class="is-align-items-center is-justify-content-space-between">
+
+                    <!-- Editable Textarea -->
+                    <textarea :id="'ta-' + key" class="textarea is-small" rows="2" v-model="subtitle.text"
+                        style="resize: none; flex-grow: 1; background-color: white; color: black;"
+                        placeholder="Edit your subtitle here...">
+                    </textarea>
+
+                    <!-- Save Button -->
+                    <button class="button is-small is-success is-light ml-2 mt-2"
+                        @click="saveSubtitleLine(subtitle.textBeforeCorrection, key)">
+                        <span class="icon">
+                            <i class="fas fa-save"></i>
+                        </span>
+                        <span>Save</span>
+                    </button>
+                </div>
+            </div>
+        </transition>
     </div>
 
 </template>
@@ -41,13 +58,11 @@ export default {
         async saveSubtitleLine(beforeCorrection, key) {
 
             let textareaValue = document.getElementById('ta-' + key).value;
-            textareaValue = textareaValue.replace('\n', "<br/>")
+            textareaValue = textareaValue.replaceAll("\n", "<br>")
 
-            console.log(textareaValue)
             textareaValue = DOMPurify.sanitize(textareaValue, {
-                ALLOWED_TAGS: ["br"], // Allow only <br> tags
+                ALLOWED_TAGS: ["br", "b", "i", "font"], // Allowed html tags
             });
-            console.log(textareaValue)
 
             let response = await fetch(("api/rest/1.0/getStringDifferences?s1=" + beforeCorrection + "&s2=" + textareaValue), {
                 method: "GET",
@@ -67,3 +82,16 @@ export default {
 }
 
 </script>
+
+<style>
+/* Fade transition styles */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+</style>

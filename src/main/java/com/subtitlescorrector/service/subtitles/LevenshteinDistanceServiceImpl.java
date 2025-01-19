@@ -179,7 +179,7 @@ public class LevenshteinDistanceServiceImpl implements EditDistanceService {
 		List<EditOperation> operations = service.getEditOperations("<b>text</b>", "tekst");
 
 		List<List<EditOperation>> grouped = Util.groupConsecutiveEditOperations(operations);
-		List<CompositeEditOperation> composite = Util.groupConsecutiveEditOperations2(operations);
+		List<CompositeEditOperation> composite = Util.convertToCompositeEditOperations(operations);
 		
 //		for (int i = 0; i < grouped.size(); i++) {
 //

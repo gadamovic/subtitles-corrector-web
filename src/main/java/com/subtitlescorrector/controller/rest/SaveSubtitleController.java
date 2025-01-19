@@ -48,8 +48,8 @@ public class SaveSubtitleController {
 		//for html line breaks are represented as <br> tags, so put them back to \n
 		for(SubtitleUnitData data : subtitleData.getLines()) {
 			
-			data.setText(data.getText().replace("<br/>", "\n"));
-			data.setTextBeforeCorrection(data.getTextBeforeCorrection().replace("<br\\>", "\n"));
+			data.setText(data.getText().replace("<br>", "\n"));
+			data.setTextBeforeCorrection(data.getTextBeforeCorrection().replace("<br>", "\n"));
 			
 		}
 		

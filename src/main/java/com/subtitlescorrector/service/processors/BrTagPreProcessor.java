@@ -13,7 +13,8 @@ public class BrTagPreProcessor implements PreProcessor{
 		
 		for(SubtitleUnitData subUnitData : data.getLines()) {
 			
-			subUnitData.setText(subUnitData.getText().replace("\n", "<br/>"));
+			String text = subUnitData.getText().replace("\n", "<br>");
+			subUnitData.setText(text);
 			
 		}
 		

@@ -15,10 +15,14 @@ public class PreProcessorsManager {
 	@Autowired
 	BrTagPreProcessor brTagPreProcessor;
 	
+	@Autowired
+	HtmlStripPreProcessor htmlStripPreProcessor;
+	
 	public List<PreProcessor> getPreProcessors() {
 		
 		List<PreProcessor> preProcessors = new ArrayList<>();
 		preProcessors.add(brTagPreProcessor);
+		preProcessors.add(htmlStripPreProcessor);
 		
 		return preProcessors;
 		
