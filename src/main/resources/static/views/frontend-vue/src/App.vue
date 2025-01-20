@@ -1,7 +1,7 @@
 <template>
 
   <div class="pb-20">
-    <nav class="navbar py-5" style="margin-left: 70px;">
+    <nav class="navbar py-5" style="margin-left: 70px; background-color: unset;">
       <div class="container is-fluid">
         <div class="navbar-brand">
           <a class="navbar-item" href="#">
@@ -34,7 +34,7 @@
 
             <h2 class="has-mw-xl mt-8 mb-8 mb-12-desktop title is-1 is-size-2-mobile">Polish Your Subtitles with Ease.
             </h2>
-            <p class="has-mw-lg mb-8 mb-12-desktop is-size-5 has-text-grey-dark">Easily fix character encoding,
+            <p class="has-mw-lg mb-8 mb-12-desktop is-size-5 has-text-grey-dark">With <span class="has-text-success">Subtitles Corrector</span> you can easily fix character encoding,
               formatting issues, and edit subtitles, ensuring your subtitle files are clean, accurate, and ready for
               use.
             </p>
@@ -119,7 +119,7 @@
 
   </div>
 
-  <FooterComponent></FooterComponent>
+  <FooterComponent style="background-color: unset;"></FooterComponent>
 
 
 
@@ -168,6 +168,11 @@ export default {
 </script>
 
 <style>
+
+body{
+  background-image: url('assets/poly-background.png')
+}
+
 .main {
   max-width: 600px;
   margin: auto;
