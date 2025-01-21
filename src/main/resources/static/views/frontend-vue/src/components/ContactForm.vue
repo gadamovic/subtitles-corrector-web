@@ -1,6 +1,6 @@
 <template>
 
-<div class="container" style="margin-bottom: 24px;">
+<div class="container">
     <form ref="contact-form" class="box" style="background-color: #004266;">
         <div class="field">
             <label class="label has-text-white">Noticed a subtitle problem that Subtitles Corrector doesn't fix? Have a feedback or suggestion?
