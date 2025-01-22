@@ -12,7 +12,7 @@
         <AppliedChanges :fileProcessingLogs="fileProcessingLogs" :processedPercentage="processedPercentage">
         </AppliedChanges>
 
-        <NumericalStepInputComponent ref="syncSubtitlesRef" v-if="lastFileProcessingLogReceived"></NumericalStepInputComponent>
+        <NumericalStepInputComponent ref="syncSubtitlesRef" v-if="lastFileProcessingLogReceived && !loaderStore.isLoading"></NumericalStepInputComponent>
 
         <SubtitleContentComponent v-if="lastFileProcessingLogReceived"></SubtitleContentComponent>
 
@@ -32,6 +32,7 @@
 import AppliedChanges from './AppliedChanges.vue';
 import SubtitleContentComponent from './SubtitleContentComponent.vue';
 import { useSubtitleDataStore } from '@/stores/subtitleDataStore';
+import { useLoaderStore } from '@/stores/subtitleContentComponentLoaderStore';
 import NumericalStepInputComponent from './NumericalStepInputComponent.vue';
 
 export default {
@@ -53,6 +54,7 @@ export default {
     return {
       loading: false,
       subtitleDataStore: useSubtitleDataStore(),
+      loaderStore: useLoaderStore(),
     };
   },
   methods: {
