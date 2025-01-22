@@ -78,7 +78,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			String s3KeyUUIDPrefix = UUID.randomUUID().toString();
 			String s3Key = s3KeyUUIDPrefix + correctedFile.getName();
 			
-			s3Service.uploadFileToS3IfProd("v1_" + s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), correctedFile);
+			s3Service.uploadFileToS3IfProd("v1_" + s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), storedFile);
 			
 			Charset detectedEncoding = FileUtil.detectEncodingOfFile(storedFile);
 			List<String> lines = FileUtil.loadTextFile(storedFile);
