@@ -35,7 +35,7 @@
             <h2 class="has-mw-xl mt-8 mb-8 mb-12-desktop title is-1 is-size-2-mobile">Polish Your Subtitles with Ease.
             </h2>
             <p class="has-mw-lg mb-8 mb-12-desktop is-size-5 has-text-grey-dark">With <span class="has-text-success">Subtitles Corrector</span> you can easily fix character encoding,
-              formatting and synchronization issues, and edit subtitles, ensuring your subtitle files are clean, accurate, and ready for
+              formatting and synchronization issues and edit subtitles, ensuring your subtitle files are clean, accurate, and ready for
               use.
             </p>
 
