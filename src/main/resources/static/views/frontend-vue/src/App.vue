@@ -176,7 +176,7 @@ export default {
 <style>
 
 body{
-  background-image: url('assets/poly-background-2.png')
+  background-image: url('assets/poly-background-3.png')
 }
 
 .main {
