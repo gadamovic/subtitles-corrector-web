@@ -64,7 +64,7 @@ export default {
                 ALLOWED_TAGS: ["br", "b", "i", "font"], // Allowed html tags
             });
 
-            let response = await fetch(("api/rest/1.0/getStringDifferences?s1=" + beforeCorrection + "&s2=" + textareaValue), {
+            let response = await fetch(("api/rest/1.0/getStringDifferences?s1=" + encodeURIComponent(beforeCorrection) + "&s2=" + encodeURIComponent(textareaValue)), {
                 method: "GET",
                 headers: new Headers({ 'Content-Type': 'application/json' })
             });
