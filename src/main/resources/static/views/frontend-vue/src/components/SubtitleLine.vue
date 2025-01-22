@@ -1,7 +1,7 @@
 <template>
 
     <div v-if="!lineVisibleFlagsStore.isVisibleFlags[lineIndex]" class="box">
-
+        <div class="has-text-grey-light has-text-left is-size-7">{{ timestampFrom }} -> {{ timestampTo }}</div>
         <span v-if="subtitle.compEditOperations">
 
             <span v-for="(operation, key) in subtitle.compEditOperations" :key="key">
@@ -71,6 +71,23 @@ export default {
             let textValue = this.subtitleDataStore.subtitleDataTmp.lines[lineIndex].text;
             textValue = textValue.replaceAll("<br>", "\n");
             this.subtitleDataStore.updateSubtitleDataTmpLineTextAtIndex(textValue, lineIndex)
+        }
+    },
+    computed:{
+        timestampFrom(){
+            //let todo = "Fali validacija, reset dugme i editovanje pojedinacnih timestampova, vidi da l pozadina moze da se razvuce";
+            if(this.subtitle.timestampFromShifted != null && typeof(this.subtitle.timestampFromShifted) != 'undefined'){
+                return this.subtitle.timestampFromShifted;
+            }else{
+                return this.subtitle.timestampFrom;
+            }
+        },
+        timestampTo(){
+            if(this.subtitle.timestampToShifted != null && typeof(this.subtitle.timestampToShifted) != 'undefined'){
+                return this.subtitle.timestampToShifted;
+            }else{
+                return this.subtitle.timestampTo;
+            }
         }
     }
 

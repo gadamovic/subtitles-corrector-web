@@ -72,13 +72,29 @@ public class SubtitleLinesToSubtitleUnitDataConverterImpl implements SubtitleLin
 		
 		for(SubtitleUnitData subtitle : lines) {
 			stringList.add(subtitle.getNumber().toString());
-			stringList.add(subtitle.getTimestampFrom() + " --> " + subtitle.getTimestampTo());
+			stringList.add(getTimestampFrom(subtitle) + " --> " + getTimestampTo(subtitle));
 			stringList.add(subtitle.getText());
 			stringList.add("");
 		}
 		
 		return stringList;
 		
+	}
+	
+	private String getTimestampFrom(SubtitleUnitData data) {
+		if(data.getTimestampFromShifted() != null) {
+			return data.getTimestampFromShifted();
+		}else {
+			return data.getTimestampFrom();
+		}
+	}
+	
+	private String getTimestampTo(SubtitleUnitData data) {
+		if(data.getTimestampToShifted() != null) {
+			return data.getTimestampToShifted();
+		}else {
+			return data.getTimestampTo();
+		}
 	}
 
 }

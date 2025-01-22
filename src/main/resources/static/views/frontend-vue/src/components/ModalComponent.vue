@@ -9,13 +9,18 @@
       </header>
       <section class="modal-card-body">
 
-        <AppliedChanges :fileProcessingLogs="fileProcessingLogs" :processedPercentage="processedPercentage"></AppliedChanges>
+        <AppliedChanges :fileProcessingLogs="fileProcessingLogs" :processedPercentage="processedPercentage">
+        </AppliedChanges>
+
+        <NumericalStepInputComponent ref="syncSubtitlesRef" v-if="lastFileProcessingLogReceived"></NumericalStepInputComponent>
+
         <SubtitleContentComponent v-if="lastFileProcessingLogReceived"></SubtitleContentComponent>
 
       </section>
       <footer class="modal-card-foot">
         <div class="buttons">
-          <button class="button is-success" :class="this.loading ? 'is-loading' : ''" @click="save">Save changes</button>
+          <button class="button is-success" :class="this.loading ? 'is-loading' : ''" @click="save">Save
+            changes</button>
           <button class="button" @click="closeModal">Cancel</button>
         </div>
       </footer>
@@ -27,11 +32,12 @@
 import AppliedChanges from './AppliedChanges.vue';
 import SubtitleContentComponent from './SubtitleContentComponent.vue';
 import { useSubtitleDataStore } from '@/stores/subtitleDataStore';
+import NumericalStepInputComponent from './NumericalStepInputComponent.vue';
 
 export default {
   name: "ModalComponent",
   components: {
-    AppliedChanges, SubtitleContentComponent
+    AppliedChanges, SubtitleContentComponent, NumericalStepInputComponent
   },
   props: {
     modalActive: { //toggleing of the modal is controlled from the parent
@@ -54,28 +60,36 @@ export default {
       this.$emit("closeModal");
       this.subtitleDataStore.setSubtitleDataTmp(JSON.parse(JSON.stringify(this.subtitleDataStore.subtitleData)))
     },
-    async save(){
+    async save() {
 
       this.loading = true;
 
       this.subtitleDataStore.setSubtitleData(JSON.parse(JSON.stringify(this.subtitleDataStore.subtitleDataTmp))); //deep copy subtitleDataTmp
-      
+
       let response = await fetch(("api/rest/1.0/save?userId=" + this.userId), {
-          method: "POST",
-          body: JSON.stringify(this.subtitleDataStore.subtitleData),
-          headers: new Headers({'Content-Type': 'application/json'})
-        });
+        method: "POST",
+        body: JSON.stringify(this.subtitleDataStore.subtitleData),
+        headers: new Headers({ 'Content-Type': 'application/json' })
+      });
 
-        this.loading = false;
+      this.loading = false;
 
-        if(response.ok){
-          this.$emit("closeModal");
-        }
-        
-        this.$emit("saveClicked");
-        
+      if (response.ok) {
+        this.$emit("closeModal");
+      }
+
+      this.$emit("saveClicked");
+
     },
-
+    getSecondsCorrection() {
+      const value = this.$refs['syncSubtitlesRef'].value;
+      return parseFloat(value) * 1000;
+    },
+    resetSubtitleSync(){
+      if(this.$refs['syncSubtitlesRef'] != null){
+        this.$refs['syncSubtitlesRef'].reset();
+      }
+    }
   },
 }
 

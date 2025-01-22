@@ -8,6 +8,8 @@ public class SubtitleUnitData {
 	Integer number;
 	String timestampFrom;
 	String timestampTo;
+	String timestampFromShifted;
+	String timestampToShifted;
 	String text;
 	String textBeforeCorrection;
 	
@@ -64,11 +66,26 @@ public class SubtitleUnitData {
 	public void setCompEditOperations(List<CompositeEditOperation> compEditOperations) {
 		this.compEditOperations = compEditOperations;
 	}
+	
+	public String getTimestampFromShifted() {
+		return timestampFromShifted;
+	}
+	public void setTimestampFromShifted(String timestampFromShifted) {
+		this.timestampFromShifted = timestampFromShifted;
+	}
+	public String getTimestampToShifted() {
+		return timestampToShifted;
+	}
+	public void setTimestampToShifted(String timestampToShifted) {
+		this.timestampToShifted = timestampToShifted;
+	}
 	@Override
 	public String toString() {
 		return "SubtitleUnitData [format=" + format + ", number=" + number + ", timestampFrom=" + timestampFrom
-				+ ", timestampTo=" + timestampTo + ", text=" + text + ", textBeforeCorrection=" + textBeforeCorrection
-				+ ", editOperations=" + editOperations + "]";
+				+ ", timestampTo=" + timestampTo + ", timestampFromShifted=" + timestampFromShifted
+				+ ", timestampToShifted=" + timestampToShifted + ", text=" + text + ", textBeforeCorrection="
+				+ textBeforeCorrection + ", editOperations=" + editOperations + ", compEditOperations="
+				+ compEditOperations + "]";
 	}
 	
 }

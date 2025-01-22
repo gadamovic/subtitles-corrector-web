@@ -3,7 +3,8 @@
   <ModalComponent :modalActive="showModal" @closeModal="onCloseModal"
     @saveClicked="saveModalClicked" :fileProcessingLogs="fileProcessingLogs"
     :processedPercentage="processedPercentage"
-    :lastFileProcessingLogReceived="lastFileProcessingLogReceived" :userId="userId">
+    :lastFileProcessingLogReceived="lastFileProcessingLogReceived" :userId="userId"
+    ref="modalComponentRef">
 
   </ModalComponent>
 
@@ -84,6 +85,11 @@ export default {
   methods: {
     handleFileChange(event) {
       // Capture the selected file
+
+      if(event.target.files == null || event.target.files.length == 0){
+        return;
+      }
+
       this.file = event.target.files[0];
 
       const allowedExtensions = ['.srt'/*, '.sub', '.txt'*/];
@@ -150,6 +156,8 @@ export default {
         this.error = "An error occurred!";
         this.loading = false;
       }
+
+      this.$refs['modalComponentRef'].resetSubtitleSync();
 
       this.loaderStore.setIsLoading(false)
       
@@ -259,7 +267,7 @@ export default {
         a.href = url;
         const subtitleDataObj = this.subtitleDataStore.subtitleData;
 
-        a.download = 'Subtitle-Corrector_' + subtitleDataObj.filename.substr(subtitleDataObj.filename.indexOf("_") + 1, subtitleDataObj.filename.length);
+        a.download = '[subtitles-corrector.com]-' + subtitleDataObj.filename.substr(subtitleDataObj.filename.indexOf("_") + 1, subtitleDataObj.filename.length);
         document.body.appendChild(a);
         a.click();
 

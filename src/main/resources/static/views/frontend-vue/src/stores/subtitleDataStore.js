@@ -20,6 +20,12 @@ export const useSubtitleDataStore = defineStore('subtitleDataStore', {
     },
     updateSubtitleDataTmpLineTextAtIndex(newValue, index){
       this.subtitleDataTmp.lines[index].text = newValue;
+    },
+    updateSubtitleDataTmpLineTimestampFromAtIndex(newValue, index){
+      this.subtitleDataTmp.lines[index].timestampFrom = newValue;
+    },
+    updateSubtitleDataTmpLineTimestampToAtIndex(newValue, index){
+      this.subtitleDataTmp.lines[index].timestampTo = newValue;
     }
   }
 })

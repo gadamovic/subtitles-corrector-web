@@ -35,7 +35,7 @@
             <h2 class="has-mw-xl mt-8 mb-8 mb-12-desktop title is-1 is-size-2-mobile">Polish Your Subtitles with Ease.
             </h2>
             <p class="has-mw-lg mb-8 mb-12-desktop is-size-5 has-text-grey-dark">With <span class="has-text-success">Subtitles Corrector</span> you can easily fix character encoding,
-              formatting issues, and edit subtitles, ensuring your subtitle files are clean, accurate, and ready for
+              formatting and synchronization issues, and edit subtitles, ensuring your subtitle files are clean, accurate, and ready for
               use.
             </p>
 
@@ -56,6 +56,12 @@
                     <i class="fas fa-check"></i>
                   </span>
                   Automatically update your encoding to UTF-8 to support wide range of characters by simply uploading a subtitle file.
+                </li>
+                <li class="is-flex is-align-items-center my-3">
+                  <span class="icon has-text-success mr-2">
+                    <i class="fas fa-check"></i>
+                  </span>
+                  Shift and sync subtitles.
                 </li>
                 <li class="is-flex is-align-items-center my-3">
                   <span class="icon has-text-success mr-2">
@@ -170,7 +176,7 @@ export default {
 <style>
 
 body{
-  background-image: url('assets/poly-background.png')
+  background-image: url('assets/poly-background-2.png')
 }
 
 .main {
