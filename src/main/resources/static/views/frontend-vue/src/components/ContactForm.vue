@@ -17,7 +17,7 @@
 
 </div>
 
-<div class="notification" :class="this.error ? 'is-danger' : 'is-success'" v-if="contactFormConfirmation != ''">
+<div class="notification mt-4" :class="this.error ? 'is-danger' : 'is-success'" v-if="contactFormConfirmation != ''">
     {{ this.contactFormConfirmation }}
 </div>
 
