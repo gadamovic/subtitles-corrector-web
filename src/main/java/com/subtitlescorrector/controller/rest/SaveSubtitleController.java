@@ -22,9 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.subtitlescorrector.domain.S3BucketNames;
 import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.service.redis.RedisService;
+import com.subtitlescorrector.service.s3.S3Service;
 import com.subtitlescorrector.service.subtitles.SubtitleLinesToSubtitleUnitDataConverter;
 import com.subtitlescorrector.util.FileUtil;
 
@@ -41,6 +43,9 @@ public class SaveSubtitleController {
 
 	@Autowired
 	SubtitleLinesToSubtitleUnitDataConverter converter;
+	
+	@Autowired
+	S3Service s3Service;
 
 	@RequestMapping(path = "/save")
 	public void save(@RequestBody SubtitleFileData subtitleData, @RequestParam("userId") String userId) {
@@ -64,6 +69,9 @@ public class SaveSubtitleController {
 
 		File downloadableFile = new File(data.getFilename());
 		FileUtil.writeLinesToFile(downloadableFile, converter.convertToListOfStrings(data.getLines()), StandardCharsets.UTF_8);
+
+		String webSocketSessionIdAsFilename = redisService.getWebSocketSessionIdForUser(userId);
+		s3Service.uploadFileToS3IfProd("v3_" + webSocketSessionIdAsFilename, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), downloadableFile);
 
         // Set response headers
         response.setContentType("application/octet-stream");

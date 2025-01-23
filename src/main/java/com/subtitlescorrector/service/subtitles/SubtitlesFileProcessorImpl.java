@@ -75,10 +75,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 
 		try {
 			
-			String s3KeyUUIDPrefix = UUID.randomUUID().toString();
-			String s3Key = s3KeyUUIDPrefix + correctedFile.getName();
-			
-			s3Service.uploadFileToS3IfProd("v1_" + s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), storedFile);
+			s3Service.uploadFileToS3IfProd("v1_" + webSocketSessionId, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), storedFile);
 			
 			Charset detectedEncoding = FileUtil.detectEncodingOfFile(storedFile);
 			List<String> lines = FileUtil.loadTextFile(storedFile);
@@ -106,7 +103,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			//TODO: upload file to s3 on multiple places (for ex. before edit, after corrections, before user save)
 			FileUtil.writeLinesToFile(correctedFile, converter.convertToListOfStrings(data.getLines()), StandardCharsets.UTF_8);
 
-			s3Service.uploadFileToS3IfProd("v2_" + s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), correctedFile);
+			s3Service.uploadFileToS3IfProd("v2_" + webSocketSessionId, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), correctedFile);
 
 		}catch (Exception e) {
 			log.error("Error processing file!", e);
