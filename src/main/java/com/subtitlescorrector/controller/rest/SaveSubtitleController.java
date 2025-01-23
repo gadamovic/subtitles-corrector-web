@@ -71,7 +71,7 @@ public class SaveSubtitleController {
 		FileUtil.writeLinesToFile(downloadableFile, converter.convertToListOfStrings(data.getLines()), StandardCharsets.UTF_8);
 
 		String webSocketSessionIdAsFilename = redisService.getWebSocketSessionIdForUser(userId);
-		s3Service.uploadFileToS3IfProd("v3_" + webSocketSessionIdAsFilename, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), downloadableFile);
+		s3Service.uploadFileToS3IfProd("v3_" + webSocketSessionIdAsFilename + "_" + data.getFilename(), S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), downloadableFile);
 
         // Set response headers
         response.setContentType("application/octet-stream");
