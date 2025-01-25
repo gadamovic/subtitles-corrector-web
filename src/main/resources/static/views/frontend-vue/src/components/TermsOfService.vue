@@ -33,7 +33,7 @@
 
                 <p> <strong>3.1</strong> By uploading files, you confirm that you own or have the right to process them.
                 </p>
-                <p> <strong>3.2</strong> We do not claim ownership of your files. However, you grant us However, you
+                <p> <strong>3.2</strong> We do not claim ownership of your files. However, you
                     grant us a limited, temporary license to process and correct the files.
                 </p>
                 <p> <strong>3.3</strong> You agree that we can store the file temporary with only purpose to:</p>
@@ -46,7 +46,7 @@
                 <p> <strong>3.4</strong>
                     The files you upload to our platform are stored securely in the cloud using Amazon Web Services
                     (AWS) Simple Storage Service (S3). These files are stored temporary for the purpose described in point 3.3
-                    and will be deleted after some period.</p>
+                    and will be deleted after 7 days.</p>
 
                 <p><strong>3.5</strong>
                     Your uploaded files are <strong>not accessible to the public</strong>. We implement strict access
