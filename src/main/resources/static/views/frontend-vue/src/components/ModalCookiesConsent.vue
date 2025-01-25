@@ -1,5 +1,5 @@
 <template>
-    <div class="column is-half" style="position: fixed; bottom:0; right: 0; z-index: 50;">
+    <div class="column is-half" style="position: fixed; bottom:0; right: 0; z-index: 50;" v-if="modalActive">
       <div class="container">
         <div class="columns is-centered">
           <div class="column">
