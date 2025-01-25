@@ -49,7 +49,7 @@ public class SubtitlesController {
 	@RequestMapping("/cookiesDeclined")
 	public void cookiesDeclined(HttpServletRequest request){
 		
-		emailService.sendEmailOnlyIfProduction("Cookies denied by: " + request.getRemoteAddr(), properties.getAdminEmailAddress(), "Cookies allowed");
+		emailService.sendEmailOnlyIfProduction("Cookies denied by: " + request.getRemoteAddr(), properties.getAdminEmailAddress(), "Cookies declined");
 	}
 	
 }

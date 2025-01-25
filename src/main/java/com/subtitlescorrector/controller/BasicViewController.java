@@ -5,11 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.subtitlescorrector.service.EmailServiceImpl;
-
 import jakarta.servlet.http.HttpServletRequest;
 
-//TODO: Implement Filter instead of controller for logging users
 
 @Controller
 public class BasicViewController {
