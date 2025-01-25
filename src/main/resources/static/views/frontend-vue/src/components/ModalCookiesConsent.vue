@@ -37,11 +37,21 @@ export default {
     allow() {
       setCookie('_cookieConsent', 'allow', 60);
       this.modalActive = false;
+
+        fetch("api/rest/1.0/cookiesAllowed", {
+          method: "GET",
+        });
+
       window.location.reload();
     },
     decline() {
       setCookie('_cookieConsent', 'decline', 60);
       this.modalActive = false;
+
+      fetch("api/rest/1.0/cookiesDeclined", {
+          method: "GET",
+        });
+
       window.location.reload();
     }
   },
