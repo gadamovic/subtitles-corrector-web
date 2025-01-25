@@ -49,7 +49,7 @@
                     <span class="icon has-text-success mr-2">
                       <i class="fas fa-check"></i>
                     </span>
-                    Everything complitely <span class="has-text-success">&nbsp;free</span>.
+                    Everything completely <span class="has-text-success">&nbsp;free</span>.
                   </li>
   
                   <li class="is-flex is-align-items-center my-3">
