@@ -1,7 +1,51 @@
-<!doctype html><html lang=""><head><script async src="https://www.googletagmanager.com/gtag/js?id=G-Z7YTXNBX8M"></script><script>window.dataLayer = window.dataLayer || [];
+<!doctype html><html lang=""><head><script async src="https://www.googletagmanager.com/gtag/js?id=G-Z7YTXNBX8M"></script><script>function setCookie(cname, cvalue, exdays) {
+      const d = new Date();
+      d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+      let expires = "expires=" + d.toUTCString();
+      document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+
+    function getCookie(cname) {
+      let name = cname + "=";
+      let ca = document.cookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+          return c.substring(name.length, c.length);
+        }
+      }
+      return "";
+    }
+
+
+    function getGoogleConsentMode() {
+      const consent = getCookie("_cookieConsent");
+      if (consent == null || consent == "" || consent == 'decline') {
+        return {
+          'ad_storage': 'denied',
+          'analytics_storage': 'denied',
+          'personalization_storage': 'denied',
+          'functionality_storage': 'denied',
+          'security_storage': 'denied',
+        };
+      } else if (consent == "allow") {
+        return {
+          'ad_storage': 'granted',
+          'analytics_storage': 'granted',
+          'personalization_storage': 'granted',
+          'functionality_storage': 'granted',
+          'security_storage': 'granted',
+        };
+      }
+    }
+
+    window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
-
+    gtag('consent', 'default', getGoogleConsentMode());
     gtag('config', 'G-Z7YTXNBX8M');</script><title>Subtitles Corrector</title><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="An app that easily fixes character encoding,
     formatting and synchronization issues, ensuring your subtitle files are clean, accurate, and ready for
-    use. Our web editor lets you edit, shift (sync) and save your subtitles in seconds."><link rel="icon" href="views/favicons/favicon.ico"/><link rel="icon" type="image/png" sizes="32x32" href="views/favicons/favicon-32x32.png"/><link rel="icon" type="image/png" sizes="16x16" href="views/favicons/favicon-16x16.png"/><link rel="manifest" href="views/favicons/manifest.json"/><script defer="defer" src="/subtitles/views/js/chunk-vendors.5d62a895.js"></script><script defer="defer" src="/subtitles/views/js/app.15e5346c.js"></script><link href="/subtitles/views/css/chunk-vendors.ffabe450.css" rel="stylesheet"><link href="/subtitles/views/css/app.cd81b9d8.css" rel="stylesheet"></head><body><div id="app"></div></body></html>
+    use. Our web editor lets you edit, shift (sync) and save your subtitles in seconds."><link rel="icon" href="views/favicons/favicon.ico"/><link rel="icon" type="image/png" sizes="32x32" href="views/favicons/favicon-32x32.png"/><link rel="icon" type="image/png" sizes="16x16" href="views/favicons/favicon-16x16.png"/><link rel="manifest" href="views/favicons/manifest.json"/><script defer="defer" src="/subtitles/views/js/chunk-vendors.448c5245.js"></script><script defer="defer" src="/subtitles/views/js/app.3c8b9aa3.js"></script><link href="/subtitles/views/css/chunk-vendors.ffabe450.css" rel="stylesheet"><link href="/subtitles/views/css/app.0c307b23.css" rel="stylesheet"></head><body><div id="app"></div></body></html>
