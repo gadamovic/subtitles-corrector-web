@@ -36,7 +36,7 @@ public class S3ServiceImpl implements S3Service {
 	Util util;
 	
 	@Override
-	public PutObjectResponse uploadFileToS3(String key, String bucket, File file){
+	public PutObjectResponse uploadFileToS3(String key, String bucket, File file, String awsTag){
 			
 		if(StringUtils.isBlank(key)) {
 			String s3KeyUUIDPrefix = UUID.randomUUID().toString();
@@ -50,6 +50,7 @@ public class S3ServiceImpl implements S3Service {
 		PutObjectRequest putObjectRequest = PutObjectRequest.builder()
 				.bucket(bucket)
 				.key(key)
+				.tagging(awsTag)
 				.build();
 		
 		log.info("Uploaded to s3 with key: {}", key);
@@ -58,10 +59,10 @@ public class S3ServiceImpl implements S3Service {
 		
 	}
 	
-	public PutObjectResponse uploadFileToS3IfProd(String key, String bucket, File file) {
+	public PutObjectResponse uploadFileToS3IfProd(String key, String bucket, File file, String awsTag) {
 		
 		if(properties.isProdEnvironment()) {
-			return uploadFileToS3(key, bucket, file);
+			return uploadFileToS3(key, bucket, file, awsTag);
 		}else {
 			return null;
 		}
@@ -73,7 +74,7 @@ public class S3ServiceImpl implements S3Service {
 		String s3KeyUUIDPrefix = UUID.randomUUID().toString();
 		String s3Key = s3KeyUUIDPrefix + correctedFile.getName();
 
-		uploadFileToS3(s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), correctedFile);		
+		uploadFileToS3(s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), correctedFile, "ttl=7days");		
 		
 		S3Presigner presigner = S3Presigner.create();
 		GetObjectPresignRequest getObjectRequest = GetObjectPresignRequest.builder()

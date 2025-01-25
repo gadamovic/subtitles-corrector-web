@@ -9,6 +9,8 @@ import com.subtitlescorrector.service.EmailServiceImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+//TODO: Implement Filter instead of controller
+
 @Controller
 public class BasicViewController {
 	

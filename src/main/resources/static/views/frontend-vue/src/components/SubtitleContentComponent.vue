@@ -19,13 +19,15 @@
                     </textarea>
 
                     <!-- Save Button -->
-                    <button class="button is-small is-success is-light ml-2 mt-2"
-                        @click="saveSubtitleLine(subtitle.textBeforeCorrection, key)">
-                        <span class="icon">
-                            <i class="fas fa-save"></i>
-                        </span>
-                        <span>Save</span>
-                    </button>
+                    <div class="has-text-right">
+                        <button class="button is-small is-success is-light ml-2 mt-2"
+                            @click="saveSubtitleLine(subtitle.textBeforeCorrection, key)">
+                            <span class="icon">
+                                <i class="fas fa-save"></i>
+                            </span>
+                            <span>Save</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </transition>

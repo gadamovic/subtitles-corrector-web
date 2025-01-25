@@ -1,6 +1,6 @@
 <template>
 
-    <div class="box" style="background-color: #004266; margin-bottom: 24px;"
+    <div class="box has-text-centered" style="background-color: #004266; margin-bottom: 24px;"
       v-if="Object.keys(fileProcessingLogs).length > 0">
 
       <div class="label has-text-white">

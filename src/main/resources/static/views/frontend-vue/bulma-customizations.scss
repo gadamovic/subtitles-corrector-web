@@ -1,5 +1,6 @@
 
 // Path to Bulma's sass folder
 @use "bulma/sass" with (
-    $modal-card-title-size: var(--bulma-size-4)
+    $modal-card-title-size: var(--bulma-size-4),
+    $navbar-burger-color: #004266
 );

@@ -15,7 +15,7 @@
 
   <form @submit.prevent enctype="multipart/form-data" class="box" style="background-color: #004266;">
 
-    <label class="label has-text-white">Upload a subtitle file:</label> <br />
+    <label class="label has-text-white has-text-centered">Upload a subtitle file:</label> <br />
     <div class="file has-name is-fullwidth field">
       <label class="file-label">
         <input class="file-input" type="file" name="file" accept=".srt, .sub, .txt" @change="handleFileChange" />
@@ -37,7 +37,7 @@
 
   </form>
 
-  <div class="notification is-link" v-if="this.subtitleFilename && this.showDownloadLink">
+  <div class="notification is-link has-text-centered" v-if="this.subtitleFilename && this.showDownloadLink">
     <a @click="downloadFile" class="">
       Download {{this.subtitleFilename}}
     </a>

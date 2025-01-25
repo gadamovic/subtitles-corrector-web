@@ -2,40 +2,42 @@
 
     <div v-if="!lineVisibleFlagsStore.isVisibleFlags[lineIndex]" class="box">
         <div class="has-text-grey-light has-text-left is-size-7">{{ timestampFrom }} -> {{ timestampTo }}</div>
-        <span v-if="subtitle.compEditOperations">
+        <div class="has-text-centered">
+            <span v-if="subtitle.compEditOperations">
 
-            <span v-for="(operation, key) in subtitle.compEditOperations" :key="key">
-
-
-                <span v-if="operation.type == 'REPLACE'" style="display: inline-flex;">
-
-                    <span class="has-text-danger"><del v-html="operation.str1"></del></span>
-                    <span class="has-text-success" v-html="operation.str2"></span>
-
-                </span>
-
-                <span v-if="operation.type == 'DELETE'">
-
-                    <del class="has-text-danger" v-html="operation.str1"></del>
-
-                </span>
+                <span v-for="(operation, key) in subtitle.compEditOperations" :key="key">
 
 
-                <span v-if="operation.type == 'ADD'">
+                    <span v-if="operation.type == 'REPLACE'" style="display: inline-flex;">
 
-                    <span class="has-text-success" v-html="operation.str1"></span>
+                        <span class="has-text-danger"><del v-html="operation.str1"></del></span>
+                        <span class="has-text-success" v-html="operation.str2"></span>
 
-                </span>
+                    </span>
+
+                    <span v-if="operation.type == 'DELETE'">
+
+                        <del class="has-text-danger" v-html="operation.str1"></del>
+
+                    </span>
 
 
-                <span v-if="operation.type == 'KEEP'">
+                    <span v-if="operation.type == 'ADD'">
 
-                    <span class="has-text-grey" v-html="operation.str1"></span>
+                        <span class="has-text-success" v-html="operation.str1"></span>
 
+                    </span>
+
+
+                    <span v-if="operation.type == 'KEEP'">
+
+                        <span class="has-text-grey" v-html="operation.str1"></span>
+
+                    </span>
                 </span>
             </span>
-        </span>
-        <div class="mt-2">
+        </div>
+        <div class="mt-2 has-text-right">
             <button class="button is-small is-primary is-light" @click="editSubtitle(lineIndex)">
                 <span class="icon">
                     <i class="fas fa-edit"></i>
@@ -73,19 +75,19 @@ export default {
             this.subtitleDataStore.updateSubtitleDataTmpLineTextAtIndex(textValue, lineIndex)
         }
     },
-    computed:{
-        timestampFrom(){
+    computed: {
+        timestampFrom() {
             //let todo = "Fali validacija, reset dugme i editovanje pojedinacnih timestampova, vidi da l pozadina moze da se razvuce";
-            if(this.subtitle.timestampFromShifted != null && typeof(this.subtitle.timestampFromShifted) != 'undefined'){
+            if (this.subtitle.timestampFromShifted != null && typeof (this.subtitle.timestampFromShifted) != 'undefined') {
                 return this.subtitle.timestampFromShifted;
-            }else{
+            } else {
                 return this.subtitle.timestampFrom;
             }
         },
-        timestampTo(){
-            if(this.subtitle.timestampToShifted != null && typeof(this.subtitle.timestampToShifted) != 'undefined'){
+        timestampTo() {
+            if (this.subtitle.timestampToShifted != null && typeof (this.subtitle.timestampToShifted) != 'undefined') {
                 return this.subtitle.timestampToShifted;
-            }else{
+            } else {
                 return this.subtitle.timestampTo;
             }
         }

@@ -3,7 +3,7 @@
 <div class="container">
     <form ref="contact-form" class="box" style="background-color: #004266;">
         <div class="field">
-            <label class="label has-text-white">Noticed a subtitle problem that Subtitles Corrector doesn't fix? Have a feedback or suggestion?
+            <label class="label has-text-white has-text-centered">Noticed a subtitle problem that Subtitles Corrector doesn't fix? Have a feedback or suggestion?
                 Let us know!</label> <br/>
             <input placeholder="Email" class="input" type="email" id="email" name="email" @change="handleEmailChange" required/>
         </div>

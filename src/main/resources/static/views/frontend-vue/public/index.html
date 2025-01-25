@@ -5,10 +5,56 @@
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z7YTXNBX8M"></script>
   <script>
+
+
+    function setCookie(cname, cvalue, exdays) {
+      const d = new Date();
+      d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+      let expires = "expires=" + d.toUTCString();
+      document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+
+    function getCookie(cname) {
+      let name = cname + "=";
+      let ca = document.cookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+          return c.substring(name.length, c.length);
+        }
+      }
+      return "";
+    }
+
+
+    function getGoogleConsentMode() {
+      const consent = getCookie("_cookieConsent");
+      if (consent == null || consent == "" || consent == 'decline') {
+        return {
+          'ad_storage': 'denied',
+          'analytics_storage': 'denied',
+          'personalization_storage': 'denied',
+          'functionality_storage': 'denied',
+          'security_storage': 'denied',
+        };
+      } else if (consent == "allow") {
+        return {
+          'ad_storage': 'granted',
+          'analytics_storage': 'granted',
+          'personalization_storage': 'granted',
+          'functionality_storage': 'granted',
+          'security_storage': 'granted',
+        };
+      }
+    }
+
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
-
+    gtag('consent', 'default', getGoogleConsentMode());
     gtag('config', 'G-Z7YTXNBX8M');
   </script>
 
