@@ -45,8 +45,7 @@
 
                 <p> <strong>3.4</strong>
                     The files you upload to our platform are stored securely in the cloud using Amazon Web Services
-                    (AWS) Simple Storage Service (S3). These files are stored temporary for the purpose described in point 3.3
-                    and will be deleted after 7 days.</p>
+                    (AWS) Simple Storage Service (S3) and will be automatically deleted after 7 days.</p>
 
                 <p><strong>3.5</strong>
                     Your uploaded files are <strong>not accessible to the public</strong>. We implement strict access
