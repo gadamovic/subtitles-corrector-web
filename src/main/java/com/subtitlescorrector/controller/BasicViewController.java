@@ -11,6 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 @Controller
 public class BasicViewController {
 	
+	//TODO: Add checkbox to choose html tags stripping
+	
 	Logger log = LoggerFactory.getLogger(BasicViewController.class);
 	
 	@RequestMapping(path="/")

@@ -33,7 +33,7 @@
                 </ul>
 
 
-                
+
                 <h2>How We Use Your Information</h2>
 
                 <p>
@@ -77,7 +77,8 @@
                 </p>
                 <ul>
                     <li>Request deletion of your data, subject to legal or operational requirements.</li>
-                    <li>Opt-out of cookies or tracking technologies through the cookie consent banner.</li>
+                    <li>Opt-out of cookies or tracking technologies through the cookie consent banner or by clicking <a
+                            @click="showCookieBanner">here</a>.</li>
                 </ul>
             </div>
         </div>
@@ -85,5 +86,17 @@
 </template>
 
 <script>
+
+import { useCookieBannerStore } from '@/stores/cookieBannerStore';
+
+export default {
+
+    methods:{
+        showCookieBanner(){
+            useCookieBannerStore().setValue(true);
+        }
+    }
+
+}
 
 </script>

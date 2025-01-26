@@ -1,5 +1,5 @@
 <template>
-    <div class="column is-half" style="position: fixed; bottom:0; right: 0; z-index: 50;" v-if="modalActive">
+    <div class="column is-half" style="position: fixed; bottom:0; right: 0; z-index: 50;" v-if="cookieBannerStore.showBanner">
       <div class="container">
         <div class="columns is-centered">
           <div class="column">
@@ -21,19 +21,20 @@
 <script>
 
 import { setCookie, getCookie } from '@/js/cookies.js'
+import { useCookieBannerStore } from '@/stores/cookieBannerStore';
 
 export default {
   name: "ModalComponent",
 
   data() {
     return {
-      modalActive: (getCookie('_cookieConsent') == null) || (getCookie('_cookieConsent') == "")
+      cookieBannerStore: useCookieBannerStore(),
     }
   },
   methods: {
     allow() {
       setCookie('_cookieConsent', 'allow', 60);
-      this.modalActive = false;
+      this.cookieBannerStore.setValue(false);
 
         fetch("api/rest/1.0/cookiesAllowed", {
           method: "GET",
@@ -43,7 +44,7 @@ export default {
     },
     decline() {
       setCookie('_cookieConsent', 'decline', 60);
-      this.modalActive = false;
+      this.cookieBannerStore.setValue(false);
 
       fetch("api/rest/1.0/cookiesDeclined", {
           method: "GET",
@@ -52,6 +53,9 @@ export default {
       window.location.reload();
     }
   },
+  mounted: function(){
+    this.cookieBannerStore.setValue((getCookie('_cookieConsent') == null) || (getCookie('_cookieConsent') == ""))
+  }
 }
 
 </script>
