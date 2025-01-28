@@ -1,6 +1,6 @@
 <template>
 
-    <div class="box content" style="background-color: #004266; margin-bottom: 24px;"
+    <div class="box content white-li-marker" style="background-color: #004266; margin-bottom: 24px;"
       v-if="Object.keys(fileProcessingLogs).length > 0">
 
       <div class="label has-text-white has-text-centered">
@@ -45,7 +45,7 @@ export default{
 
 <style>
 
-  li::marker {
+  .white-li-marker li::marker{
     color: white; /* Bullet color */
   }
 
