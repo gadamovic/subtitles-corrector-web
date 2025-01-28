@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
+import com.subtitlescorrector.domain.AdditionalData;
 import com.subtitlescorrector.domain.SubtitleFileData;
-import com.subtitlescorrector.domain.SubtitlesFileProcessorResponse;
 import com.subtitlescorrector.service.EmailService;
 import com.subtitlescorrector.service.S3ServiceMonitor;
 import com.subtitlescorrector.service.StorageService;
@@ -63,8 +63,12 @@ public class FileUploadController {
 		}
 				
 		File storedFile = fileSystemStorageService.store(file);
+		
 		String webSocketSessionId = redisService.getWebSocketSessionIdForUser(request.getParameter("webSocketUserId"));
-		SubtitleFileData data = processor.process(storedFile, webSocketSessionId);
+		AdditionalData clientParameters = extractOptions(request);
+		clientParameters.setWebSocketSessionId(webSocketSessionId);
+		
+		SubtitleFileData data = processor.process(storedFile, clientParameters);
 
 		//save uploaded and server-corrected version as the first version
 		redisService.addUserSubtitleCurrentVersion(data, request.getParameter("webSocketUserId"));
@@ -73,6 +77,18 @@ public class FileUploadController {
 
 		return ResponseEntity.ok(data);
 		
+	}
+
+	private AdditionalData extractOptions(HttpServletRequest request) {
+		
+		AdditionalData params = new AdditionalData();
+		
+		params.setStripBTags(Boolean.parseBoolean(request.getParameter("stripBTags")));
+		params.setStripITags(Boolean.parseBoolean(request.getParameter("stripITags")));
+		params.setStripFontTags(Boolean.parseBoolean(request.getParameter("stripFontTags")));
+		params.setStripUTags(Boolean.parseBoolean(request.getParameter("stripUTags")));
+		
+		return params;
 	}
 }
 

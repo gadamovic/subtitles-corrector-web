@@ -23,8 +23,8 @@ public class SubtitleCorrectionEventConsumerImpl implements SubtitleCorrectionEv
 	@KafkaListener(id = "subtitlesCorrectionListenerContainer", topics = "subtitlesCorrections", containerFactory = "kafkaListenerContainerFactory")
 	public void consumeCorrections(List<SubtitleCorrectionEvent> events) {
 		for(SubtitleCorrectionEvent event : events) {
-				webSocketHandler.sendMessage(event);
-				log.info(event.toString());
+			webSocketHandler.sendMessage(event);
+			log.info(event.toString());
 		}
 	}
 

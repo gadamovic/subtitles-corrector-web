@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -38,6 +40,9 @@ public class Util {
 
 	@Autowired
 	ApplicationProperties properties;
+	
+	@Autowired
+	KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate;
 
 	public static String getCurrentTimestampAsString() {
 		return LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyyHHmmssSSS"));
@@ -224,6 +229,25 @@ public class Util {
 
 		}
 		return composite;
+	}
+	
+	public String checkForChanges(String afterCorrection, String beforeCorrection, String correctionDescription, float processedPercentage, String webSocketSessionId) {
+		if(!afterCorrection.equals(beforeCorrection)) {
+			
+			SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
+			event.setCorrection(correctionDescription);
+			event.setEventTimestamp(Instant.now());
+
+			event.setProcessedPercentage(String.valueOf(processedPercentage));
+			event.setWebSocketSessionId(webSocketSessionId);
+						
+			if(properties.getSubtitlesKafakEnabled()) {
+				kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
+			}
+			
+		}
+
+		return afterCorrection;
 	}
 
 }

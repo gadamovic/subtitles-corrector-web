@@ -1,10 +1,8 @@
 <template>
 
-  <ModalComponent :modalActive="showModal" @closeModal="onCloseModal"
-    @saveClicked="saveModalClicked" :fileProcessingLogs="fileProcessingLogs"
-    :processedPercentage="processedPercentage"
-    :lastFileProcessingLogReceived="lastFileProcessingLogReceived" :userId="userId"
-    ref="modalComponentRef">
+  <ModalComponent :modalActive="showModal" @closeModal="onCloseModal" @saveClicked="saveModalClicked"
+    :fileProcessingLogs="fileProcessingLogs" :processedPercentage="processedPercentage"
+    :lastFileProcessingLogReceived="lastFileProcessingLogReceived" :userId="userId" ref="modalComponentRef">
 
   </ModalComponent>
 
@@ -31,9 +29,35 @@
       </label>
     </div>
 
-    <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled" @click="handleSubmit"></GenericButton>
-    <GenericButton :loading="false" button_text="Continue editing" :enabled="true" v-if="showDownloadLink" @click="showModalMethod"></GenericButton>
-    
+    <div class="box checkboxes mb-5">
+      <label class="checkbox">
+        <input type="checkbox" @click="toggleStripBTags"/>
+        Strip &lt;b&gt; tags
+      </label>
+
+      <label class="checkbox">
+        <input type="checkbox" @click="toggleStripITags"/>
+        Strip &lt;i&gt; tags
+      </label>
+
+      <label class="checkbox">
+        <input type="checkbox" @click="toggleStripUTags"/>
+        Strip &lt;u&gt; tags
+      </label>
+
+      <label class="checkbox">
+        <input type="checkbox" @click="toggleStripFontTags"/>
+        Strip &lt;font&gt; tags
+      </label>
+
+      <strong>*All other html is not relevant for srt files and is always removed.</strong>
+    </div>
+
+    <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled" @click="handleSubmit">
+    </GenericButton>
+    <GenericButton :loading="false" button_text="Continue editing" :enabled="true" v-if="showDownloadLink"
+      @click="showModalMethod"></GenericButton>
+
 
   </form>
 
@@ -42,9 +66,9 @@
       Download {{this.subtitleFilename}}
     </a>
   </div>
-  
+
   <!-- Error Message -->
-  <div class="notification is-danger" style="margin-bottom: 24px;" v-if="error">
+  <div class="notification is-danger has-text-centered" style="margin-bottom: 24px;" v-if="error">
     {{ error }}
   </div>
 
@@ -79,7 +103,11 @@ export default {
       showSaved: false,
       showDownloadLink: false,
       loaderStore: useLoaderStore(),
-      lineVisibleFlagsStore: useLineVisibleFlagsStore()
+      lineVisibleFlagsStore: useLineVisibleFlagsStore(),
+      stripBTags: false,
+      stripITags: false,
+      stripUTags: false,
+      stripFontTags: false,
     };
   },
   methods: {
@@ -126,6 +154,11 @@ export default {
       const formData = new FormData();
       formData.append("file", this.file);
       formData.append("webSocketUserId", this.userId);
+
+      formData.append("stripBTags", this.stripBTags)
+      formData.append("stripITags", this.stripITags)
+      formData.append("stripFontTags", this.stripFontTags)
+      formData.append("stripUTags", this.stripUTags)
 
       try {
         const response = await fetch("api/rest/1.0/upload", {
@@ -280,6 +313,18 @@ export default {
 
       setTimeout(() => {this.showDownloadLink = true}, 700);
       
+    },
+    toggleStripBTags() {
+      this.stripBTags = !this.stripBTags;
+    },
+    toggleStripITags() {
+      this.stripITags = !this.stripITags;
+    },
+    toggleStripUTags() {
+      this.stripUTags = !this.stripUTags;
+    },
+    toggleStripFontTags() {
+      this.stripFontTags = !this.stripFontTags;
     },
   },
   mounted: function () {

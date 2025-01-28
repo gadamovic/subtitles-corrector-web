@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.controller.rest.FileUploadController;
+import com.subtitlescorrector.domain.AdditionalData;
 import com.subtitlescorrector.domain.EditOperation;
 import com.subtitlescorrector.domain.EditOperation.OperationType;
 import com.subtitlescorrector.domain.S3BucketNames;
@@ -68,14 +69,14 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	EditDistanceService levenshteinDistance;
 
 	@Override
-	public SubtitleFileData process(File storedFile, String webSocketSessionId) {
+	public SubtitleFileData process(File storedFile, AdditionalData params) {
 
 		SubtitleFileData data = new SubtitleFileData();
 		File correctedFile = new File(storedFile.getName());
 
 		try {
 			
-			String s3Key = webSocketSessionId + "_" + storedFile.getName();
+			String s3Key = params.getWebSocketSessionId() + "_" + storedFile.getName();
 			
 			s3Service.uploadFileToS3IfProd("v1_" + s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), storedFile, "ttl=7days");
 			
@@ -86,23 +87,29 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			data.setFilename(correctedFile.getName());
 			data.setLines(converter.convertToSubtitleUnits(lines));
 			
-			//preprocessors are not considered as subtitle corrections and won't be reported to the user as corrections
-			//this are preparations of the content of the uploaded file
+			//preprocessors are not considered as subtitle corrections. Corrections will be reported in <AppliedChanges> section, but not in the editor's content
+			//this are preparations of the content of the uploaded file. For example we don't want to keep any non-srt-relevant HTML
+			//because of security and show it in the editor (either as text before correction or after correction) where html is not escaped
 			for (PreProcessor preProcessor : preProcessorsManager.getPreProcessors()) {
-				data = preProcessor.process(data);
+				data = preProcessor.process(data, params);
 			}
 			
-			for (Corrector corrector : correctorsManager.getCorrectors()) {
-				data = corrector.correct(data, webSocketSessionId);
+			List<Corrector> correctors = correctorsManager.getCorrectors(params);
+			params.setNumberOfCorrectors(correctors.size());
+			
+			for (Corrector corrector : correctors) {
+				data = corrector.correct(data, params);
+				params.setCorrectorIndex(params.getCorrectorIndex() + 1);
 			}
 			
 			calculateEditOperationsAfterCorrections(data);
 
 			if (detectedEncoding != StandardCharsets.UTF_8) {
-				updateEncoding(storedFile, webSocketSessionId, detectedEncoding);
+				updateEncoding(storedFile, params.getWebSocketSessionId(), detectedEncoding);
 			}
 
-			//TODO: upload file to s3 on multiple places (for ex. before edit, after corrections, before user save)
+			sendProcessingFinishedMessage(params.getWebSocketSessionId());
+			
 			FileUtil.writeLinesToFile(correctedFile, converter.convertToListOfStrings(data.getLines()), StandardCharsets.UTF_8);
 
 			s3Service.uploadFileToS3IfProd("v2_" + s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), correctedFile, "ttl=7days");
@@ -147,4 +154,18 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, encodingUpdate);
 	}
 
+	private void sendProcessingFinishedMessage(String webSocketSessionId) {
+		
+		//wait a bit to be sure that this is the last progress update message
+		try {
+			Thread.sleep(20);
+		} catch (InterruptedException e) {}
+		
+		SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
+		event.setWebSocketSessionId(webSocketSessionId);
+		event.setProcessedPercentage("100");
+		kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
+
+	}
+	
 }

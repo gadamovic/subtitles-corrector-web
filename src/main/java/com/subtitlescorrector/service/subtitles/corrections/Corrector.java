@@ -1,7 +1,6 @@
 package com.subtitlescorrector.service.subtitles.corrections;
 
-import java.util.List;
-
+import com.subtitlescorrector.domain.AdditionalData;
 import com.subtitlescorrector.domain.SubtitleFileData;
 
 public interface Corrector {
@@ -12,6 +11,6 @@ public interface Corrector {
 	 * @param webSocketSessionId that is used to send log data back to the client (browser)
 	 * @return corrected lines
 	 */
-	public SubtitleFileData correct(SubtitleFileData data, String webSocketSessionId);
+	public SubtitleFileData correct(SubtitleFileData data, AdditionalData additionalData);
 	
 }

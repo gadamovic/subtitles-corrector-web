@@ -20,7 +20,12 @@
                     </span>
                     Fix commonly seen invalid characters like: È -> Č, Æ -> Ć and much more.
                   </li>
-  
+                  <li class="is-flex is-align-items-center my-3">
+                    <span class="icon has-text-success mr-2">
+                      <i class="fas fa-check"></i>
+                    </span>
+                    Strip HTML from files.
+                  </li>
                   <li class="is-flex is-align-items-center my-3">
                     <span class="icon has-text-success mr-2">
                       <i class="fas fa-check"></i>

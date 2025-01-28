@@ -2,6 +2,7 @@ package com.subtitlescorrector.service.processors;
 
 import org.springframework.stereotype.Service;
 
+import com.subtitlescorrector.domain.AdditionalData;
 import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitleUnitData;
 
@@ -9,7 +10,7 @@ import com.subtitlescorrector.domain.SubtitleUnitData;
 public class BrTagPreProcessor implements PreProcessor{
 
 	@Override
-	public SubtitleFileData process(SubtitleFileData data) {
+	public SubtitleFileData process(SubtitleFileData data, AdditionalData params) {
 		
 		for(SubtitleUnitData subUnitData : data.getLines()) {
 			
