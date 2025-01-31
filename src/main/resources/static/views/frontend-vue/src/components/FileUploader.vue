@@ -13,8 +13,8 @@
 
   <form @submit.prevent enctype="multipart/form-data" class="box" style="background-color: #004266;">
 
-    <label class="label has-text-white has-text-centered">Upload a subtitle file:</label> <br />
-    <div class="file has-name is-fullwidth field">
+    <label class="label has-text-white has-text-centered title is-5">Upload a subtitle file:</label> <br />
+    <div class="file has-name is-fullwidth field mb-3">
       <label class="file-label">
         <input class="file-input" type="file" name="file" accept=".srt, .sub, .txt" @change="handleFileChange" />
         <span class="file-cta">
@@ -29,7 +29,7 @@
       </label>
     </div>
 
-    <div class="box">
+    <div class="box mb-3">
       <p class="title is-5 has-text-centered mb-3">HTML options</p>
       <div class="checkboxes">
         <label class="checkbox">
@@ -56,7 +56,7 @@
     </div>
   </div>
 
-    <div class="box">
+    <div class="box mb-3">
       <p class="title is-5 has-text-centered mb-3">Character / encoding options</p>
       <div class="checkboxes">
         <label class="checkbox">
