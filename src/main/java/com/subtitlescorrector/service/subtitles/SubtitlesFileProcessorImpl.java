@@ -85,7 +85,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			
 			
 			data.setFilename(correctedFile.getName());
-			data.setLines(converter.convertToSubtitleUnits(lines));
+			data.setLines(converter.convertToSubtitleUnits(lines, params));
 			
 			//preprocessors are not considered as subtitle corrections. Corrections will be reported in <AppliedChanges> section, but not in the editor's content
 			//this are preparations of the content of the uploaded file. For example we don't want to keep any non-srt-relevant HTML
@@ -105,7 +105,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			calculateEditOperationsAfterCorrections(data);
 
 			if (detectedEncoding != StandardCharsets.UTF_8) {
-				updateEncoding(storedFile, params.getWebSocketSessionId(), detectedEncoding);
+				sendUpdatedEncodingLogMessage(storedFile, params.getWebSocketSessionId(), detectedEncoding);
 			}
 
 			sendProcessingFinishedMessage(params.getWebSocketSessionId());
@@ -145,7 +145,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		}
 	}
 
-	private void updateEncoding(File storedFile, String webSocketSessionId, Charset detectedEncoding) {
+	private void sendUpdatedEncodingLogMessage(File storedFile, String webSocketSessionId, Charset detectedEncoding) {
 		log.info("Updated encoding of: {} to UTF-8!", storedFile.getName());
 
 		SubtitleCorrectionEvent encodingUpdate = new SubtitleCorrectionEvent();

@@ -29,28 +29,61 @@
       </label>
     </div>
 
-    <div class="box checkboxes mb-5">
-      <label class="checkbox">
-        <input type="checkbox" @click="toggleStripBTags"/>
-        Strip &lt;b&gt; tags
-      </label>
+    <div class="box">
+      <p class="title is-5 has-text-centered mb-3">HTML options</p>
+      <div class="checkboxes">
+        <label class="checkbox">
+          <input type="checkbox" @click="toggleStripBTags"/>
+          Strip &lt;b&gt; tags
+        </label>
 
-      <label class="checkbox">
-        <input type="checkbox" @click="toggleStripITags"/>
-        Strip &lt;i&gt; tags
-      </label>
+        <label class="checkbox">
+          <input type="checkbox" @click="toggleStripITags"/>
+          Strip &lt;i&gt; tags
+        </label>
 
-      <label class="checkbox">
-        <input type="checkbox" @click="toggleStripUTags"/>
-        Strip &lt;u&gt; tags
-      </label>
+        <label class="checkbox">
+          <input type="checkbox" @click="toggleStripUTags"/>
+          Strip &lt;u&gt; tags
+        </label>
 
-      <label class="checkbox">
-        <input type="checkbox" @click="toggleStripFontTags"/>
-        Strip &lt;font&gt; tags
-      </label>
+        <label class="checkbox">
+          <input type="checkbox" @click="toggleStripFontTags"/>
+          Strip &lt;font&gt; tags
+        </label>
 
-      <strong>*All other html is not relevant for srt files and is always removed.</strong>
+      <strong>All other html is not relevant for srt files and is always removed.</strong>
+    </div>
+  </div>
+
+    <div class="box">
+      <p class="title is-5 has-text-centered mb-3">Character / encoding options</p>
+      <div class="checkboxes">
+        <label class="checkbox">
+          <input type="checkbox" @click="toggleKeepBOM"/>
+          Keep BOM
+        </label>
+
+        <label class="checkbox">
+          <input type="checkbox" checked @click="toggleaeToTj"/>
+          Convert æ to ć
+        </label>
+
+        <label class="checkbox">
+          <input type="checkbox" checked @click="toggleAEToTJ"/>
+          Convert Æ to Ć
+        </label>
+
+        <label class="checkbox">
+          <input type="checkbox" checked @click="toggleeToch"/>
+          Convert è to č
+        </label>
+
+        <label class="checkbox">
+          <input type="checkbox" checked @click="toggleEToCH"/>
+          Convert È to Č
+        </label>
+      </div>
     </div>
 
     <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled" @click="handleSubmit">
@@ -62,7 +95,7 @@
   </form>
 
   <div class="notification is-link has-text-centered" v-if="this.subtitleFilename && this.showDownloadLink">
-    <a @click="downloadFile" class="">
+    <a @click="downloadFile" style="overflow-wrap: break-word;">
       Download {{this.subtitleFilename}}
     </a>
   </div>
@@ -108,6 +141,11 @@ export default {
       stripITags: false,
       stripUTags: false,
       stripFontTags: false,
+      keepBOM: false,
+      aeToTj: true,
+      AEToTJ: true,
+      eToch: true,
+      EToCH: true,
     };
   },
   methods: {
@@ -159,6 +197,12 @@ export default {
       formData.append("stripITags", this.stripITags)
       formData.append("stripFontTags", this.stripFontTags)
       formData.append("stripUTags", this.stripUTags)
+
+      formData.append("keepBOM", this.keepBOM)
+      formData.append("aeToTj", this.aeToTj)
+      formData.append("AEToTJ", this.AEToTJ)
+      formData.append("eToch", this.eToch)
+      formData.append("EToCH", this.EToCH)
 
       try {
         const response = await fetch("api/rest/1.0/upload", {
@@ -326,6 +370,25 @@ export default {
     toggleStripFontTags() {
       this.stripFontTags = !this.stripFontTags;
     },
+
+
+
+
+    toggleaeToTj() {
+      this.aeToTj = !this.aeToTj;
+    },
+    toggleAEToTJ() {
+      this.AEToTJ = !this.AEToTJ;
+    },
+    toggleeToch() {
+      this.eToch = !this.eToch;
+    },
+    toggleEToCH() {
+      this.EToCH = !this.EToCH;
+    },
+    toggleKeepBOM(){
+      this.keepBOM = !this.keepBOM;
+    }
   },
   mounted: function () {
     this.establishWSConnection();

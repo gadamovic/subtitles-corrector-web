@@ -87,6 +87,11 @@ public class FileUploadController {
 		params.setStripITags(Boolean.parseBoolean(request.getParameter("stripITags")));
 		params.setStripFontTags(Boolean.parseBoolean(request.getParameter("stripFontTags")));
 		params.setStripUTags(Boolean.parseBoolean(request.getParameter("stripUTags")));
+		params.setKeepBOM(Boolean.parseBoolean(request.getParameter("keepBOM")));
+		params.setConvertAeToTj(Boolean.parseBoolean(request.getParameter("aeToTj")));
+		params.setConvertAEToTJ(Boolean.parseBoolean(request.getParameter("AEToTJ")));
+		params.setConverteToch(Boolean.parseBoolean(request.getParameter("eToch")));
+		params.setConvertEToCH(Boolean.parseBoolean(request.getParameter("EToCH")));
 		
 		return params;
 	}

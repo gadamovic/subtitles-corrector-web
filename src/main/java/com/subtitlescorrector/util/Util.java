@@ -249,5 +249,17 @@ public class Util {
 
 		return afterCorrection;
 	}
+	
+	public void sendWebSocketCorrectionMessageToKafka(String webSocketSessionId, String message) {
+		SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
+		event.setCorrection(message);
+		event.setEventTimestamp(Instant.now());
+
+		event.setWebSocketSessionId(webSocketSessionId);
+					
+		if(properties.getSubtitlesKafakEnabled()) {
+			kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
+		}
+	}
 
 }

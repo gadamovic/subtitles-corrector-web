@@ -5,9 +5,12 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.subtitlescorrector.domain.AdditionalData;
 import com.subtitlescorrector.domain.SubtitleUnitData;
+import com.subtitlescorrector.util.Util;
 
 import io.micrometer.common.util.StringUtils;
 
@@ -16,14 +19,22 @@ public class SubtitleLinesToSubtitleUnitDataConverterImpl implements SubtitleLin
 
 	Logger log = LoggerFactory.getLogger(SubtitleLinesToSubtitleUnitDataConverterImpl.class);
 
+	@Autowired
+	Util util;
+	
 	@Override
-	public List<SubtitleUnitData> convertToSubtitleUnits(List<String> lines){
+	public List<SubtitleUnitData> convertToSubtitleUnits(List<String> lines, AdditionalData params){
 		
 		List<SubtitleUnitData> dataList = new ArrayList<>();
 		SubtitleUnitData data = null;
 
 		for(String line : lines) {
 			
+	        // Remove BOM if present
+	        if (line.startsWith("\uFEFF") && !params.getKeepBOM()) {
+				line = line.substring(1);
+				util.sendWebSocketCorrectionMessageToKafka(params.getWebSocketSessionId(), "Removed BOM from file");
+			}
 			
 			Integer number = toInteger(line);
 			if(number != null && data == null) {

@@ -8,6 +8,14 @@ public class AdditionalData {
 	private Boolean stripUTags;
 	private Boolean stripFontTags;
 	private Integer correctorIndex = 1;
+	/**
+	 * Flag to indicate not to remove BOM from files if it is present
+	 */
+	private Boolean keepBOM;
+	private Boolean aeToTj;
+	private Boolean AEToTJ;
+	private Boolean eToch;
+	private Boolean EToCH;
 
 	private int numberOfCorrectors;
 
@@ -67,4 +75,44 @@ public class AdditionalData {
 		this.numberOfCorrectors = numberOfCorrectors;
 	}
 
+	public Boolean getKeepBOM() {
+		return keepBOM;
+	}
+
+	public void setKeepBOM(Boolean keepBOM) {
+		this.keepBOM = keepBOM;
+	}
+
+	public Boolean getConvertAeToTj() {
+		return aeToTj;
+	}
+
+	public void setConvertAeToTj(Boolean aeToTj) {
+		this.aeToTj = aeToTj;
+	}
+
+	public Boolean getConvertAEToTJ() {
+		return AEToTJ;
+	}
+
+	public void setConvertAEToTJ(Boolean aEToTJ) {
+		AEToTJ = aEToTJ;
+	}
+
+	public Boolean getConverteToch() {
+		return eToch;
+	}
+
+	public void setConverteToch(Boolean eToch) {
+		this.eToch = eToch;
+	}
+
+	public Boolean getConvertEToCH() {
+		return EToCH;
+	}
+
+	public void setConvertEToCH(Boolean eToCH) {
+		EToCH = eToCH;
+	}
+	
 }

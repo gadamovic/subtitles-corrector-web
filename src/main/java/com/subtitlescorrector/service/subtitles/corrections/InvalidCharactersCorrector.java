@@ -23,13 +23,13 @@ public class InvalidCharactersCorrector implements Corrector{
 	Util util;
 	
 	@Override
-	public SubtitleFileData correct(SubtitleFileData data, AdditionalData additionalData) {
+	public SubtitleFileData correct(SubtitleFileData data, AdditionalData params) {
 
-		int numberOfLines = data.getLines().size() * additionalData.getNumberOfCorrectors();
-		int currentLineNumber = data.getLines().size() * (additionalData.getCorrectorIndex() - 1) + 1;
+		int numberOfLines = data.getLines().size() * params.getNumberOfCorrectors();
+		int currentLineNumber = data.getLines().size() * (params.getCorrectorIndex() - 1) + 1;
 		float processedPercentage = 0f;
 
-		String webSocketSessionId = additionalData.getWebSocketSessionId();
+		String webSocketSessionId = params.getWebSocketSessionId();
 		
 		for(SubtitleUnitData subUnitData : data.getLines()) {
 			
@@ -61,17 +61,25 @@ public class InvalidCharactersCorrector implements Corrector{
 			tmp = beforeCorrection.replace("", "");
 			beforeCorrection = util.checkForChanges(tmp, beforeCorrection, "Removed \"\"", processedPercentage, webSocketSessionId);
 			
-			tmp = beforeCorrection.replace("æ", "ć");
-			beforeCorrection = util.checkForChanges(tmp, beforeCorrection, "æ -> ć", processedPercentage, webSocketSessionId);
+			if(params.getConvertAeToTj()) {
+				tmp = beforeCorrection.replace("æ", "ć");
+				beforeCorrection = util.checkForChanges(tmp, beforeCorrection, "æ -> ć", processedPercentage, webSocketSessionId);
+			}
 			
-			tmp = beforeCorrection.replace("Æ", "Ć");
-			beforeCorrection = util.checkForChanges(tmp, beforeCorrection, "Æ -> Ć", processedPercentage, webSocketSessionId);
-	
-			tmp = beforeCorrection.replace("è", "č");
-			beforeCorrection = util.checkForChanges(tmp, beforeCorrection, "è -> č", processedPercentage, webSocketSessionId);
+			if(params.getConvertAEToTJ()) {			
+				tmp = beforeCorrection.replace("Æ", "Ć");
+				beforeCorrection = util.checkForChanges(tmp, beforeCorrection, "Æ -> Ć", processedPercentage, webSocketSessionId);
+			}
 			
-			tmp = beforeCorrection.replace("È", "Č");
-			beforeCorrection = util.checkForChanges(tmp, beforeCorrection, "È -> Č", processedPercentage, webSocketSessionId);
+			if(params.getConverteToch()) {
+				tmp = beforeCorrection.replace("è", "č");
+				beforeCorrection = util.checkForChanges(tmp, beforeCorrection, "è -> č", processedPercentage, webSocketSessionId);
+			}
+			
+			if(params.getConvertEToCH()) {
+				tmp = beforeCorrection.replace("È", "Č");
+				beforeCorrection = util.checkForChanges(tmp, beforeCorrection, "È -> Č", processedPercentage, webSocketSessionId);
+			}
 			
 			subUnitData.setText(beforeCorrection);
 			

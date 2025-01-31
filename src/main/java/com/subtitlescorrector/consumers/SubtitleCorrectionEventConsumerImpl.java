@@ -17,8 +17,12 @@ public class SubtitleCorrectionEventConsumerImpl implements SubtitleCorrectionEv
 
 	Logger log = LoggerFactory.getLogger(SubtitleCorrectionEventConsumerImpl.class);
 	
+	private final CustomWebSocketHandler webSocketHandler;
+	
 	@Autowired
-	CustomWebSocketHandler webSocketHandler;
+	public SubtitleCorrectionEventConsumerImpl(CustomWebSocketHandler webSocketHandler) {
+		this.webSocketHandler = webSocketHandler;
+	}
 	
 	@KafkaListener(id = "subtitlesCorrectionListenerContainer", topics = "subtitlesCorrections", containerFactory = "kafkaListenerContainerFactory")
 	public void consumeCorrections(List<SubtitleCorrectionEvent> events) {

@@ -41,7 +41,10 @@ public class FileUtil {
 			}
 			
 			while (scanner.hasNext()) {
-				content.add(scanner.nextLine());
+				
+				String line = scanner.nextLine();
+				
+				content.add(line);
 			}
 
 			scanner.close();
