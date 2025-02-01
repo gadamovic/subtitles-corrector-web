@@ -67,8 +67,14 @@ public class SaveSubtitleController {
 		
 		SubtitleFileData data = redisService.getUserSubtitleCurrentVersion(userId);
 
+		List<String> lines = converter.convertToListOfStrings(data.getLines());
+		
+		if(data.getHasBom()) {
+			lines = addBom(lines);
+		}
+		
 		File downloadableFile = new File(data.getFilename());
-		FileUtil.writeLinesToFile(downloadableFile, converter.convertToListOfStrings(data.getLines()), StandardCharsets.UTF_8);
+		FileUtil.writeLinesToFile(downloadableFile, lines, StandardCharsets.UTF_8);
 
 		String webSocketSessionIdAsFilename = redisService.getWebSocketSessionIdForUser(userId);
 		s3Service.uploadFileToS3IfProd("v3_" + webSocketSessionIdAsFilename + "_" + data.getFilename(), S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), downloadableFile, "ttl=7days");
@@ -93,6 +99,20 @@ public class SaveSubtitleController {
                 log.error("Failed to delete the file: " + downloadableFile.getAbsolutePath());
             }
         }
+	}
+
+	private List<String> addBom(List<String> lines) {
+		
+		if(lines.size() > 0) {
+			String firstLine = lines.get(0);
+			if(!firstLine.startsWith("\uFEFF")) {
+				firstLine = "\uFEFF" + firstLine;
+				lines.set(0, firstLine);
+			}
+		}
+		
+		return lines;
+		
 	}
 
 }

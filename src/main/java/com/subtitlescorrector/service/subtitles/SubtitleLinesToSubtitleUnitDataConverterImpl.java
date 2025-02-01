@@ -31,9 +31,13 @@ public class SubtitleLinesToSubtitleUnitDataConverterImpl implements SubtitleLin
 		for(String line : lines) {
 			
 	        // Remove BOM if present
-	        if (line.startsWith("\uFEFF") && !params.getKeepBOM()) {
+	        if (line.startsWith("\uFEFF")) {
 				line = line.substring(1);
-				util.sendWebSocketCorrectionMessageToKafka(params.getWebSocketSessionId(), "Removed BOM from file");
+				
+				// Don't print message about removing BOM if user marked to keep it, it will be added back later
+				if(!params.getKeepBOM()) {
+					util.sendWebSocketCorrectionMessageToKafka(params.getWebSocketSessionId(), "Removed BOM from file");
+				}
 			}
 			
 			Integer number = toInteger(line);

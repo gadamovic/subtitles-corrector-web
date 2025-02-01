@@ -81,8 +81,15 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			s3Service.uploadFileToS3IfProd("v1_" + s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), storedFile, "ttl=7days");
 			
 			Charset detectedEncoding = FileUtil.detectEncodingOfFile(storedFile);
+			data.setDetectedCharset(detectedEncoding);
+			
 			List<String> lines = FileUtil.loadTextFile(storedFile);
 			
+			if(lines.get(0).startsWith("\uFEFF") && params.getKeepBOM()) {
+				data.setHasBom(true);
+			}else {
+				data.setHasBom(false);
+			}
 			
 			data.setFilename(correctedFile.getName());
 			data.setLines(converter.convertToSubtitleUnits(lines, params));
@@ -94,8 +101,10 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 				data = preProcessor.process(data, params);
 			}
 			
+			data.getLines().forEach(line -> line.setTextBeforeCorrection(line.getText()));
+			
 			List<Corrector> correctors = correctorsManager.getCorrectors(params);
-			params.setNumberOfCorrectors(correctors.size());
+			params.setNumberOfCorrectors(correctors.size());			
 			
 			for (Corrector corrector : correctors) {
 				data = corrector.correct(data, params);

@@ -35,7 +35,7 @@ public class FileUtil {
 			
 			if(file.length() > 0 && !scanner.hasNext()) {
 				//try another encoding
-				log.warn("Not able to read from file: <" + file.getName() + "> with encoding: " + detectedEncoding.displayName() + ". Trying again with UTF-8");
+				log.warn("Not able to read from file: <" + file.getName() + "> with encoding: " + detectedEncoding.displayName() + ". Trying again with ISO_8859_1");
 				scanner.close();
 				scanner = new Scanner(file, StandardCharsets.ISO_8859_1.displayName());
 			}

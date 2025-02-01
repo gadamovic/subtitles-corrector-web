@@ -1,6 +1,7 @@
 package com.subtitlescorrector.domain;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.List;
 
 public class SubtitleFileData implements Serializable{
@@ -12,6 +13,13 @@ public class SubtitleFileData implements Serializable{
 	List<SubtitleUnitData> lines;
 	
 	String httpResponseMessage;
+	
+	Charset detectedCharset;
+	
+	/**
+	 * Byte order mark
+	 */
+	Boolean hasBom;
 
 	public String getFilename() {
 		return filename;
@@ -35,6 +43,22 @@ public class SubtitleFileData implements Serializable{
 
 	public void setHttpResponseMessage(String httpResponseMessage) {
 		this.httpResponseMessage = httpResponseMessage;
+	}
+
+	public Charset getDetectedCharset() {
+		return detectedCharset;
+	}
+
+	public void setDetectedCharset(Charset detectedCharset) {
+		this.detectedCharset = detectedCharset;
+	}
+
+	public Boolean getHasBom() {
+		return hasBom;
+	}
+
+	public void setHasBom(Boolean hasBom) {
+		this.hasBom = hasBom;
 	}
 
 }

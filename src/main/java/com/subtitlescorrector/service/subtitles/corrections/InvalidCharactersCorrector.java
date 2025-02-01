@@ -34,8 +34,6 @@ public class InvalidCharactersCorrector implements Corrector{
 		for(SubtitleUnitData subUnitData : data.getLines()) {
 			
 			String line = subUnitData.getText();
-			//TODO: Check if this can be moved outside of correctors, or make sure it's added only on the first one
-			subUnitData.setTextBeforeCorrection(line);
 			
 			processedPercentage = ((float) currentLineNumber / (float) numberOfLines) * 100;
 			
