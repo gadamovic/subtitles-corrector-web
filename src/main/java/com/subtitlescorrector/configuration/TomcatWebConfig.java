@@ -2,7 +2,9 @@ package com.subtitlescorrector.configuration;
 
 import java.io.File;
 
+import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.valves.AccessLogValve;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.Ssl;
@@ -58,6 +60,21 @@ public class TomcatWebConfig implements WebServerFactoryCustomizer<TomcatServlet
 
 			factory.setSsl(ssl);
 		}
+		
+		if(properties.isProdEnvironment()) {
+			factory.addContextValves(accessLogValve());
+			factory.setBaseDirectory(new File("/home/ec2-user/subtitles-corrector-files/logs/access_logs"));
+		}
 
 	}
+	
+    private Valve accessLogValve() {
+        AccessLogValve logValve = new AccessLogValve();
+        logValve.setPattern("%h %l %u %t \"%r\" %s %b");
+        logValve.setDirectory("tomcat_access_logs");
+        logValve.setPrefix("access_log");
+        logValve.setSuffix(".log");
+        logValve.setEnabled(true);
+        return logValve;
+    }
 }
