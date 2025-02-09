@@ -63,7 +63,7 @@ public class TomcatWebConfig implements WebServerFactoryCustomizer<TomcatServlet
 		
 		if(properties.isProdEnvironment()) {
 			factory.addContextValves(accessLogValve());
-			factory.setBaseDirectory(new File("/home/ec2-user/subtitles-corrector-files/logs/access_logs"));
+			factory.setBaseDirectory(new File("/home/logs/access_logs"));
 		}
 
 	}
