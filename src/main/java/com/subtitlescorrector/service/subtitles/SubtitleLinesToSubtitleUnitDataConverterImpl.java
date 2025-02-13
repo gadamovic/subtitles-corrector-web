@@ -27,8 +27,15 @@ public class SubtitleLinesToSubtitleUnitDataConverterImpl implements SubtitleLin
 		
 		List<SubtitleUnitData> dataList = new ArrayList<>();
 		SubtitleUnitData data = null;
-
+		int i = -1;
+		
 		for(String line : lines) {
+			
+			//ignore multiple consecutive blank lines
+			i++;
+			if(StringUtils.isBlank(line) && (i < lines.size()) && StringUtils.isBlank(lines.get(i + 1))) {
+				continue;
+			}
 			
 	        // Remove BOM if present
 	        if (line.startsWith("\uFEFF")) {
@@ -60,6 +67,13 @@ public class SubtitleLinesToSubtitleUnitDataConverterImpl implements SubtitleLin
 				}else {
 					data.setText(line);
 				}
+				
+				if(i == lines.size()-1) {
+					//last line of the file
+					dataList.add(data);
+					data = null;
+				}
+				
 			}else {
 				//end of subtitle
 				dataList.add(data);
