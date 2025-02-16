@@ -1,4 +1,4 @@
-package com.subtitlescorrector.service.processors;
+package com.subtitlescorrector.service.preprocessors;
 
 import java.util.ArrayList;
 import java.util.List;

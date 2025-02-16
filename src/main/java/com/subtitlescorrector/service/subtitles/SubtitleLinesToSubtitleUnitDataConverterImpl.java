@@ -25,6 +25,8 @@ public class SubtitleLinesToSubtitleUnitDataConverterImpl implements SubtitleLin
 	@Override
 	public List<SubtitleUnitData> convertToSubtitleUnits(List<String> lines, AdditionalData params){
 		
+		lines = trimLines(lines);
+		
 		List<SubtitleUnitData> dataList = new ArrayList<>();
 		SubtitleUnitData data = null;
 		int i = -1;
@@ -84,6 +86,25 @@ public class SubtitleLinesToSubtitleUnitDataConverterImpl implements SubtitleLin
 		}
 		
 		return dataList;
+	}
+
+	private List<String> trimLines(List<String> lines) {
+				
+		int firstValidIndex = 0;
+		
+		for(String line : lines) {
+			
+			if(StringUtils.isBlank(line)) {
+				firstValidIndex ++;
+				continue;
+			}else {
+				break;
+			}
+			
+		}
+		
+		return lines.subList(firstValidIndex, lines.size());
+		
 	}
 
 	public Integer toInteger(String candidate) {

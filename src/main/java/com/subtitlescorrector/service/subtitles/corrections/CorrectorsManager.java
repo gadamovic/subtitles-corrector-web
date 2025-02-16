@@ -22,10 +22,10 @@ public class CorrectorsManager {
 		List<Corrector> correctors = new ArrayList<>();
 		correctors.add(invalidCharactersCorrector);
 		
-		if(clientParameters.getStripBTags() ||
-				clientParameters.getStripFontTags() ||
-				clientParameters.getStripITags() || 
-				clientParameters.getStripUTags()) {
+		if((clientParameters.getStripBTags() != null && clientParameters.getStripBTags()) ||
+				(clientParameters.getStripFontTags() != null && clientParameters.getStripFontTags()) ||
+				(clientParameters.getStripITags() != null && clientParameters.getStripITags()) || 
+				(clientParameters.getStripUTags() != null && clientParameters.getStripUTags())) {
 			correctors.add(htmlTagsCorrector);
 		}
 		

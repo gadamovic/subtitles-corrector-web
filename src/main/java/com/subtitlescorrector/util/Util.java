@@ -242,7 +242,8 @@ public class Util {
 			event.setWebSocketSessionId(webSocketSessionId);
 						
 			if(properties.getSubtitlesKafakEnabled()) {
-				kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
+				Object ret = kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
+				System.out.println(ret);
 			}
 			
 		}

@@ -1,4 +1,4 @@
-package com.subtitlescorrector.service.processors;
+package com.subtitlescorrector.service.preprocessors;
 
 import java.time.Instant;
 import java.util.List;

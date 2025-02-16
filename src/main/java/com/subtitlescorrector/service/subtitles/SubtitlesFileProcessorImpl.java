@@ -6,29 +6,23 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.mail.MailSender;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Component;
 
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.controller.rest.FileUploadController;
 import com.subtitlescorrector.domain.AdditionalData;
 import com.subtitlescorrector.domain.EditOperation;
-import com.subtitlescorrector.domain.EditOperation.OperationType;
 import com.subtitlescorrector.domain.S3BucketNames;
 import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitleUnitData;
-import com.subtitlescorrector.domain.SubtitlesFileProcessorResponse;
-import com.subtitlescorrector.domain.SubtitlesProcessingStatus;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
-import com.subtitlescorrector.service.processors.PreProcessor;
-import com.subtitlescorrector.service.processors.PreProcessorsManager;
+import com.subtitlescorrector.service.preprocessors.PreProcessor;
+import com.subtitlescorrector.service.preprocessors.PreProcessorsManager;
 import com.subtitlescorrector.service.s3.S3Service;
 import com.subtitlescorrector.service.subtitles.corrections.Corrector;
 import com.subtitlescorrector.service.subtitles.corrections.CorrectorsManager;
@@ -44,7 +38,6 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	@Autowired
 	ApplicationProperties properties;
 
-	@Autowired
 	KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate;
 
 	@Autowired
@@ -53,20 +46,26 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	@Autowired
 	PreProcessorsManager preProcessorsManager;
 
-	@Autowired
 	S3Service s3Service;
 
 	@Autowired
 	Util util;
 	
 	@Autowired
-	MailSender mailSender;
-	
-	@Autowired
 	SubtitleLinesToSubtitleUnitDataConverter converter;
 	
 	@Autowired
 	EditDistanceService levenshteinDistance;
+	
+	@Autowired
+	public void setKafkaTemplate(KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate) {
+		this.kafkaTemplate = kafkaTemplate;
+	}
+
+	@Autowired
+	public void setS3Service(S3Service s3Service) {
+		this.s3Service = s3Service;
+	}
 
 	@Override
 	public SubtitleFileData process(File storedFile, AdditionalData params) {
@@ -147,8 +146,15 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 
 	private void deleteFiles(File storedFile, File correctedFile) {
 		try {
-			Files.delete(storedFile.toPath());
-			Files.delete(correctedFile.toPath());
+			
+			if(storedFile.exists()) {
+				Files.delete(storedFile.toPath());
+			}
+			
+			if(correctedFile.exists()) {
+				Files.delete(correctedFile.toPath());
+			}
+			
 		} catch (IOException e) {
 			log.error("Error deleting files!", e);
 		}

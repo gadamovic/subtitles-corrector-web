@@ -1,4 +1,4 @@
-package com.subtitlescorrector.service.processors;
+package com.subtitlescorrector.service.preprocessors;
 
 import com.subtitlescorrector.domain.AdditionalData;
 import com.subtitlescorrector.domain.SubtitleFileData;
