@@ -6,6 +6,14 @@
 
   </ModalComponent>
 
+  <DownloadFileModalComponent :modalActive="showDownloadModal"
+   @closeDownloadModal="onCloseDownloadModal"
+   @downloadFileClicked="onDownloadFileClicked"
+   v-if="this.subtitleFilename && this.showDownloadLink"
+   :subtitleFilename="this.subtitleFilename">
+
+  </DownloadFileModalComponent>
+
   <div class="notification is-success" v-if="showSaved">
     <button class="delete" @click="() => {this.showSaved = false}"></button>
     Changes saved
@@ -114,11 +122,12 @@ import { useLineVisibleFlagsStore } from '@/stores/subtitleLineVisibleFlagsStore
 import GenericButton from './GenericButton.vue';
 import ModalComponent from './ModalComponent.vue';
 import { useSubtitleDataStore } from '@/stores/subtitleDataStore';
+import DownloadFileModalComponent from './DownloadFileModalComponent.vue';
 
 export default {
   name: "FileUploader",
   components: {
-    GenericButton, ModalComponent
+    GenericButton, ModalComponent, DownloadFileModalComponent
   },
   data() {
     return {
@@ -127,6 +136,7 @@ export default {
       error: null, // Error message
       subtitleDataStore: useSubtitleDataStore(),
       showModal: false,
+      showDownloadModal: true,
       fileProcessingLogs: {},
       processedPercentage: 0,
       userId: crypto.randomUUID(),
@@ -322,6 +332,15 @@ export default {
     showModalMethod(){
       this.showModal = true;
     },
+    onCloseDownloadModal() {
+      this.showDownloadModal = false;
+    },
+    showDownloadModalMethod(){
+      this.showDownloadModal = true;
+    },
+    onDownloadFileClicked(){
+      this.downloadFile();
+    },
     isJson(str) {
       try {
         JSON.parse(str);
@@ -355,6 +374,7 @@ export default {
     },
     saveModalClicked() {
 
+      this.showDownloadModalMethod();
       setTimeout(() => {this.showDownloadLink = true}, 700);
       
     },
