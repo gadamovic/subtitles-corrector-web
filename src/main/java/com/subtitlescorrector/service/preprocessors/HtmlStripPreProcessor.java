@@ -20,6 +20,7 @@ import com.subtitlescorrector.domain.AdditionalData;
 import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
+import com.subtitlescorrector.service.CustomWebSocketHandler;
 import com.subtitlescorrector.util.Constants;
 import com.subtitlescorrector.util.Util;
 
@@ -32,11 +33,14 @@ public class HtmlStripPreProcessor implements PreProcessor{
 	@Autowired
 	Util util;
 	
-	@Autowired
-	KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate;
+//	@Autowired
+//	KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate;
 	
 	@Autowired
 	ApplicationProperties properties;
+	
+	@Autowired
+	CustomWebSocketHandler webSocketHandler;
 	
 	@Override
 	public SubtitleFileData process(SubtitleFileData data, AdditionalData params) {
@@ -69,8 +73,9 @@ public class HtmlStripPreProcessor implements PreProcessor{
 					event.setProcessedPercentage("0");
 					event.setWebSocketSessionId(params.getWebSocketSessionId());
 					
-					if(properties.getSubtitlesKafakEnabled()) {
-						kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
+					if(properties.getSubtitlesRealTimeUpdatesEnabled()) {
+						//kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
+						webSocketHandler.sendMessage(event);
 					}
 					
 				}

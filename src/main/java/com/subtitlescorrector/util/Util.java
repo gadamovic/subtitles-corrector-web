@@ -32,6 +32,7 @@ import com.subtitlescorrector.domain.EditOperation;
 import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
+import com.subtitlescorrector.service.CustomWebSocketHandler;
 
 @Component
 public class Util {
@@ -41,8 +42,11 @@ public class Util {
 	@Autowired
 	ApplicationProperties properties;
 	
+//	@Autowired
+//	KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate;
+	
 	@Autowired
-	KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate;
+	CustomWebSocketHandler webSocketHandler;
 
 	public static String getCurrentTimestampAsString() {
 		return LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyyHHmmssSSS"));
@@ -241,9 +245,10 @@ public class Util {
 			event.setProcessedPercentage(String.valueOf(processedPercentage));
 			event.setWebSocketSessionId(webSocketSessionId);
 						
-			if(properties.getSubtitlesKafakEnabled()) {
-				Object ret = kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
-				System.out.println(ret);
+			if(properties.getSubtitlesRealTimeUpdatesEnabled()) {
+//				Object ret = kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
+//				System.out.println(ret);
+				webSocketHandler.sendMessage(event);
 			}
 			
 		}
@@ -258,8 +263,9 @@ public class Util {
 
 		event.setWebSocketSessionId(webSocketSessionId);
 					
-		if(properties.getSubtitlesKafakEnabled()) {
-			kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
+		if(properties.getSubtitlesRealTimeUpdatesEnabled()) {
+			//kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
+			webSocketHandler.sendMessage(event);
 		}
 	}
 

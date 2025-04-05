@@ -21,6 +21,7 @@ import com.subtitlescorrector.domain.S3BucketNames;
 import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
+import com.subtitlescorrector.service.CustomWebSocketHandler;
 import com.subtitlescorrector.service.preprocessors.PreProcessor;
 import com.subtitlescorrector.service.preprocessors.PreProcessorsManager;
 import com.subtitlescorrector.service.s3.S3Service;
@@ -38,7 +39,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	@Autowired
 	ApplicationProperties properties;
 
-	KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate;
+	//KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate;
 
 	@Autowired
 	CorrectorsManager correctorsManager;
@@ -58,9 +59,12 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	EditDistanceService levenshteinDistance;
 	
 	@Autowired
-	public void setKafkaTemplate(KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate) {
-		this.kafkaTemplate = kafkaTemplate;
-	}
+	CustomWebSocketHandler webSocketHandler;
+	
+//	@Autowired
+//	public void setKafkaTemplate(KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate) {
+//		this.kafkaTemplate = kafkaTemplate;
+//	}
 
 	@Autowired
 	public void setS3Service(S3Service s3Service) {
@@ -103,7 +107,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			data.getLines().forEach(line -> line.setTextBeforeCorrection(line.getText()));
 			
 			List<Corrector> correctors = correctorsManager.getCorrectors(params);
-			params.setNumberOfCorrectors(correctors.size());			
+			params.setNumberOfCorrectors(correctors.size());
 			
 			for (Corrector corrector : correctors) {
 				data = corrector.correct(data, params);
@@ -166,7 +170,8 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		SubtitleCorrectionEvent encodingUpdate = new SubtitleCorrectionEvent();
 		encodingUpdate.setCorrection("Encoding updated: " + detectedEncoding + " -> UTF-8");
 		encodingUpdate.setWebSocketSessionId(webSocketSessionId);
-		kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, encodingUpdate);
+		//kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, encodingUpdate);
+		webSocketHandler.sendMessage(encodingUpdate);
 	}
 
 	private void sendProcessingFinishedMessage(String webSocketSessionId) {
@@ -179,7 +184,8 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
 		event.setWebSocketSessionId(webSocketSessionId);
 		event.setProcessedPercentage("100");
-		kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
+		//kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
+		webSocketHandler.sendMessage(event);
 
 	}
 	

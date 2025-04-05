@@ -27,6 +27,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     	
         List<String> allowedOrigins = new ArrayList<>();
         allowedOrigins.add("http://localhost:8080");
+        allowedOrigins.add("http://localhost:8081");
         allowedOrigins.add("http://localhost:8082");
         if(properties.isProdEnvironment()) {
             allowedOrigins.add("https://subtitles-corrector.com");

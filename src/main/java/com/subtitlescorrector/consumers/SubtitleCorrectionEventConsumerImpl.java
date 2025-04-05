@@ -12,7 +12,7 @@ import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 import com.subtitlescorrector.service.CustomWebSocketHandler;
 import com.subtitlescorrector.service.WebSocketMessageBrokerService;
 
-@Service
+//@Service
 public class SubtitleCorrectionEventConsumerImpl implements SubtitleCorrectionEventConsumer {
 
 	Logger log = LoggerFactory.getLogger(SubtitleCorrectionEventConsumerImpl.class);

@@ -33,7 +33,7 @@ public class ApplicationProperties {
 	private static final String APPLICATION_CONTEXT_ROOT = "application.context.root";
 	private static final String TLS_KEYSTORE_LOCATION = "tls.keystore.location";
 	private static final String TLS_ENABLED = "tls.enabled";
-	private static final String SUBTITLES_KAFKA_ENABLED = "subtitle.correction.kafka.enabled";
+	private static final String SUBTITLES_REAL_TIME_UPDATES_ENABLED = "subtitle.realtimeclientupdates.enabled";
 	
 	private static final String MAIL_SENDER_HOST_KEY = "mailSender.config.host";
 	private static final String MAIL_SENDER_PORT_KEY = "mailSender.config.port";
@@ -116,8 +116,8 @@ public class ApplicationProperties {
 		return Boolean.parseBoolean(getProperty(TLS_ENABLED));
 	}
 	
-	public Boolean getSubtitlesKafakEnabled() {
-		return Boolean.parseBoolean(getProperty(SUBTITLES_KAFKA_ENABLED));
+	public Boolean getSubtitlesRealTimeUpdatesEnabled() {
+		return Boolean.parseBoolean(getProperty(SUBTITLES_REAL_TIME_UPDATES_ENABLED));
 	}
 	
 	public Boolean isProdEnvironment() {
