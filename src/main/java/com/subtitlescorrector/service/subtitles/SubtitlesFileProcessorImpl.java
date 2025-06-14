@@ -71,9 +71,14 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		this.s3Service = s3Service;
 	}
 
+	private static final Logger logger = LoggerFactory.getLogger(SubtitlesFileProcessorImpl.class);
+	
 	@Override
 	public SubtitleFileData process(File storedFile, AdditionalData params) {
 
+		
+		
+		
 		SubtitleFileData data = new SubtitleFileData();
 		File correctedFile = new File(storedFile.getName());
 
