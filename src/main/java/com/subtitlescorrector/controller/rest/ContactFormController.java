@@ -31,6 +31,21 @@ public class ContactFormController {
 		
 		EmailSendStatus status = emailService.sendEmailOnlyIfProduction(description, properties.getAdminEmailAddress(), "Contact form");
 		
+		return createResponseFromStatus(status);
+	}
+	
+	@RequestMapping(path = "/submitFeedback", method = RequestMethod.POST)
+	public ResponseEntity<EmailSendStatus> feedbackFormSubmit(HttpServletRequest request) {
+
+		String description = request.getParameter("description");
+		description += "\n\nFeedback content: \n\n";
+		
+		EmailSendStatus status = emailService.sendEmailOnlyIfProduction(description, properties.getAdminEmailAddress(), "Contact form");
+		
+		return createResponseFromStatus(status);
+	}
+
+	private ResponseEntity<EmailSendStatus> createResponseFromStatus(EmailSendStatus status) {
 		if(status == EmailSendStatus.SUCCESS) {
 			return ResponseEntity.ok(status);			
 		}else if(status == EmailSendStatus.FAILURE_EMAIL_SEND_RATE_LIMIT){
