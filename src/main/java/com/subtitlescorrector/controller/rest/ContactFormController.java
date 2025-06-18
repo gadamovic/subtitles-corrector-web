@@ -37,8 +37,7 @@ public class ContactFormController {
 	@RequestMapping(path = "/submitFeedback", method = RequestMethod.POST)
 	public ResponseEntity<EmailSendStatus> feedbackFormSubmit(HttpServletRequest request) {
 
-		String description = request.getParameter("description");
-		description += "\n\nFeedback content: \n\n";
+		String description = "Feedback content: \n\n" + request.getParameter("description");
 		
 		EmailSendStatus status = emailService.sendEmailOnlyIfProduction(description, properties.getAdminEmailAddress(), "Contact form");
 		
