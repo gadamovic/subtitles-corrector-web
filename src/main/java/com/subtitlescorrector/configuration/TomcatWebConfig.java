@@ -5,6 +5,7 @@ import java.io.File;
 import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.valves.AccessLogValve;
+import org.apache.catalina.valves.RemoteIpValve;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.Ssl;
@@ -62,13 +63,22 @@ public class TomcatWebConfig implements WebServerFactoryCustomizer<TomcatServlet
 		}
 		
 		if(properties.isProdEnvironment()) {
-			factory.addContextValves(accessLogValve());
+			factory.addContextValves(accessLogValve(), remoteIpValve());
 			factory.setBaseDirectory(new File("/home/logs/access_logs"));
 		}
 
 	}
 	
-    private Valve accessLogValve() {
+    private Valve remoteIpValve() {
+    	RemoteIpValve remoteIpValve = new RemoteIpValve();
+    	remoteIpValve.setInternalProxies("127.0.0.1|::1");
+    	remoteIpValve.setRemoteIpHeader("x-forwarded-for");
+    	remoteIpValve.setProxiesHeader("x-forwarded-by");
+    	remoteIpValve.setProtocolHeader("x-forwarded-proto");
+		return remoteIpValve;
+	}
+
+	private Valve accessLogValve() {
         AccessLogValve logValve = new AccessLogValve();
         logValve.setPattern("%h %l %u %t \"%r\" %s %b");
         logValve.setDirectory("tomcat_access_logs");

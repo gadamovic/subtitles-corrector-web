@@ -110,10 +110,11 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			}
 			
 			data.getLines().forEach(line -> line.setTextBeforeCorrection(line.getText()));
-			
+			 					         //TODO: Can correctorsManager be a factory?			
 			List<Corrector> correctors = correctorsManager.getCorrectors(params);
 			params.setNumberOfCorrectors(correctors.size());
 			
+			//TODO: Should only 1 loop over subtitle data cover all correctors for performance?
 			for (Corrector corrector : correctors) {
 				data = corrector.correct(data, params);
 				params.setCorrectorIndex(params.getCorrectorIndex() + 1);

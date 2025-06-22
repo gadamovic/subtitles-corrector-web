@@ -17,9 +17,6 @@ public class InvalidCharactersCorrector implements Corrector{
 	Logger log = LoggerFactory.getLogger(InvalidCharactersCorrector.class);
 	
 	@Autowired
-	ApplicationProperties properties;
-	
-	@Autowired
 	Util util;
 	
 	@Override
