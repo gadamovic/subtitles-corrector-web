@@ -25,7 +25,7 @@ public class UserMonitoringController {
 		log.info(data.toString());
 		
 		Collections.list(request.getHeaderNames())
-	    .forEach(name -> System.out.println(name + ": " + request.getHeader(name)));
+	    .forEach(name -> log.info(name + ": " + request.getHeader(name)));
 		
 	}
 
