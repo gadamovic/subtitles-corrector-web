@@ -74,7 +74,7 @@ public class TomcatWebConfig implements WebServerFactoryCustomizer<TomcatServlet
     private Valve remoteIpValve() {
     	RemoteIpValve remoteIpValve = new RemoteIpValve();
     	remoteIpValve.setInternalProxies("127\\.0\\.0\\.1|::1|10\\..*|172\\..*|192\\.168\\..*");
-    	remoteIpValve.setRemoteIpHeader("x-real-ip");
+    	remoteIpValve.setRemoteIpHeader("x-forwarded-for");
     	remoteIpValve.setProxiesHeader("x-forwarded-by");
     	remoteIpValve.setProtocolHeader("x-forwarded-proto");
 		return remoteIpValve;
@@ -86,6 +86,7 @@ public class TomcatWebConfig implements WebServerFactoryCustomizer<TomcatServlet
         logValve.setDirectory("tomcat_access_logs");
         logValve.setPrefix("access_log");
         logValve.setSuffix(".log");
+        logValve.setRequestAttributesEnabled(true);
         logValve.setEnabled(true);
         return logValve;
     }
