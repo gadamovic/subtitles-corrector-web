@@ -1,6 +1,7 @@
 package com.subtitlescorrector.configuration;
 
 import java.io.File;
+import java.util.Collections;
 
 import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Connector;
@@ -63,7 +64,8 @@ public class TomcatWebConfig implements WebServerFactoryCustomizer<TomcatServlet
 		}
 		
 		if(properties.isProdEnvironment()) {
-			factory.addContextValves(remoteIpValve(), accessLogValve());
+			factory.setEngineValves(Collections.singletonList(remoteIpValve()));
+			factory.addContextValves(accessLogValve());
 			factory.setBaseDirectory(new File("/home/logs/access_logs"));
 		}
 
