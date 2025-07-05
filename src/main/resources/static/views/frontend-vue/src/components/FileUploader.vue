@@ -94,7 +94,7 @@
       </div>
     </div>
 
-    <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled" @click="handleSubmit">
+    <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled" @click="upload">
     </GenericButton>
     <GenericButton :loading="false" button_text="Continue editing" :enabled="true" v-if="showDownloadLink"
       @click="showModalMethod"></GenericButton>
@@ -147,6 +147,7 @@ export default {
       showDownloadLink: false,
       loaderStore: useLoaderStore(),
       lineVisibleFlagsStore: useLineVisibleFlagsStore(),
+      socket: WebSocket,
       stripBTags: false,
       stripITags: false,
       stripUTags: false,
@@ -183,13 +184,19 @@ export default {
         this.upload_button_enabled = true;
       }
     },
-    async handleSubmit() {
+    async upload() {
 
       //wait for the server to ack the client
       let i = 0;
       while (!this.user_acked && i < 100) {
         i++;
         setTimeout(() => { }, 10);
+      }
+
+      //if ws connection broke, establish it again
+      if (this.socket.readyState !== WebSocket.OPEN) {
+        this.establishWSConnection();
+        console.log("Re-established WS connection")
       }
 
       if (!this.file) {
@@ -273,16 +280,16 @@ export default {
         contextRoot = "";
         hostAddress = "wss://subtitles-corrector.com";
       }
-      const socket = new WebSocket(hostAddress + contextRoot + "/sc-ws-connection-entrypoint");
-
+      this.socket = new WebSocket(hostAddress + contextRoot + "/sc-ws-connection-entrypoint");
+      
       // Handle connection open
-      socket.onopen = () => {
+      this.socket.onopen = () => {
         console.log("WebSocket connected");
-        socket.send("USER_ID<" + this.userId + ">");
+        this.socket.send("USER_ID<" + this.userId + ">");
       };
 
       // Handle messages
-      socket.onmessage = (event) => {
+      this.socket.onmessage = (event) => {
 
         if (this.isJson(event.data)) {
           this.handleMessage(JSON.parse(event.data))
@@ -294,7 +301,7 @@ export default {
       };
 
       // Handle connection close
-      socket.onclose = () => {
+      this.socket.onclose = () => {
         console.log("WebSocket disconnected");
       };
     },
