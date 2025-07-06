@@ -5,7 +5,12 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +30,7 @@ import com.subtitlescorrector.service.CustomWebSocketHandler;
 import com.subtitlescorrector.service.preprocessors.PreProcessor;
 import com.subtitlescorrector.service.preprocessors.PreProcessorsManager;
 import com.subtitlescorrector.service.s3.S3Service;
+import com.subtitlescorrector.service.subtitles.corrections.AiCorrector;
 import com.subtitlescorrector.service.subtitles.corrections.Corrector;
 import com.subtitlescorrector.service.subtitles.corrections.CorrectorsManager;
 import com.subtitlescorrector.util.Constants;
@@ -60,6 +66,9 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	
 	@Autowired
 	CustomWebSocketHandler webSocketHandler;
+	
+	@Autowired
+	AiCorrector aiCorrector;
 	
 //	@Autowired
 //	public void setKafkaTemplate(KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate) {
@@ -115,16 +124,30 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			params.setNumberOfCorrectors(correctors.size());
 			
 			//TODO: Should only 1 loop over subtitle data cover all correctors for performance?
-			for (Corrector corrector : correctors) {
-				data = corrector.correct(data, params);
-				params.setCorrectorIndex(params.getCorrectorIndex() + 1);
+//			for (Corrector corrector : correctors) {
+//				data = corrector.correct(data, params);
+//				params.setCorrectorIndex(params.getCorrectorIndex() + 1);
+//			}
+			params.setTotalNumberOfLines(data.getLines().size());
+						
+			for(SubtitleUnitData subUnit : data.getLines()) {
+				for(Corrector corrector : correctors) {
+					
+					corrector.correct(subUnit, params);
+					
+				}
+				params.setProcessedLines(params.getProcessedLines() + 1);
 			}
 			
-			calculateEditOperationsAfterCorrections(data);
-
 			if (detectedEncoding != StandardCharsets.UTF_8) {
 				sendUpdatedEncodingLogMessage(storedFile, params.getWebSocketSessionId(), detectedEncoding);
 			}
+			
+			if (params.getAiEnabled()) {
+				aiCorrector.correct(data, params);
+			}
+			
+			calculateEditOperationsAfterCorrections(data);
 
 			sendProcessingFinishedMessage(params.getWebSocketSessionId());
 			

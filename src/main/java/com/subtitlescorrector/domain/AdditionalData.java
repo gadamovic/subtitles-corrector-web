@@ -16,8 +16,13 @@ public class AdditionalData {
 	private Boolean AEToTJ;
 	private Boolean eToch;
 	private Boolean EToCH;
+	
+	private Boolean aiEnabled;
 
 	private int numberOfCorrectors;
+	
+	int processedLines = 0;
+	int totalNumberOfLines = 0;
 
 	public String getWebSocketSessionId() {
 		return webSocketSessionId;
@@ -113,6 +118,30 @@ public class AdditionalData {
 
 	public void setConvertEToCH(Boolean eToCH) {
 		EToCH = eToCH;
+	}
+
+	public int getProcessedLines() {
+		return processedLines;
+	}
+
+	public void setProcessedLines(int processedLines) {
+		this.processedLines = processedLines;
+	}
+
+	public int getTotalNumberOfLines() {
+		return totalNumberOfLines;
+	}
+
+	public void setTotalNumberOfLines(int totalNumberOfLines) {
+		this.totalNumberOfLines = totalNumberOfLines;
+	}
+
+	public Boolean getAiEnabled() {
+		return aiEnabled;
+	}
+
+	public void setAiEnabled(Boolean aiEnabled) {
+		this.aiEnabled = aiEnabled;
 	}
 	
 }

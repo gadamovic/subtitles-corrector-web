@@ -238,6 +238,9 @@ public class Util {
 	public String checkForChanges(String afterCorrection, String beforeCorrection, String correctionDescription, float processedPercentage, String webSocketSessionId) {
 		if(!afterCorrection.equals(beforeCorrection)) {
 			
+			log.info("Before correction: " + beforeCorrection);
+			log.info("After correction : " + afterCorrection);
+			
 			SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
 			event.setCorrection(correctionDescription);
 			event.setEventTimestamp(Instant.now());

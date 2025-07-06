@@ -92,6 +92,7 @@ public class FileUploadController {
 		params.setConvertAEToTJ(Boolean.parseBoolean(request.getParameter("AEToTJ")));
 		params.setConverteToch(Boolean.parseBoolean(request.getParameter("eToch")));
 		params.setConvertEToCH(Boolean.parseBoolean(request.getParameter("EToCH")));
+		params.setAiEnabled(Boolean.parseBoolean(request.getParameter("aiEnabled")));
 		
 		return params;
 	}

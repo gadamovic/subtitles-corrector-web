@@ -17,6 +17,9 @@ public class CorrectorsManager {
 	@Autowired
 	HtmlTagsCorrector htmlTagsCorrector;
 	
+	@Autowired
+	AiCorrector aiCorrector;
+	
 	public List<Corrector> getCorrectors(AdditionalData clientParameters) {
 		
 		List<Corrector> correctors = new ArrayList<>();
@@ -28,6 +31,8 @@ public class CorrectorsManager {
 				(clientParameters.getStripUTags() != null && clientParameters.getStripUTags())) {
 			correctors.add(htmlTagsCorrector);
 		}
+		
+		//correctors.add(aiCorrector);
 		
 		return correctors;
 		

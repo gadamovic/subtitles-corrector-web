@@ -37,6 +37,19 @@
       </label>
     </div>
 
+
+    <div class="box mb-3">
+        <p class="title is-5 has-text-centered mb-3">AI options (experimental)</p>
+        <div class="checkboxes">
+          <label class="checkbox">
+            <input type="checkbox" @click="toggleAi"/>
+            AI correction
+          </label>
+          <i>*Give AI a try at correcting your file! Keep in mind that AI can make mistakes and this
+            feature is still in experimental phase.</i>
+      </div>
+    </div>
+
     <div class="box mb-3">
       <p class="title is-5 has-text-centered mb-3">HTML options</p>
       <div class="checkboxes">
@@ -64,35 +77,35 @@
     </div>
   </div>
 
-    <div class="box mb-3">
-      <p class="title is-5 has-text-centered mb-3">Character / encoding options</p>
-      <div class="checkboxes">
-        <label class="checkbox">
-          <input type="checkbox" @click="toggleKeepBOM"/>
-          Keep BOM
-        </label>
+  <div class="box mb-3">
+    <p class="title is-5 has-text-centered mb-3">Character / encoding options</p>
+    <div class="checkboxes">
+      <label class="checkbox">
+        <input type="checkbox" @click="toggleKeepBOM"/>
+        Keep BOM
+      </label>
 
-        <label class="checkbox">
-          <input type="checkbox" checked @click="toggleaeToTj"/>
-          Convert æ to ć
-        </label>
+      <label class="checkbox">
+        <input type="checkbox" checked @click="toggleaeToTj"/>
+        Convert æ to ć
+      </label>
 
-        <label class="checkbox">
-          <input type="checkbox" checked @click="toggleAEToTJ"/>
-          Convert Æ to Ć
-        </label>
+      <label class="checkbox">
+        <input type="checkbox" checked @click="toggleAEToTJ"/>
+        Convert Æ to Ć
+      </label>
 
-        <label class="checkbox">
-          <input type="checkbox" checked @click="toggleeToch"/>
-          Convert è to č
-        </label>
+      <label class="checkbox">
+        <input type="checkbox" checked @click="toggleeToch"/>
+        Convert è to č
+      </label>
 
-        <label class="checkbox">
-          <input type="checkbox" checked @click="toggleEToCH"/>
-          Convert È to Č
-        </label>
-      </div>
+      <label class="checkbox">
+        <input type="checkbox" checked @click="toggleEToCH"/>
+        Convert È to Č
+      </label>
     </div>
+  </div>
 
     <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled" @click="upload">
     </GenericButton>
@@ -157,6 +170,7 @@ export default {
       AEToTJ: true,
       eToch: true,
       EToCH: true,
+      aiEnabled: false,
     };
   },
   methods: {
@@ -220,6 +234,8 @@ export default {
       formData.append("AEToTJ", this.AEToTJ)
       formData.append("eToch", this.eToch)
       formData.append("EToCH", this.EToCH)
+
+      formData.append("aiEnabled", this.aiEnabled)
 
       try {
         const response = await fetch("api/rest/1.0/upload", {
@@ -317,6 +333,9 @@ export default {
 
 
         let correction = this.fileProcessingLogs[message.correctionDescription];
+
+
+
         if (correction) {
           correction++;
           this.fileProcessingLogs[message.correctionDescription] = correction;
@@ -415,6 +434,13 @@ export default {
     },
     toggleKeepBOM(){
       this.keepBOM = !this.keepBOM;
+    },
+    
+
+
+  
+    toggleAi(){
+      this.aiEnabled = !this.aiEnabled;
     }
   },
   mounted: function () {

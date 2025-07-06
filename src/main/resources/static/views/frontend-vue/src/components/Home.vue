@@ -20,6 +20,14 @@
                     </span>
                     Fix commonly seen invalid characters like: È -> Č, Æ -> Ć and much more.
                   </li>
+
+                  <li class="is-flex is-align-items-center my-3">
+                    <span class="icon has-text-success mr-2">
+                      <i class="fas fa-check"></i>
+                    </span>
+                    &nbsp;<span><b>AI</b></span>&nbsp;corrections.
+                  </li>
+                  
                   <li class="is-flex is-align-items-center my-3">
                     <span class="icon has-text-success mr-2">
                       <i class="fas fa-check"></i>
@@ -36,7 +44,7 @@
                     <span class="icon has-text-success mr-2">
                       <i class="fas fa-check"></i>
                     </span>
-                    Shift and sync subtitles.
+                    <span><b>Shift</b></span>&nbsp;and&nbsp;<span><b>sync</b></span>&nbsp;subtitles.
                   </li>
                   <li class="is-flex is-align-items-center my-3">
                     <span class="icon has-text-success mr-2">

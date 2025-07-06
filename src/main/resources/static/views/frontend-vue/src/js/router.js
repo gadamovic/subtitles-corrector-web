@@ -40,7 +40,7 @@ export const router = createRouter({
 router.beforeEach((to) => {
     document.title = to.meta?.title ?? 'Subtitles Corrector'
 
-    const description = to.meta?.description ?? "An app that easily fixes character encoding, formatting and synchronization issues, ensuring your subtitle files are clean, accurate, and ready for use."
+    const description = to.meta?.description ?? "An AI-powered app that easily fixes character encoding, formatting and synchronization issues, ensuring your subtitle files are clean, accurate, and ready for use."
     const descriptionElement = document.querySelector('head meta[name="description"]')
     descriptionElement.setAttribute('content', description || description)
 })
