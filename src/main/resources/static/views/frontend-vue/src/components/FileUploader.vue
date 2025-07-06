@@ -45,7 +45,7 @@
             <input type="checkbox" @click="toggleAi"/>
             AI correction
           </label>
-          <i>*Give AI a try at correcting your file! Keep in mind that AI can make mistakes and this
+          <i>Give AI a try at correcting your file! Keep in mind that AI can make mistakes and this
             feature is still in experimental phase.</i>
       </div>
     </div>
