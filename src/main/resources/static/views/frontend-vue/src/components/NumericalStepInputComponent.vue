@@ -145,8 +145,14 @@ export default {
             finalTimestamp += newFromSecond.length == 1 ? ("0" + newFromSecond) : newFromSecond;
             finalTimestamp += ",";
 
-            finalTimestamp += newFromMillisecond.length == 1 ? ("0" + newFromMillisecond) : newFromMillisecond;
-
+            if(newFromMillisecond.length == 1){
+                finalTimestamp += ("00" + newFromMillisecond);
+            }else if (newFromMillisecond.length == 2){
+                finalTimestamp += ("0" + newFromMillisecond);
+            }else{
+                finalTimestamp += newFromMillisecond;
+            }
+            
             return finalTimestamp;
 
         },

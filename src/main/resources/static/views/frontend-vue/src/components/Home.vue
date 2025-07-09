@@ -38,7 +38,7 @@
                     <span class="icon has-text-success mr-2">
                       <i class="fas fa-check"></i>
                     </span>
-                    Automatically update your encoding to UTF-8 to support wide range of characters by simply uploading a subtitle file.
+                    <span>Automatically update your <b>encoding</b> to <b>UTF-8</b> to support wide range of characters by simply uploading a subtitle file.</span>
                   </li>
                   <li class="is-flex is-align-items-center my-3">
                     <span class="icon has-text-success mr-2">

@@ -40,8 +40,6 @@ import com.subtitlescorrector.util.Util;
 @Component
 public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 
-	Logger log = LoggerFactory.getLogger(FileUploadController.class);
-
 	@Autowired
 	ApplicationProperties properties;
 
@@ -80,36 +78,25 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		this.s3Service = s3Service;
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(SubtitlesFileProcessorImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(SubtitlesFileProcessorImpl.class);
 	
 	@Override
 	public SubtitleFileData process(File storedFile, AdditionalData params) {
 
-		
-		
-		
 		SubtitleFileData data = new SubtitleFileData();
 		File correctedFile = new File(storedFile.getName());
 
 		try {
 			
 			String s3Key = params.getWebSocketSessionId() + "_" + storedFile.getName();
-			
 			s3Service.uploadFileToS3IfProd("v1_" + s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), storedFile, "ttl=7days");
 			
 			Charset detectedEncoding = FileUtil.detectEncodingOfFile(storedFile);
-			data.setDetectedCharset(detectedEncoding);
 			
 			List<String> lines = FileUtil.loadTextFile(storedFile);
 			
-			if(lines.get(0).startsWith("\uFEFF") && params.getKeepBOM()) {
-				data.setHasBom(true);
-			}else {
-				data.setHasBom(false);
-			}
-			
-			data.setFilename(correctedFile.getName());
-			data.setLines(converter.convertToSubtitleUnits(lines, params));
+			handleBOM(params, data, lines);
+			populateSubtitleFileData(params, data, correctedFile, detectedEncoding, lines);
 			
 			//preprocessors are not considered as subtitle corrections. Corrections will be reported in <AppliedChanges> section, but not in the editor's content
 			//this are preparations of the content of the uploaded file. For example we don't want to keep any non-srt-relevant HTML
@@ -123,11 +110,6 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			List<Corrector> correctors = correctorsManager.getCorrectors(params);
 			params.setNumberOfCorrectors(correctors.size());
 			
-			//TODO: Should only 1 loop over subtitle data cover all correctors for performance?
-//			for (Corrector corrector : correctors) {
-//				data = corrector.correct(data, params);
-//				params.setCorrectorIndex(params.getCorrectorIndex() + 1);
-//			}
 			params.setTotalNumberOfLines(data.getLines().size());
 						
 			for(SubtitleUnitData subUnit : data.getLines()) {
@@ -162,6 +144,21 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		}
 
 		return data;
+	}
+
+	private void populateSubtitleFileData(AdditionalData params, SubtitleFileData data, File correctedFile,
+			Charset detectedEncoding, List<String> lines) {
+		data.setDetectedCharset(detectedEncoding);
+		data.setFilename(correctedFile.getName());
+		data.setLines(converter.convertToSubtitleUnits(lines, params));
+	}
+
+	private void handleBOM(AdditionalData params, SubtitleFileData data, List<String> lines) {
+		if(lines.get(0).startsWith("\uFEFF") && params.getKeepBOM()) {
+			data.setHasBom(true);
+		}else {
+			data.setHasBom(false);
+		}
 	}
 
 	private void calculateEditOperationsAfterCorrections(SubtitleFileData data) {
