@@ -11,7 +11,7 @@ public class ExecutorServiceConfig {
 
     @Bean(name = "executorService")
     public ExecutorService executorService() {
-        return Executors.newFixedThreadPool(5);
+        return Executors.newFixedThreadPool(10);
     }
 	
 }

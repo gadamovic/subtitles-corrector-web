@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -83,7 +84,9 @@ public class AiCorrector implements Corrector{
 		//after sending same event for the second time, FE will know ai processing is completed
 		webSocket.sendMessage(createAiProcessingStartedEvent(webSocketSessionId));
 		
-		log.info("AI corrector finished after: " + (System.currentTimeMillis() - start));
+		MDC.put("execution_time", Long.toString(System.currentTimeMillis() - start));
+		log.info("AI corrector finished...");
+		MDC.remove("execution_time");
 		
 		return data;
 	}
