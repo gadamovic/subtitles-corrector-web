@@ -1,6 +1,6 @@
 <template>
 
-  <div class="box content white-li-marker" style="background-color: #004266; margin-bottom: 24px;"
+  <div ref="mainDiv" class="box content white-li-marker" style="background-color: #004266; margin-bottom: 24px;"
     v-if="Object.keys(fileProcessingLogs).length > 0">
 
     <div class="label has-text-white has-text-centered">
@@ -47,6 +47,18 @@ export default {
   data() {
     return {
 
+    }
+  },
+  watch: {
+    fileProcessingLogs: {
+
+      handler() {
+        this.$nextTick(() => {
+          const el = this.$refs.mainDiv;
+          if (el) this.$emit("scrollSubtitlesEditor", el.scrollHeight);
+        });
+      },
+      deep: true
     }
   }
 }

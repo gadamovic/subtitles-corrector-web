@@ -7,9 +7,12 @@
         <p class="modal-card-title has-text-centered">Subtitle editor</p>
         <button class="delete" aria-label="close" @click="closeModal"></button>
       </header>
-      <section class="modal-card-body">
+      <section class="modal-card-body" ref="scrollableSection">
 
-        <AppliedChanges :fileProcessingLogs="fileProcessingLogs" :processedPercentage="processedPercentage">
+        <AppliedChanges 
+           :fileProcessingLogs="fileProcessingLogs"
+           :processedPercentage="processedPercentage"
+           @scrollSubtitlesEditor="scrollToBottom">
         </AppliedChanges>
 
         <NumericalStepInputComponent ref="syncSubtitlesRef" v-if="lastFileProcessingLogReceived && !loaderStore.isLoading"></NumericalStepInputComponent>
@@ -91,8 +94,14 @@ export default {
       if(this.$refs['syncSubtitlesRef'] != null){
         this.$refs['syncSubtitlesRef'].reset();
       }
-    }
-  },
+    },
+    scrollToBottom(height){
+      const el = this.$refs.scrollableSection;
+      if (el) {
+        el.scrollTop = height;
+      }
+    },
+  }
 }
 
 </script>

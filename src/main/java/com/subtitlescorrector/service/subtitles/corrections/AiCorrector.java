@@ -85,8 +85,10 @@ public class AiCorrector implements Corrector{
 		webSocket.sendMessage(createAiProcessingStartedEvent(webSocketSessionId));
 		
 		MDC.put("execution_time", Long.toString(System.currentTimeMillis() - start));
+		MDC.put("subtitle_name", data.getFilename());
 		log.info("AI corrector finished...");
 		MDC.remove("execution_time");
+		MDC.remove("subtitle_name");
 		
 		return data;
 	}
