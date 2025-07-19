@@ -18,7 +18,7 @@ public class CorrectorsManager {
 	HtmlTagsCorrector htmlTagsCorrector;
 	
 	@Autowired
-	AiCorrector aiCorrector;
+	AiCustomCorrector aiCorrector;
 	
 	public List<Corrector> getCorrectors(AdditionalData clientParameters) {
 		

@@ -30,7 +30,7 @@ import com.subtitlescorrector.service.CustomWebSocketHandler;
 import com.subtitlescorrector.service.preprocessors.PreProcessor;
 import com.subtitlescorrector.service.preprocessors.PreProcessorsManager;
 import com.subtitlescorrector.service.s3.S3Service;
-import com.subtitlescorrector.service.subtitles.corrections.AiCorrector;
+import com.subtitlescorrector.service.subtitles.corrections.AiCustomCorrector;
 import com.subtitlescorrector.service.subtitles.corrections.Corrector;
 import com.subtitlescorrector.service.subtitles.corrections.CorrectorsManager;
 import com.subtitlescorrector.util.Constants;
@@ -66,7 +66,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	CustomWebSocketHandler webSocketHandler;
 	
 	@Autowired
-	AiCorrector aiCorrector;
+	AiCustomCorrector aiCorrector;
 	
 //	@Autowired
 //	public void setKafkaTemplate(KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate) {
@@ -115,7 +115,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			for(SubtitleUnitData subUnit : data.getLines()) {
 				for(Corrector corrector : correctors) {
 					
-					corrector.correct(subUnit, params);
+					corrector.process(subUnit, params);
 					
 				}
 				params.setProcessedLines(params.getProcessedLines() + 1);

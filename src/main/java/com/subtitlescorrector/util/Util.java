@@ -235,29 +235,27 @@ public class Util {
 		return composite;
 	}
 	
-	public String checkForChanges(String afterCorrection, String beforeCorrection, String correctionDescription, float processedPercentage, String webSocketSessionId) {
-		if(!afterCorrection.equals(beforeCorrection)) {
-			
-			log.info("Before correction: " + beforeCorrection);
-			log.info("After correction : " + afterCorrection);
-			
-			SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
-			event.setCorrection(correctionDescription);
-			event.setEventTimestamp(Instant.now());
+   public String checkForChanges(String afterCorrection, String beforeCorrection, String correctionDescription, float processedPercentage, String webSocketSessionId) {
+               if(!afterCorrection.equals(beforeCorrection)) {
 
-			event.setProcessedPercentage(String.valueOf(processedPercentage));
-			event.setWebSocketSessionId(webSocketSessionId);
-						
-			if(properties.getSubtitlesRealTimeUpdatesEnabled()) {
-//				Object ret = kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
-//				System.out.println(ret);
-				webSocketHandler.sendMessage(event);
-			}
-			
-		}
+                       log.info("Before correction: " + beforeCorrection);
+                       log.info("After correction : " + afterCorrection);
 
-		return afterCorrection;
-	}
+                       SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
+                       event.setCorrection(correctionDescription);
+                       event.setEventTimestamp(Instant.now());
+
+                       event.setProcessedPercentage(String.valueOf(processedPercentage));
+                       event.setWebSocketSessionId(webSocketSessionId);
+
+                       if(properties.getSubtitlesRealTimeUpdatesEnabled()) {
+                    	   webSocketHandler.sendMessage(event);
+                       }
+
+               }
+
+               return afterCorrection;
+       }
 	
 	public void sendWebSocketCorrectionMessageToKafka(String webSocketSessionId, String message) {
 		SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();

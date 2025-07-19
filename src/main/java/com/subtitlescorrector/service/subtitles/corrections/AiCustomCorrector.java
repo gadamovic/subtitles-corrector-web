@@ -34,11 +34,17 @@ import com.subtitlescorrector.util.Util;
 import jakarta.annotation.PostConstruct;
 
 @Service
-public class AiCorrector implements Corrector{
+/**
+ * Custom corrector that works with the entire subtitles file instead of one subtitle line as other correctors
+ * that are subclasses of AbstractCorrector.java
+ * @author Gavrilo Adamovic
+ *
+ */
+public class AiCustomCorrector{
 
 	private static final int AI_PROCESSING_CHUNK_SIZE = 100;
 
-	Logger log = LoggerFactory.getLogger(AiCorrector.class);
+	Logger log = LoggerFactory.getLogger(AiCustomCorrector.class);
 	
 	@Autowired
 	Util util;
@@ -54,7 +60,6 @@ public class AiCorrector implements Corrector{
 	
 	String promptTemplate = null;
 	
-	@Override
 	public SubtitleFileData correct(SubtitleFileData data, AdditionalData params) {
 		
 		log.info("AI corrector started...");
@@ -173,43 +178,6 @@ public class AiCorrector implements Corrector{
 		} catch (IOException e) {
 			log.error("Error reading openAiCorrectionPrompt.txt file!", e);
 		}
-	}
-
-	@Override
-	public void correct(SubtitleUnitData subUnit, AdditionalData params) {
-		
-		String line = subUnit.getText();
-		
-		String webSocketSessionId = params.getWebSocketSessionId();
-		float processedPercentage = 0f;
-		processedPercentage = ((float) params.getProcessedLines() / (float) params.getTotalNumberOfLines()) * 100;
-				
-		ObjectMapper mapper = new ObjectMapper();
-		
-		String tmp = "";
-		String beforeCorrection = line;
-		
-		String prompt = promptTemplate + "\n" + line;
-		
-		String aiCorrectionResponseStr = ai.askOpenAi(prompt).getFirstChoiceMessage();
-		
-		CorrectionResponse aiCorrectionResponse = new CorrectionResponse();
-		try {
-			aiCorrectionResponse = mapper.readValue(aiCorrectionResponseStr, CorrectionResponse.class);
-		} catch (Exception e) {
-			log.error("Error deserializing json: " + aiCorrectionResponseStr, e);
-			aiCorrectionResponse.setCorrection(line); //ignore correction
-		}
-		
-		tmp = aiCorrectionResponse.getCorrection();
-		beforeCorrection = util.checkForChanges(tmp, beforeCorrection, aiCorrectionResponse.getDescription(), processedPercentage, webSocketSessionId);
-		
-		if(line.equals(aiCorrectionResponse.getCorrection())) {
-			log.info("No correction.");
-		}
-		
-		subUnit.setText(beforeCorrection);
-		
 	}
 	
 }
