@@ -84,13 +84,17 @@ public class AiCorrector implements Corrector{
 		//after sending same event for the second time, FE will know ai processing is completed
 		webSocket.sendMessage(createAiProcessingStartedEvent(webSocketSessionId));
 		
+		logAICorrectorFinished(data, start);
+		
+		return data;
+	}
+
+	private void logAICorrectorFinished(SubtitleFileData data, Long start) {
 		MDC.put("execution_time", Long.toString(System.currentTimeMillis() - start));
 		MDC.put("subtitle_name", data.getFilename());
 		log.info("AI corrector finished...");
 		MDC.remove("execution_time");
 		MDC.remove("subtitle_name");
-		
-		return data;
 	}
 
 	private void processOneChunk(ObjectMapper mapper, String webSocketSessionId,

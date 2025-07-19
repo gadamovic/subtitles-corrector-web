@@ -2,6 +2,7 @@ package com.subtitlescorrector.controller.rest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +19,11 @@ public class UserMonitoringController {
 	
 	@RequestMapping(path = "/logUser", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public void logUser(@RequestBody LogUserDataHolder data) {
-		log.info(data.toString());
+		
+		data.putAllIntoMDC();
+		log.info("User info...");
+		data.clearFromMDC();
+
 	}
 
 }

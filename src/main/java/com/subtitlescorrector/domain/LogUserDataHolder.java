@@ -3,6 +3,8 @@ package com.subtitlescorrector.domain;
 import java.io.Serializable;
 import java.util.Objects;
 
+import org.slf4j.MDC;
+
 public class LogUserDataHolder implements Serializable{
 	
 	private static final long serialVersionUID = -3749858856634387612L;
@@ -26,6 +28,48 @@ public class LogUserDataHolder implements Serializable{
 	private float fraud;
 	private boolean tor;
 
+    public void putAllIntoMDC() {
+        MDC.put("ip", ip);
+        MDC.put("city", city);
+        MDC.put("isp", isp);
+        MDC.put("country", country);
+        MDC.put("countryIso", countryIso);
+        MDC.put("postalCode", postalCode);
+        MDC.put("subdivisionIso", subdivisionIso);
+        MDC.put("timeZone", timeZone);
+        MDC.put("cityGeonameId", String.valueOf(cityGeonameId));
+        MDC.put("countryGeonameId", String.valueOf(countryGeonameId));
+        MDC.put("subdivisionGeonameId", String.valueOf(subdivisionGeonameId));
+        MDC.put("ispId", String.valueOf(ispId));
+        MDC.put("latitude", String.valueOf(latitude));
+        MDC.put("longitude", String.valueOf(longitude));
+        MDC.put("fingerprint", fingerprint);
+        MDC.put("session", session);
+        MDC.put("fraud", String.valueOf(fraud));
+        MDC.put("tor", String.valueOf(tor));
+    }
+    
+    public void clearFromMDC() {
+        MDC.remove("ip");
+        MDC.remove("city");
+        MDC.remove("isp");
+        MDC.remove("country");
+        MDC.remove("countryIso");
+        MDC.remove("postalCode");
+        MDC.remove("subdivisionIso");
+        MDC.remove("timeZone");
+        MDC.remove("cityGeonameId");
+        MDC.remove("countryGeonameId");
+        MDC.remove("subdivisionGeonameId");
+        MDC.remove("ispId");
+        MDC.remove("latitude");
+        MDC.remove("longitude");
+        MDC.remove("fingerprint");
+        MDC.remove("session");
+        MDC.remove("fraud");
+        MDC.remove("tor");
+    }
+	
 	public String getIp() {
 		return ip;
 	}

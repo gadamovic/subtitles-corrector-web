@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -65,7 +66,12 @@ public class SaveSubtitleController {
 	@RequestMapping(path = "/downloadFile")
 	public void download(@RequestParam("userId") String userId, HttpServletResponse response) {
 		
+		
 		SubtitleFileData data = redisService.getUserSubtitleCurrentVersion(userId);
+
+		MDC.put("subtitle_name", data.getFilename());
+		log.info("Downloading corrected file...");
+		MDC.remove("filename");
 
 		List<String> lines = converter.convertToListOfStrings(data.getLines());
 		
