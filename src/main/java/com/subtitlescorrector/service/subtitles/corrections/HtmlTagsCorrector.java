@@ -14,7 +14,7 @@ import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 
 @Service
-public class HtmlTagsCorrector extends Corrector{
+public class HtmlTagsCorrector extends AbstractCorrector{
 
 	Logger log = LoggerFactory.getLogger(HtmlTagsCorrector.class);
 	

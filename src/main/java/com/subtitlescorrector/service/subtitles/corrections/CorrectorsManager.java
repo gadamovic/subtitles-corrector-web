@@ -20,9 +20,9 @@ public class CorrectorsManager {
 	@Autowired
 	AiCustomCorrector aiCorrector;
 	
-	public List<Corrector> getCorrectors(AdditionalData clientParameters) {
+	public List<AbstractCorrector> getCorrectors(AdditionalData clientParameters) {
 		
-		List<Corrector> correctors = new ArrayList<>();
+		List<AbstractCorrector> correctors = new ArrayList<>();
 		correctors.add(invalidCharactersCorrector);
 		
 		if((clientParameters.getStripBTags() != null && clientParameters.getStripBTags()) ||

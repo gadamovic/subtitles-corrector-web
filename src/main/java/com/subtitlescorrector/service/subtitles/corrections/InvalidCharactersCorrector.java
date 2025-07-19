@@ -8,7 +8,7 @@ import com.subtitlescorrector.domain.AdditionalData;
 import com.subtitlescorrector.domain.SubtitleUnitData;
 
 @Service
-public class InvalidCharactersCorrector extends Corrector{
+public class InvalidCharactersCorrector extends AbstractCorrector{
 
 	Logger log = LoggerFactory.getLogger(InvalidCharactersCorrector.class);
 

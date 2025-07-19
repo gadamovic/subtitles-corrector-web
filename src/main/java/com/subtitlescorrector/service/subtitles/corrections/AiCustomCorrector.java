@@ -68,7 +68,7 @@ public class AiCustomCorrector{
 		ObjectMapper mapper = new ObjectMapper();
 
 		String webSocketSessionId = params.getWebSocketSessionId();
-		webSocket.sendMessage(createAiProcessingStartedEvent(webSocketSessionId));
+		webSocket.sendMessage(createAiProcessingEndedEvent(webSocketSessionId));
 		Map<Integer, List<SubtitleUnitData>> partitioned = partitionSubUnits(data.getLines(), AI_PROCESSING_CHUNK_SIZE);
 		
 		List<Future<?>> futures = new ArrayList<>();
@@ -86,12 +86,20 @@ public class AiCustomCorrector{
 			} catch (Exception e) {}
 		});
 		
-		//after sending same event for the second time, FE will know ai processing is completed
-		webSocket.sendMessage(createAiProcessingStartedEvent(webSocketSessionId));
+		webSocket.sendMessage(createAiProcessingEndedEvent(webSocketSessionId));
 		
 		logAICorrectorFinished(data, start);
 		
 		return data;
+	}
+
+	/**
+	 * after sending same event for the second time, FE will know ai processing is completed
+	 * @param webSocketSessionId
+	 * @return
+	 */
+	private SubtitleCorrectionEvent createAiProcessingEndedEvent(String webSocketSessionId) {
+		return createAiProcessingStartedEvent(webSocketSessionId);
 	}
 
 	private void logAICorrectorFinished(SubtitleFileData data, Long start) {

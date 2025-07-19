@@ -31,7 +31,7 @@ import com.subtitlescorrector.service.preprocessors.PreProcessor;
 import com.subtitlescorrector.service.preprocessors.PreProcessorsManager;
 import com.subtitlescorrector.service.s3.S3Service;
 import com.subtitlescorrector.service.subtitles.corrections.AiCustomCorrector;
-import com.subtitlescorrector.service.subtitles.corrections.Corrector;
+import com.subtitlescorrector.service.subtitles.corrections.AbstractCorrector;
 import com.subtitlescorrector.service.subtitles.corrections.CorrectorsManager;
 import com.subtitlescorrector.util.Constants;
 import com.subtitlescorrector.util.FileUtil;
@@ -107,13 +107,13 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			
 			data.getLines().forEach(line -> line.setTextBeforeCorrection(line.getText()));
 			 					         //TODO: Can correctorsManager be a factory?			
-			List<Corrector> correctors = correctorsManager.getCorrectors(params);
+			List<AbstractCorrector> correctors = correctorsManager.getCorrectors(params);
 			params.setNumberOfCorrectors(correctors.size());
 			
 			params.setTotalNumberOfLines(data.getLines().size());
 						
 			for(SubtitleUnitData subUnit : data.getLines()) {
-				for(Corrector corrector : correctors) {
+				for(AbstractCorrector corrector : correctors) {
 					
 					corrector.process(subUnit, params);
 					

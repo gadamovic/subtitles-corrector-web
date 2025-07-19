@@ -12,7 +12,7 @@ import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 import com.subtitlescorrector.service.CustomWebSocketHandler;
 
-public abstract class Corrector {
+public abstract class AbstractCorrector {
 
 	@Autowired
 	CustomWebSocketHandler webSocketHandler;
@@ -20,7 +20,7 @@ public abstract class Corrector {
 	@Autowired
 	ApplicationProperties properties;
 	
-	private static final Logger log = LoggerFactory.getLogger(Corrector.class);
+	private static final Logger log = LoggerFactory.getLogger(AbstractCorrector.class);
 	
 	public abstract void correct(SubtitleUnitData subUnit, AdditionalData params, float processedPercentage);
 
