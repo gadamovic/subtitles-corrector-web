@@ -21,7 +21,7 @@ public class UserMonitoringController {
 	public void logUser(@RequestBody LogUserDataHolder data) {
 		
 		data.putAllIntoMDC();
-		log.info("User info...");
+		log.info("LogUserDataHolder");
 		data.clearFromMDC();
 
 	}
