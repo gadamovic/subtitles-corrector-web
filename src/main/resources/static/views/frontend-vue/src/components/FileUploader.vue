@@ -24,7 +24,7 @@
     <label class="label has-text-white has-text-centered title is-5">Upload a subtitle file:</label> <br />
     <div class="file has-name is-fullwidth field mb-3">
       <label class="file-label">
-        <input class="file-input" type="file" name="file" accept=".srt, .sub, .txt" @change="handleFileChange" />
+        <input class="file-input" type="file" name="file" accept=".srt, .vtt" @change="handleFileChange" />
         <span class="file-cta">
           <span class="file-icon">
             <i class="fas fa-upload"></i>
@@ -183,12 +183,12 @@ export default {
 
       this.file = event.target.files[0];
 
-      const allowedExtensions = ['.srt'/*, '.sub', '.txt'*/];
+      const allowedExtensions = ['.srt', '.vtt'/*, '.sub', '.txt'*/];
       const fileName = this.file.name.toLowerCase();
       const isValid = allowedExtensions.some(ext => fileName.endsWith(ext));
 
       if (!isValid) {
-        this.error = 'Invalid file type. Please upload a .srt file.';
+        this.error = 'Invalid file type. Allowed types are: ' + allowedExtensions;
         //this.error = 'Invalid file type. Please upload a .srt, .sub, or .txt file.';
         this.upload_button_enabled = false;
         event.target.value = ''; // Clear the input

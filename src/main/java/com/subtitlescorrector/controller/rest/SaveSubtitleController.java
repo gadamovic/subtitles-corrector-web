@@ -29,6 +29,7 @@ import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.service.redis.RedisService;
 import com.subtitlescorrector.service.s3.S3Service;
 import com.subtitlescorrector.service.subtitles.SubtitleLinesToSubtitleUnitDataConverter;
+import com.subtitlescorrector.service.subtitles.SubtitlesConverterFactory;
 import com.subtitlescorrector.util.FileUtil;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,7 +44,7 @@ public class SaveSubtitleController {
 	RedisService redisService;
 
 	@Autowired
-	SubtitleLinesToSubtitleUnitDataConverter converter;
+	SubtitlesConverterFactory converterFactory;
 	
 	@Autowired
 	S3Service s3Service;
@@ -73,9 +74,9 @@ public class SaveSubtitleController {
 		log.info("Downloading corrected file...");
 		MDC.remove("filename");
 
-		List<String> lines = converter.convertToListOfStrings(data.getLines());
+		List<String> lines = converterFactory.getConverter(data.getFormat()).convertToListOfStrings(data.getLines());
 		
-		if(data.getHasBom()) {
+		if(data.getHasBom() && data.getKeepBom()) {
 			lines = addBom(lines);
 		}
 		

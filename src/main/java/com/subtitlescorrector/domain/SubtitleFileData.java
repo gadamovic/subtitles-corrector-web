@@ -16,10 +16,25 @@ public class SubtitleFileData implements Serializable{
 	
 	Charset detectedCharset;
 	
+	SubtitleFormat format;
+	
 	/**
 	 * Byte order mark
 	 */
 	Boolean hasBom;
+	
+	/**
+	 * User selected option to keep bom or not
+	 */
+	Boolean keepBom;
+	
+	public SubtitleFormat getFormat() {
+		return format;
+	}
+
+	public void setFormat(SubtitleFormat format) {
+		this.format = format;
+	}
 
 	public String getFilename() {
 		return filename;
@@ -59,6 +74,14 @@ public class SubtitleFileData implements Serializable{
 
 	public void setHasBom(Boolean hasBom) {
 		this.hasBom = hasBom;
+	}
+
+	public Boolean getKeepBom() {
+		return keepBom;
+	}
+
+	public void setKeepBom(Boolean keepBom) {
+		this.keepBom = keepBom;
 	}
 
 }

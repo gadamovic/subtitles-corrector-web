@@ -56,50 +56,50 @@ public class SubtitleOverallProcessingIntegrationTest {
 		assertEquals(fileData.getLines().get(0).getText(), "aaaaaaaaaaaa not permited tag<br>aaaaaaaaaaaa <font color=\"red\">permited tag</font>");
 		assertEquals(fileData.getLines().get(0).getNumber(), 1);
 		assertEquals(fileData.getLines().get(0).getFormat(), "srt");
-		assertTrue(fileData.getLines().get(0).getTimestampFrom().length() > 0);
-		assertTrue(fileData.getLines().get(0).getTimestampTo().length() > 0);
+		assertTrue(fileData.getLines().get(0).getTimestampFrom() != null);
+		assertTrue(fileData.getLines().get(0).getTimestampTo() != null);
 		
 		assertEquals(fileData.getLines().get(1).getText(), "multi<br>line");
 		assertEquals(fileData.getLines().get(1).getNumber(), 2);
 		assertEquals(fileData.getLines().get(1).getFormat(), "srt");
-		assertTrue(fileData.getLines().get(1).getTimestampFrom().length() > 0);
-		assertTrue(fileData.getLines().get(1).getTimestampTo().length() > 0);
+		assertTrue(fileData.getLines().get(1).getTimestampFrom() != null);
+		assertTrue(fileData.getLines().get(1).getTimestampTo() != null);
 		
 		assertEquals(fileData.getLines().get(2).getText(), "Ћирилица");
 		assertEquals(fileData.getLines().get(2).getNumber(), 3);
 		assertEquals(fileData.getLines().get(2).getFormat(), "srt");
-		assertTrue(fileData.getLines().get(2).getTimestampFrom().length() > 0);
-		assertTrue(fileData.getLines().get(2).getTimestampTo().length() > 0);
+		assertTrue(fileData.getLines().get(2).getTimestampFrom() != null);
+		assertTrue(fileData.getLines().get(2).getTimestampTo() != null);
 		
 		assertEquals(fileData.getLines().get(3).getText(), "Ćirilica");
 		assertEquals(fileData.getLines().get(3).getNumber(), 4);
 		assertEquals(fileData.getLines().get(3).getFormat(), "srt");
-		assertTrue(fileData.getLines().get(3).getTimestampFrom().length() > 0);
-		assertTrue(fileData.getLines().get(3).getTimestampTo().length() > 0);
+		assertTrue(fileData.getLines().get(3).getTimestampFrom() != null);
+		assertTrue(fileData.getLines().get(3).getTimestampTo() != null);
 		
 		assertEquals(fileData.getLines().get(4).getText(), "asdasdasd");
 		assertEquals(fileData.getLines().get(4).getNumber(), 5);
 		assertEquals(fileData.getLines().get(4).getFormat(), "srt");
-		assertTrue(fileData.getLines().get(4).getTimestampFrom().length() > 0);
-		assertTrue(fileData.getLines().get(4).getTimestampTo().length() > 0);
+		assertTrue(fileData.getLines().get(4).getTimestampFrom() != null);
+		assertTrue(fileData.getLines().get(4).getTimestampTo() != null);
 		
 		assertEquals(fileData.getLines().get(5).getText(), "Nemilosrdna je prema svemu<br>lažnom. Ali zato je i predivna.");
 		assertEquals(fileData.getLines().get(5).getNumber(), 6);
 		assertEquals(fileData.getLines().get(5).getFormat(), "srt");
-		assertTrue(fileData.getLines().get(5).getTimestampFrom().length() > 0);
-		assertTrue(fileData.getLines().get(5).getTimestampTo().length() > 0);
+		assertTrue(fileData.getLines().get(5).getTimestampFrom() != null);
+		assertTrue(fileData.getLines().get(5).getTimestampTo() != null);
 		
 		assertEquals(fileData.getLines().get(6).getText(), "test");
 		assertEquals(fileData.getLines().get(6).getNumber(), 7);
 		assertEquals(fileData.getLines().get(6).getFormat(), "srt");
-		assertTrue(fileData.getLines().get(6).getTimestampFrom().length() > 0);
-		assertTrue(fileData.getLines().get(6).getTimestampTo().length() > 0);
+		assertTrue(fileData.getLines().get(6).getTimestampFrom() != null);
+		assertTrue(fileData.getLines().get(6).getTimestampTo() != null);
 		
 		assertEquals(fileData.getLines().get(7).getText(), "ćĆčČ");
 		assertEquals(fileData.getLines().get(7).getNumber(), 8);
 		assertEquals(fileData.getLines().get(7).getFormat(), "srt");
-		assertTrue(fileData.getLines().get(7).getTimestampFrom().length() > 0);
-		assertTrue(fileData.getLines().get(7).getTimestampTo().length() > 0);
+		assertTrue(fileData.getLines().get(7).getTimestampFrom() != null);
+		assertTrue(fileData.getLines().get(7).getTimestampTo() != null);
 
 
 	}

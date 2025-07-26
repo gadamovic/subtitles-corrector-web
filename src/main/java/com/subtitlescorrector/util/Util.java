@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -30,6 +31,8 @@ import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.domain.CompositeEditOperation;
 import com.subtitlescorrector.domain.EditOperation;
 import com.subtitlescorrector.domain.SubtitleFileData;
+import com.subtitlescorrector.domain.SubtitleFormat;
+import com.subtitlescorrector.domain.SubtitleTimestamp;
 import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 import com.subtitlescorrector.service.CustomWebSocketHandler;
@@ -269,5 +272,56 @@ public class Util {
 			webSocketHandler.sendMessage(event);
 		}
 	}
+
+	public static SubtitleFormat detectSubtitleFormat(List<String> lines) {
+
+		for (String line : lines) {
+			if (line.startsWith("\uFEFF")) {
+				// remove BOM
+				line = line.substring(1);
+			}
+
+			if (line.equals("WEBVTT")) {
+				return SubtitleFormat.VTT;
+			}
+
+		}
+
+		return SubtitleFormat.SRT;
+
+	}
+	
+	public static SubtitleTimestamp parseSubtitleTimestampString(String timestampString, String secondMillisecondDelimiterRegex) {
+		
+		SubtitleTimestamp ts = new SubtitleTimestamp();
+		String[] fromSplit = timestampString.split(":");
+		ts.setHour(Short.parseShort(fromSplit[0]));
+		ts.setMinute(Short.parseShort(fromSplit[1]));
+		
+		String secondMillisecondSplit[] = fromSplit[2].split(secondMillisecondDelimiterRegex);
+		ts.setSecond(Short.parseShort(secondMillisecondSplit[0]));
+		ts.setMillisecond(Short.parseShort(secondMillisecondSplit[1]));
+		
+		return ts;
+	}
+	
+	public static String formatTimestamp(SubtitleTimestamp timestamp, String secondMillisecondDelimiter) {
+		String hour = timestamp.getHour() < 10 ? "0" + timestamp.getHour() : String.valueOf(timestamp.getHour());
+		String minute = timestamp.getMinute() < 10 ? "0" + timestamp.getMinute() : String.valueOf(timestamp.getMinute());
+		String second = timestamp.getSecond() < 10 ? "0" + timestamp.getSecond() : String.valueOf(timestamp.getSecond());
+		String millisecond = null;
+		
+		if(timestamp.getMillisecond() < 10) {
+			millisecond = "00" + String.valueOf(timestamp.getMillisecond());
+		}else if (timestamp.getMillisecond() < 100) {
+			millisecond = "0" + String.valueOf(timestamp.getMillisecond());
+		}else {
+			millisecond = String.valueOf(timestamp.getMillisecond());
+		}
+		
+		String formattedTimestamp = hour + ":" + minute + ":" + second + secondMillisecondDelimiter + millisecond;
+		return formattedTimestamp;
+	}
+	
 
 }

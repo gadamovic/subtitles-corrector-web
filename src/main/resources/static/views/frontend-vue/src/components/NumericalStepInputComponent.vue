@@ -9,7 +9,7 @@
             </button>
         </div>
         <div class="control">
-            <input class="input is-small" v-model="this.value" style="width:6rem" placeholder="Shift subtitle" />
+            <input class="input is-small" v-model="this.shiftValue" style="width:6rem" placeholder="Shift subtitle" />
             <p class="help is-danger" v-if="showInvalidSyncInput">Invalid input</p>
         </div>
         <div class="control">
@@ -44,7 +44,7 @@ export default {
     name: "NumericalStepInputComponent",
     data: function () {
         return {
-            value: "",
+            shiftValue: "",
             subtitleDataStore: useSubtitleDataStore(),
             isApplySyncLoading: false,
             showInvalidSyncInput: false,
@@ -53,36 +53,36 @@ export default {
     },
     methods: {
         incrementValue() {
-            if (this.value == "") {
-                this.value = "0"
+            if (this.shiftValue == "") {
+                this.shiftValue = "0"
             }
 
-            let floatValue = parseFloat(this.value);
+            let floatValue = parseFloat(this.shiftValue);
             floatValue += 0.1;
             floatValue = Math.round(floatValue * 10) / 10
             if (floatValue == 0) {
-                this.value = ""
+                this.shiftValue = ""
             } else if (floatValue > 0) {
-                this.value = "+" + floatValue.toString();
+                this.shiftValue = "+" + floatValue.toString();
             } else {
-                this.value = floatValue.toString();
+                this.shiftValue = floatValue.toString();
             }
         },
 
         decrementValue() {
-            if (this.value == "") {
-                this.value = "0"
+            if (this.shiftValue == "") {
+                this.shiftValue = "0"
             }
 
-            let floatValue = parseFloat(this.value);
+            let floatValue = parseFloat(this.shiftValue);
             floatValue -= 0.1;
             floatValue = Math.round(floatValue * 10) / 10
             if (floatValue == 0) {
-                this.value = ""
+                this.shiftValue = ""
             } else if (floatValue > 0) {
-                this.value = "+" + floatValue.toString();
+                this.shiftValue = "+" + floatValue.toString();
             } else {
-                this.value = floatValue.toString();
+                this.shiftValue = floatValue.toString();
             }
         },
         applySync() {
@@ -100,34 +100,31 @@ export default {
                 let from = this.updateTimestamp(stateCopy.lines[i].timestampFrom)
                 let to = this.updateTimestamp(stateCopy.lines[i].timestampTo);
 
+                from.formattedTimestamp = this.formatSubtitleTimestamp(from);
+                to.formattedTimestamp = this.formatSubtitleTimestamp(to);
+
                 stateCopy.lines[i].timestampFromShifted = from;
                 stateCopy.lines[i].timestampToShifted = to
 
             }
 
-            this.lastAppliedSyncChange = this.value;
+            this.lastAppliedSyncChange = this.shiftValue;
             this.subtitleDataStore.setSubtitleDataTmp(stateCopy);
 
             this.isApplySyncLoading = false;
 
         },
-        updateTimestamp(base) {
+        updateTimestamp(baseTimestamp) {
 
-            if (this.value == null || this.length == 0) {
-                this.value = 0;
+            if (this.shiftValue == null || this.length == 0) {
+                this.shiftValue = 0;
             }
 
-            const fromSplit = base.split(":");
-
-            let fromHour = fromSplit[0];
-            let fromMinute = fromSplit[1];
-            let fromSecondAndMillisecond = fromSplit[2];
-
             let timestampFrom = new Date();
-            timestampFrom.setHours(fromHour);
-            timestampFrom.setMinutes(fromMinute);
-            timestampFrom.setSeconds(fromSecondAndMillisecond.split(",")[0])
-            timestampFrom.setMilliseconds(parseFloat(fromSecondAndMillisecond.split(",")[1]) + (parseFloat(this.value) * 1000))
+            timestampFrom.setHours(baseTimestamp.hour);
+            timestampFrom.setMinutes(baseTimestamp.minute);
+            timestampFrom.setSeconds(baseTimestamp.second)
+            timestampFrom.setMilliseconds(baseTimestamp.millisecond + (parseFloat(this.shiftValue) * 1000))
 
 
             let newFromHour = timestampFrom.getHours().toString();
@@ -135,44 +132,60 @@ export default {
             let newFromSecond = timestampFrom.getSeconds().toString();
             let newFromMillisecond = timestampFrom.getMilliseconds().toString();
 
-            let finalTimestamp = "";
-            finalTimestamp += newFromHour.length == 1 ? ("0" + newFromHour) : newFromHour;
+            let timestampShifted = {};
+            timestampShifted.hour = newFromHour;
+            timestampShifted.minute = newFromMinute;
+            timestampShifted.second = newFromSecond;
+            timestampShifted.millisecond = newFromMillisecond;
+
+            return timestampShifted;
+        },
+        formatSubtitleTimestamp(subtitleTimestamp){
+
+            let hour = subtitleTimestamp.hour;
+            let minute = subtitleTimestamp.minute;
+            let second = subtitleTimestamp.second;
+            let millisecond = subtitleTimestamp.millisecond;
+
+           let finalTimestamp = "";
+            finalTimestamp += hour.length == 1 ? ("0" + hour) : hour;
             finalTimestamp += ":";
 
-            finalTimestamp += newFromMinute.length == 1 ? ("0" + newFromMinute) : newFromMinute;
+            finalTimestamp += minute.length == 1 ? ("0" + minute) : minute;
             finalTimestamp += ":";
 
-            finalTimestamp += newFromSecond.length == 1 ? ("0" + newFromSecond) : newFromSecond;
+            finalTimestamp += second.length == 1 ? ("0" + second) : second;
             finalTimestamp += ",";
 
-            if(newFromMillisecond.length == 1){
-                finalTimestamp += ("00" + newFromMillisecond);
-            }else if (newFromMillisecond.length == 2){
-                finalTimestamp += ("0" + newFromMillisecond);
-            }else{
-                finalTimestamp += newFromMillisecond;
-            }
             
+            if(millisecond.length == 1){
+                finalTimestamp += ("00" + millisecond);
+            }else if (millisecond.length == 2){
+                finalTimestamp += ("0" + millisecond);
+            }else{
+                finalTimestamp += millisecond;
+            }
+
             return finalTimestamp;
 
         },
         reset (){
-            this.value = "0";
+            this.shiftValue = "0";
             this.applySync();
-            this.value = "";
+            this.shiftValue = "";
             this.lastAppliedSyncChange = null;
         },
         validateSyncInput(){
 
-            if(this.value == null || this.value == ""){
+            if(this.shiftValue == null || this.shiftValue == ""){
                 return false;
             }
             let valueTmp;
 
-            if(this.value.startsWith("+") || this.value.startsWith("-")){
-                valueTmp = this.value.substring(1);    
+            if(this.shiftValue.startsWith("+") || this.shiftValue.startsWith("-")){
+                valueTmp = this.shiftValue.substring(1);    
             }else{
-                valueTmp = this.value;
+                valueTmp = this.shiftValue;
             }
 
             if(!isNaN(valueTmp) && valueTmp < (60 * 60 * 2) && valueTmp > (0 - 60 * 60 * 2)){

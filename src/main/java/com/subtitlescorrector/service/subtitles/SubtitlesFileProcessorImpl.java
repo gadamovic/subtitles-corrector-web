@@ -24,6 +24,7 @@ import com.subtitlescorrector.domain.AdditionalData;
 import com.subtitlescorrector.domain.EditOperation;
 import com.subtitlescorrector.domain.S3BucketNames;
 import com.subtitlescorrector.domain.SubtitleFileData;
+import com.subtitlescorrector.domain.SubtitleFormat;
 import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 import com.subtitlescorrector.service.CustomWebSocketHandler;
@@ -57,9 +58,6 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	Util util;
 	
 	@Autowired
-	SubtitleLinesToSubtitleUnitDataConverter converter;
-	
-	@Autowired
 	EditDistanceService levenshteinDistance;
 	
 	@Autowired
@@ -67,6 +65,9 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	
 	@Autowired
 	AiCustomCorrector aiCorrector;
+
+	@Autowired
+	private SubtitlesConverterFactory converterFactory;
 	
 //	@Autowired
 //	public void setKafkaTemplate(KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate) {
@@ -108,7 +109,6 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			data.getLines().forEach(line -> line.setTextBeforeCorrection(line.getText()));
 			 					         //TODO: Can correctorsManager be a factory?			
 			List<AbstractCorrector> correctors = correctorsManager.getCorrectors(params);
-			params.setNumberOfCorrectors(correctors.size());
 			
 			params.setTotalNumberOfLines(data.getLines().size());
 						
@@ -133,7 +133,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 
 			sendProcessingFinishedMessage(params.getWebSocketSessionId());
 			
-			FileUtil.writeLinesToFile(correctedFile, converter.convertToListOfStrings(data.getLines()), StandardCharsets.UTF_8);
+			FileUtil.writeLinesToFile(correctedFile, converterFactory.getConverter(data.getFormat()).convertToListOfStrings(data.getLines()), StandardCharsets.UTF_8);
 
 			s3Service.uploadFileToS3IfProd("v2_" + s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), correctedFile, "ttl=7days");
 
@@ -148,17 +148,33 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 
 	private void populateSubtitleFileData(AdditionalData params, SubtitleFileData data, File correctedFile,
 			Charset detectedEncoding, List<String> lines) {
+		SubtitleFormat format = Util.detectSubtitleFormat(lines);
+		data.setFormat(format);
 		data.setDetectedCharset(detectedEncoding);
 		data.setFilename(correctedFile.getName());
-		data.setLines(converter.convertToSubtitleUnits(lines, params));
+		data.setLines(converterFactory.getConverter(format).convertToSubtitleUnits(lines, params));
 	}
 
 	private void handleBOM(AdditionalData params, SubtitleFileData data, List<String> lines) {
-		if(lines.get(0).startsWith("\uFEFF") && params.getKeepBOM()) {
+
+		if (lines.get(0).startsWith("\uFEFF")) {
+			
+			// Remove BOM
+			String line = lines.get(0).substring(1);
+			lines.remove(0);
+			lines.add(0, line);
+			
 			data.setHasBom(true);
-		}else {
+			if(params.getKeepBOM()) {
+				data.setKeepBom(true);
+			}else {
+				data.setKeepBom(false);
+			}
+		} else {
 			data.setHasBom(false);
+			data.setKeepBom(false);
 		}
+
 	}
 
 	private void calculateEditOperationsAfterCorrections(SubtitleFileData data) {

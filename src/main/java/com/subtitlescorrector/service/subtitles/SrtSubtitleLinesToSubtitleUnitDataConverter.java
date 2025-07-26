@@ -9,15 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.domain.AdditionalData;
+import com.subtitlescorrector.domain.SubtitleFormat;
+import com.subtitlescorrector.domain.SubtitleTimestamp;
 import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.util.Util;
 
 import io.micrometer.common.util.StringUtils;
 
 @Service
-public class SubtitleLinesToSubtitleUnitDataConverterImpl implements SubtitleLinesToSubtitleUnitDataConverter {
+public class SrtSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLinesToSubtitleUnitDataConverter {
 
-	Logger log = LoggerFactory.getLogger(SubtitleLinesToSubtitleUnitDataConverterImpl.class);
+	Logger log = LoggerFactory.getLogger(SrtSubtitleLinesToSubtitleUnitDataConverter.class);
 
 	@Autowired
 	Util util;
@@ -39,27 +41,27 @@ public class SubtitleLinesToSubtitleUnitDataConverterImpl implements SubtitleLin
 				continue;
 			}
 			
-	        // Remove BOM if present
-	        if (line.startsWith("\uFEFF")) {
-				line = line.substring(1);
-				
-				// Don't print message about removing BOM if user marked to keep it, it will be added back later
-				if(!params.getKeepBOM()) {
-					util.sendWebSocketCorrectionMessageToKafka(params.getWebSocketSessionId(), "Removed BOM from file");
-				}
-			}
-			
 			Integer number = toInteger(line);
 			if(number != null && data == null) {
 				data = new SubtitleUnitData();
 				data.setNumber(number);
-				data.setFormat("srt");
+				data.setFormat(SubtitleFormat.SRT);
 				continue;
 			}
 			
 			if(line.contains("-->")) {
-				data.setTimestampFrom(line.substring(0, line.indexOf("-->") - 1));
-				data.setTimestampTo(line.substring((line.lastIndexOf(" ") + 1), line.length()));
+				String from = (line.substring(0, line.indexOf("-->") - 1));
+				String to = line.substring((line.lastIndexOf(" ") + 1), line.length());
+				
+				SubtitleTimestamp tsFrom = Util.parseSubtitleTimestampString(from, ",");
+				SubtitleTimestamp tsTo = Util.parseSubtitleTimestampString(to, ",");
+				
+				tsFrom.setFormattedTimestamp(Util.formatTimestamp(tsFrom, ","));
+				tsTo.setFormattedTimestamp(Util.formatTimestamp(tsTo, ","));
+				
+				data.setTimestampFrom(tsFrom);
+				data.setTimestampTo(tsTo);
+				
 				continue;
 			}
 			
@@ -129,22 +131,37 @@ public class SubtitleLinesToSubtitleUnitDataConverterImpl implements SubtitleLin
 		
 		return stringList;
 		
-	}
+	} 
 	
 	private String getTimestampFrom(SubtitleUnitData data) {
+		
+		SubtitleTimestamp timestamp = null;
+		
 		if(data.getTimestampFromShifted() != null) {
-			return data.getTimestampFromShifted();
+			timestamp = data.getTimestampFromShifted();
 		}else {
-			return data.getTimestampFrom();
+			timestamp = data.getTimestampFrom();
 		}
+		
+		String formattedTimestamp = Util.formatTimestamp(timestamp, ",");
+		
+		return formattedTimestamp;
+		
 	}
-	
+
 	private String getTimestampTo(SubtitleUnitData data) {
+		
+		SubtitleTimestamp timestamp = null;
+		
 		if(data.getTimestampToShifted() != null) {
-			return data.getTimestampToShifted();
+			timestamp = data.getTimestampToShifted();
 		}else {
-			return data.getTimestampTo();
+			timestamp = data.getTimestampTo();
 		}
+		
+		String formattedTimestamp = Util.formatTimestamp(timestamp, ",");
+		
+		return formattedTimestamp;
 	}
 
 }

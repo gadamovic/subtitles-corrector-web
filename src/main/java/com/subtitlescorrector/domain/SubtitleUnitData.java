@@ -4,22 +4,23 @@ import java.util.List;
 
 public class SubtitleUnitData {
 
-	String format; 
+	SubtitleFormat format; 
 	Integer number;
-	String timestampFrom;
-	String timestampTo;
-	String timestampFromShifted;
-	String timestampToShifted;
+	SubtitleTimestamp timestampFrom;
+	SubtitleTimestamp timestampTo;
+	SubtitleTimestamp timestampFromShifted;
+	SubtitleTimestamp timestampToShifted;
 	String text;
 	String textBeforeCorrection;
 	
 	List<List<EditOperation>> editOperations;
 	List<CompositeEditOperation> compEditOperations;
 	
-	public String getFormat() {
+	
+	public SubtitleFormat getFormat() {
 		return format;
 	}
-	public void setFormat(String format) {
+	public void setFormat(SubtitleFormat format) {
 		this.format = format;
 	}
 	public Integer getNumber() {
@@ -28,16 +29,16 @@ public class SubtitleUnitData {
 	public void setNumber(Integer number) {
 		this.number = number;
 	}
-	public String getTimestampFrom() {
+	public SubtitleTimestamp getTimestampFrom() {
 		return timestampFrom;
 	}
-	public void setTimestampFrom(String timestampFrom) {
+	public void setTimestampFrom(SubtitleTimestamp timestampFrom) {
 		this.timestampFrom = timestampFrom;
 	}
-	public String getTimestampTo() {
+	public SubtitleTimestamp getTimestampTo() {
 		return timestampTo;
 	}
-	public void setTimestampTo(String timestampTo) {
+	public void setTimestampTo(SubtitleTimestamp timestampTo) {
 		this.timestampTo = timestampTo;
 	}
 	public String getText() {
@@ -67,16 +68,16 @@ public class SubtitleUnitData {
 		this.compEditOperations = compEditOperations;
 	}
 	
-	public String getTimestampFromShifted() {
+	public SubtitleTimestamp getTimestampFromShifted() {
 		return timestampFromShifted;
 	}
-	public void setTimestampFromShifted(String timestampFromShifted) {
+	public void setTimestampFromShifted(SubtitleTimestamp timestampFromShifted) {
 		this.timestampFromShifted = timestampFromShifted;
 	}
-	public String getTimestampToShifted() {
+	public SubtitleTimestamp getTimestampToShifted() {
 		return timestampToShifted;
 	}
-	public void setTimestampToShifted(String timestampToShifted) {
+	public void setTimestampToShifted(SubtitleTimestamp timestampToShifted) {
 		this.timestampToShifted = timestampToShifted;
 	}
 	@Override
@@ -87,5 +88,6 @@ public class SubtitleUnitData {
 				+ textBeforeCorrection + ", editOperations=" + editOperations + ", compEditOperations="
 				+ compEditOperations + "]";
 	}
+
 	
 }

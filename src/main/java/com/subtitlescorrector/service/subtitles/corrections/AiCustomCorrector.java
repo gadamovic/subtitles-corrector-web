@@ -68,7 +68,7 @@ public class AiCustomCorrector{
 		ObjectMapper mapper = new ObjectMapper();
 
 		String webSocketSessionId = params.getWebSocketSessionId();
-		webSocket.sendMessage(createAiProcessingEndedEvent(webSocketSessionId));
+		webSocket.sendMessage(createAiProcessingStartedEvent(webSocketSessionId));
 		Map<Integer, List<SubtitleUnitData>> partitioned = partitionSubUnits(data.getLines(), AI_PROCESSING_CHUNK_SIZE);
 		
 		List<Future<?>> futures = new ArrayList<>();
@@ -121,7 +121,6 @@ public class AiCustomCorrector{
 		
 		String prompt = promptTemplate + "\n" + sb.toString();
 		
-		//TODO: Update logic to receive only updated lines from AI to save tokens
 		String aiCorrectionResponseStr = ai.askOpenAi(prompt).getFirstChoiceMessage();
 		
 		List<CorrectionResponse> aiCorrectionResponses = new ArrayList<>();

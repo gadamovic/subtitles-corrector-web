@@ -1,7 +1,7 @@
 <template>
 
     <div v-if="!lineVisibleFlagsStore.isVisibleFlags[lineIndex]" class="box">
-        <div class="has-text-grey-light has-text-left is-size-7">{{ timestampFrom }} -> {{ timestampTo }}</div>
+        <div class="has-text-grey-light has-text-left is-size-7">{{ timestampFrom.formattedTimestamp }} -> {{ timestampTo.formattedTimestamp }}</div>
         <div class="has-text-centered">
             <span v-if="subtitle.compEditOperations">
 
