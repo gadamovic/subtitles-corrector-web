@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.subtitlescorrector.domain.SubtitleConversionFileData;
 import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.util.Util;
@@ -23,6 +24,7 @@ public class RedisServiceImpl implements RedisService {
 	private static final int USER_WEBSOCKET_SESSION_CACHE_TTL = 60 * 60 * 3;
 	private static final int NUMBER_OF_EMAILS_CACHE_TTL = 60 * 60 * 3;
 	private static final int USER_SUBTITLE_CURRENT_VERSION_CACHE_TTL = 60 * 60 * 3;
+	private static final int USER_SUBTITLE_CONVERSION_DATA_CACHE_TTL = USER_SUBTITLE_CURRENT_VERSION_CACHE_TTL;
 	private static final int NUMBER_OF_PROCESSED_SUBTITLES_PER_USER_TTL = 60 * 60;
 	
 	@Override
@@ -103,7 +105,16 @@ public class RedisServiceImpl implements RedisService {
 	public void addUserSubtitleCurrentVersion(SubtitleFileData data, String userId) {
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
 			
-			jedis.setex(RedisSchema.createUserSubtitleCurrentVersionKey(userId), USER_SUBTITLE_CURRENT_VERSION_CACHE_TTL, Util.subtitleUnitDataListToJson(data));
+			jedis.setex(RedisSchema.createUserSubtitleCurrentVersionKey(userId), USER_SUBTITLE_CURRENT_VERSION_CACHE_TTL, Util.subtitleFileDataToJson(data));
+			
+		}
+	}
+	
+	
+	public void addUserSubtitleConversionData(SubtitleConversionFileData data, String userId) {
+		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
+			
+			jedis.setex(RedisSchema.createUserSubtitleConversionDataKey(userId), USER_SUBTITLE_CONVERSION_DATA_CACHE_TTL, Util.subtitleConversionFileDataToJson(data));
 			
 		}
 	}
@@ -112,7 +123,15 @@ public class RedisServiceImpl implements RedisService {
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
 			
 			String jsonResult = jedis.get(RedisSchema.createUserSubtitleCurrentVersionKey(userId));
-			return Util.jsonToSubtitleUnitDataList(jsonResult);
+			return Util.jsonToSubtitleFileData(jsonResult);
+		}
+	}
+	
+	public SubtitleConversionFileData getUserSubtitleConversionData(String userId) {
+		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
+			
+			String jsonResult = jedis.get(RedisSchema.createUserSubtitleCurrentVersionKey(userId));
+			return Util.jsonToSubtitleConversionFileData(jsonResult);
 		}
 	}
 	

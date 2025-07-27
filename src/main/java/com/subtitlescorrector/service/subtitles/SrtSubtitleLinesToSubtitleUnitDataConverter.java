@@ -25,7 +25,7 @@ public class SrtSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 	Util util;
 	
 	@Override
-	public List<SubtitleUnitData> convertToSubtitleUnits(List<String> lines, AdditionalData params){
+	public List<SubtitleUnitData> convertToSubtitleUnits(List<String> lines){
 		
 		lines = trimLines(lines);
 		

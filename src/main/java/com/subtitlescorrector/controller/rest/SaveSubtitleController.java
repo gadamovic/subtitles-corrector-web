@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.subtitlescorrector.domain.S3BucketNames;
+import com.subtitlescorrector.domain.SubtitleConversionFileData;
 import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.service.redis.RedisService;
@@ -72,7 +73,7 @@ public class SaveSubtitleController {
 
 		MDC.put("subtitle_name", data.getFilename());
 		log.info("Downloading corrected file...");
-		MDC.remove("filename");
+		MDC.remove("subtitle_name");
 
 		List<String> lines = converterFactory.getConverter(data.getFormat()).convertToListOfStrings(data.getLines());
 		
@@ -85,6 +86,45 @@ public class SaveSubtitleController {
 
 		String webSocketSessionIdAsFilename = redisService.getWebSocketSessionIdForUser(userId);
 		s3Service.uploadFileToS3IfProd("v3_" + webSocketSessionIdAsFilename + "_" + data.getFilename(), S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), downloadableFile, "ttl=7days");
+
+        // Set response headers
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + data.getFilename() + "\"");
+        response.setContentLengthLong(downloadableFile.length());
+		
+        try (FileInputStream fis = new FileInputStream(downloadableFile)) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = fis.read(buffer)) != -1) {
+                response.getOutputStream().write(buffer, 0, bytesRead);
+            }
+        } catch (IOException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        } finally {
+            // Delete the file after response is sent
+            if (!downloadableFile.delete()) {
+                log.error("Failed to delete the file: " + downloadableFile.getAbsolutePath());
+            }
+        }
+	}
+	
+	@RequestMapping(path = "/downloadConvertedFile")
+	public void downloadConvertedFile(@RequestParam("userId") String userId, HttpServletResponse response) {
+		
+		
+		SubtitleConversionFileData data = redisService.getUserSubtitleConversionData(userId);
+
+		MDC.put("subtitle_name", data.getFilename());
+		log.info("Downloading converted file...");
+		MDC.remove("filename");
+
+		List<String> lines = converterFactory.getConverter(data.getTargetFormat()).convertToListOfStrings(data.getLines());
+		
+		File downloadableFile = new File(data.getFilename());
+		FileUtil.writeLinesToFile(downloadableFile, lines, StandardCharsets.UTF_8);
+
+		//s3Service.uploadFileToS3IfProd("v3_" + webSocketSessionIdAsFilename + "_" + data.getFilename(), S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), downloadableFile, "ttl=7days");
 
         // Set response headers
         response.setContentType("application/octet-stream");

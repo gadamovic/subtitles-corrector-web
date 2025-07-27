@@ -221,6 +221,9 @@ export default {
       this.initBeforeUpload();
 
       const formData = new FormData();
+
+      formData.append("businessOperation", "correction");
+
       formData.append("file", this.file);
       formData.append("webSocketUserId", this.userId);
 

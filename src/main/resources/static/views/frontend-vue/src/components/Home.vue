@@ -50,6 +50,12 @@
                     <span class="icon has-text-success mr-2">
                       <i class="fas fa-check"></i>
                     </span>
+                    <span><b>Convert </b>Between different subtitle file formats.</span>
+                  </li>
+                  <li class="is-flex is-align-items-center my-3">
+                    <span class="icon has-text-success mr-2">
+                      <i class="fas fa-check"></i>
+                    </span>
                     Edit and modify subtitle files directly in your browser.
                   </li>
                   <li class="is-flex is-align-items-center my-3">

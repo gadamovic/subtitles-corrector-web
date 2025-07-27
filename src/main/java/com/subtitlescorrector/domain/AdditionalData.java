@@ -24,6 +24,12 @@ public class AdditionalData {
 	int processedLines = 0;
 	int totalNumberOfLines = 0;
 
+	private BusinessOperation businessOperation;
+	
+	private SubtitleFormat targetConversionFormat;
+	
+	private String userId;
+	
 	public String getWebSocketSessionId() {
 		return webSocketSessionId;
 	}
@@ -143,5 +149,45 @@ public class AdditionalData {
 	public void setAiEnabled(Boolean aiEnabled) {
 		this.aiEnabled = aiEnabled;
 	}
+
+	public BusinessOperation getBusinessOperation() {
+		return businessOperation;
+	}
+
+	public void setBusinessOperation(BusinessOperation businessOperation) {
+		this.businessOperation = businessOperation;
+	}
+	public void setBusinessOperation(String businessOperationStr) {
+		
+		for(BusinessOperation operation : BusinessOperation.values()) {
+			if(businessOperationStr.equalsIgnoreCase(operation.name())) {
+				this.businessOperation = operation;
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Decouple conversion related parameters from correction related parameters
+	 * by splitting them into separate object and passing it to conversion logic
+	 * @return
+	 */
+	public ConversionParameters getConversionParameters() {
+		
+		ConversionParameters parameters = new ConversionParameters();
+		parameters.setTargetFormat(targetConversionFormat);
+		parameters.setUserId(userId);
+		
+		return parameters;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+	
 	
 }

@@ -30,6 +30,7 @@ import com.google.gson.JsonObject;
 import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.domain.CompositeEditOperation;
 import com.subtitlescorrector.domain.EditOperation;
+import com.subtitlescorrector.domain.SubtitleConversionFileData;
 import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitleFormat;
 import com.subtitlescorrector.domain.SubtitleTimestamp;
@@ -155,7 +156,7 @@ public class Util {
 
 	}
 
-	public static String subtitleUnitDataListToJson(SubtitleFileData data) {
+	public static String subtitleFileDataToJson(SubtitleFileData data) {
 		ObjectMapper obj = new ObjectMapper();
 		try {
 			return obj.writeValueAsString(data);
@@ -165,7 +166,7 @@ public class Util {
 		}
 	}
 
-	public static SubtitleFileData jsonToSubtitleUnitDataList(String json) {
+	public static SubtitleFileData jsonToSubtitleFileData(String json) {
 		ObjectMapper obj = new ObjectMapper();
 
 		try {
@@ -175,6 +176,28 @@ public class Util {
 			return null;
 		}
 	}
+	
+	public static String subtitleConversionFileDataToJson(SubtitleConversionFileData data) { 
+		ObjectMapper obj = new ObjectMapper();
+		try {
+			return obj.writeValueAsString(data);
+		} catch (JsonProcessingException e) {
+			log.error("Error converting saying subtitleUnitData list to json", e);
+			return null;
+		}
+	}
+
+	public static SubtitleConversionFileData jsonToSubtitleConversionFileData(String json) {
+		ObjectMapper obj = new ObjectMapper();
+
+		try {
+			return obj.readValue(json, SubtitleConversionFileData.class);
+		} catch (IOException e) {
+			log.error("Error deserializing saying: " + json, e);
+			return null;
+		}
+	}
+	
 
 	public static String generateS3Key(String postfix) {
 

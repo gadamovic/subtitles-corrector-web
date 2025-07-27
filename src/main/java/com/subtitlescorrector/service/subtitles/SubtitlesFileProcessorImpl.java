@@ -135,8 +135,6 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			
 			FileUtil.writeLinesToFile(correctedFile, converterFactory.getConverter(data.getFormat()).convertToListOfStrings(data.getLines()), StandardCharsets.UTF_8);
 
-			s3Service.uploadFileToS3IfProd("v2_" + s3Key, S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), correctedFile, "ttl=7days");
-
 		}catch (Exception e) {
 			log.error("Error processing file!", e);
 		} finally {
@@ -152,7 +150,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		data.setFormat(format);
 		data.setDetectedCharset(detectedEncoding);
 		data.setFilename(correctedFile.getName());
-		data.setLines(converterFactory.getConverter(format).convertToSubtitleUnits(lines, params));
+		data.setLines(converterFactory.getConverter(format).convertToSubtitleUnits(lines));
 	}
 
 	private void handleBOM(AdditionalData params, SubtitleFileData data, List<String> lines) {

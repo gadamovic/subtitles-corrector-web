@@ -3,6 +3,7 @@ import { createWebHistory, createRouter } from 'vue-router'
 import Home from '../components/Home.vue'
 import PrivacyPolicy from '../components/PrivacyPolicy.vue'
 import TermsOfService from '../components/TermsOfService.vue'
+import SubtitleConverters from '../components/SubtitleConverters.vue'
 
 const routes = [
     {
@@ -19,7 +20,7 @@ const routes = [
         component: PrivacyPolicy,
         meta: {
             title: 'Privacy Policy',
-            description: 'What we do with the data you provide to us.'
+            description: 'What we do with the data you provide to us'
         }
     },
     {
@@ -28,6 +29,14 @@ const routes = [
         meta: {
             title: 'Terms of Service',
             description: 'Legal agreements that you comply with by using our app'
+        }
+    },
+        {
+        path: '/converters',
+        component: SubtitleConverters,
+        meta: {
+            title: 'Subtitle converters',
+            description: 'Convert between various subtitle file formats'
         }
     },
 ]

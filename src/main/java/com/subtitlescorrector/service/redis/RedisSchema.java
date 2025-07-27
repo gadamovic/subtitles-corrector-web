@@ -60,4 +60,8 @@ public class RedisSchema {
 		return RedisKeys.USER_SUBTITLE_CURRENT_VERSION.getKey() + ":" + userId;
 	}
 	
+	public static String createUserSubtitleConversionDataKey(String userId) {
+		return RedisKeys.USER_SUBTITLE_CURRENT_VERSION.getKey() + ":" + userId;
+	}
+	
 }

@@ -7,7 +7,7 @@ import com.subtitlescorrector.domain.SubtitleUnitData;
 
 public interface SubtitleLinesToSubtitleUnitDataConverter {
 
-	List<SubtitleUnitData> convertToSubtitleUnits(List<String> lines, AdditionalData params);
+	List<SubtitleUnitData> convertToSubtitleUnits(List<String> lines);
 	public List<String> convertToListOfStrings(List<SubtitleUnitData> lines);
 
 }
