@@ -49,6 +49,10 @@ public class FileUploadController {
 	@Autowired
 	ApplicationProperties properties;
 	
+	
+	@Autowired
+	EmailService emailService;
+	
 	@Autowired
 	SubtitlesCorrectionService correctionService;
 	
@@ -74,6 +78,9 @@ public class FileUploadController {
 		File storedFile = fileSystemStorageService.store(file);		
 		AdditionalData clientParameters = extractOptions(request);
 		
+		emailService.sendEmailOnlyIfProduction("Ip: " + clientIp + "\nFilename: " + storedFile.getName(), properties.getAdminEmailAddress(),
+				"Somebody is uploading a subtitle for: " + clientParameters.getBusinessOperation().toString());
+
 		SubtitleFileData data = null;
 		SubtitleConversionFileData conversionData = null;
 		if (clientParameters.getBusinessOperation() != null) {

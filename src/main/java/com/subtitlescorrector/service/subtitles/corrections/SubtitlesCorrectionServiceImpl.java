@@ -32,13 +32,8 @@ public class SubtitlesCorrectionServiceImpl implements SubtitlesCorrectionServic
 	@Autowired
 	ApplicationProperties properties;
 	
-	@Autowired
-	EmailService emailService;
-	
 	public SubtitleFileData applyCorrectionOperations(AdditionalData clientParameters, File uploadedFile, HttpServletRequest request, String originalFileName) {
-		
-		String clientIp = request.getRemoteAddr();
-		
+				
 		String webSocketSessionId = redisService.getWebSocketSessionIdForUser(request.getParameter("webSocketUserId"));
 
 		clientParameters.setWebSocketSessionId(webSocketSessionId);
@@ -48,8 +43,6 @@ public class SubtitlesCorrectionServiceImpl implements SubtitlesCorrectionServic
 		//save uploaded and server-corrected version as the first version
 		redisService.addUserSubtitleCurrentVersion(data, request.getParameter("webSocketUserId"));
 		
-		emailService.sendEmailOnlyIfProduction("Ip: " + clientIp + "\nFilename: " + originalFileName, properties.getAdminEmailAddress(), "Somebody is uploading a subtitle!");
-
 		return data;
 		
 	}
