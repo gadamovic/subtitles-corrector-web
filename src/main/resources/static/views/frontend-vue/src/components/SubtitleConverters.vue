@@ -74,7 +74,10 @@
                     <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled"
                         @click="upload">
                     </GenericButton>
-
+                    <!-- Error Message -->
+                    <div class="notification is-danger has-text-centered" style="margin-bottom: 24px;" v-if="error">
+                        {{ error }}
+                    </div>
                 </form>
 
             </div>
@@ -90,6 +93,7 @@ export default {
     components: { GenericButton },
     data: function () {
         return {
+            error: null, // Error message
             upload_button_enabled: true,
             loading: false,
             file: null, // Selected file
@@ -114,7 +118,18 @@ export default {
             const allowedExtensions = ['.srt', '.vtt'/*, '.sub', '.txt'*/];
             const fileName = this.file.name.toLowerCase();
             const isValid = allowedExtensions.some(ext => fileName.endsWith(ext));
-            console.log(isValid);
+
+            if (!isValid) {
+                this.error = 'Invalid file type. Allowed types are: ' + allowedExtensions;
+                //this.error = 'Invalid file type. Please upload a .srt, .sub, or .txt file.';
+                this.upload_button_enabled = false;
+                event.target.value = ''; // Clear the input
+                this.file = null;
+            } else {
+                this.error = '';
+                this.upload_button_enabled = true;
+            }
+
         },
         async upload() {
 
@@ -237,13 +252,13 @@ export default {
                 window.URL.revokeObjectURL(url);
             }
         },
-        createDownloadedFileName(filename, targetFormat, sourceFormat){
+        createDownloadedFileName(filename, targetFormat, sourceFormat) {
 
-            if(filename.toLowerCase().endsWith("." + sourceFormat.toLowerCase())){
+            if (filename.toLowerCase().endsWith("." + sourceFormat.toLowerCase())) {
                 const dotIndex = filename.lastIndexOf('.');
                 filename = filename.substr(0, dotIndex);
                 filename += ("." + targetFormat.toLowerCase());
-            }else{
+            } else {
                 filename += ("." + targetFormat.toLowerCase());
             }
 
