@@ -37,6 +37,13 @@ public class BasicViewController {
 		return "index";
 		
 	}
+	
+	@RequestMapping(path="converters")
+	public String converters(HttpServletRequest request) {
+		log.info("converters");
+		return "index";
+		
+	}
 }
 
 
