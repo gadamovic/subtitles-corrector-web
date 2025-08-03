@@ -117,8 +117,12 @@ public class SaveSubtitleController {
 		SubtitleConversionFileData data = redisService.getUserSubtitleConversionData(userId);
 
 		MDC.put("subtitle_name", data.getFilename());
+		MDC.put("source_format", data.getSourceFormat().toString());
+		MDC.put("target_format", data.getTargetFormat().toString());
 		log.info("Downloading converted file...");
 		MDC.remove("filename");
+		MDC.remove("source_format");
+		MDC.remove("target_format");
 
 		List<String> lines = converterFactory.getConverter(SubtitleFormat.valueOf(SubtitleFormat.class, targetFormat)).convertToListOfStrings(data.getLines());
 		
