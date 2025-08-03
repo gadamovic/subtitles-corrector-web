@@ -31,6 +31,7 @@ import com.subtitlescorrector.applicationproperties.ApplicationProperties;
 import com.subtitlescorrector.domain.CompositeEditOperation;
 import com.subtitlescorrector.domain.EditOperation;
 import com.subtitlescorrector.domain.SubtitleConversionFileData;
+import com.subtitlescorrector.domain.SubtitleConversionFileDataResponse;
 import com.subtitlescorrector.domain.SubtitleFileData;
 import com.subtitlescorrector.domain.SubtitleFormat;
 import com.subtitlescorrector.domain.SubtitleTimestamp;
@@ -161,7 +162,7 @@ public class Util {
 		try {
 			return obj.writeValueAsString(data);
 		} catch (JsonProcessingException e) {
-			log.error("Error converting saying subtitleUnitData list to json", e);
+			log.error("Error converting SubtitleFileData to json", e);
 			return null;
 		}
 	}
@@ -182,7 +183,7 @@ public class Util {
 		try {
 			return obj.writeValueAsString(data);
 		} catch (JsonProcessingException e) {
-			log.error("Error converting saying subtitleUnitData list to json", e);
+			log.error("Error converting subtitleConversionFileData to json", e);
 			return null;
 		}
 	}
@@ -193,7 +194,7 @@ public class Util {
 		try {
 			return obj.readValue(json, SubtitleConversionFileData.class);
 		} catch (IOException e) {
-			log.error("Error deserializing saying: " + json, e);
+			log.error("Error deserializing SubtitleConversionFileData: " + json, e);
 			return null;
 		}
 	}
@@ -261,27 +262,28 @@ public class Util {
 		return composite;
 	}
 	
-   public String checkForChanges(String afterCorrection, String beforeCorrection, String correctionDescription, float processedPercentage, String webSocketSessionId) {
-               if(!afterCorrection.equals(beforeCorrection)) {
+	public String checkForChanges(String afterCorrection, String beforeCorrection, String correctionDescription,
+			float processedPercentage, String webSocketSessionId) {
+		if (!afterCorrection.equals(beforeCorrection)) {
 
-                       log.info("Before correction: " + beforeCorrection);
-                       log.info("After correction : " + afterCorrection);
+			log.info("Before correction: " + beforeCorrection);
+			log.info("After correction : " + afterCorrection);
 
-                       SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
-                       event.setCorrection(correctionDescription);
-                       event.setEventTimestamp(Instant.now());
+			SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
+			event.setCorrection(correctionDescription);
+			event.setEventTimestamp(Instant.now());
 
-                       event.setProcessedPercentage(String.valueOf(processedPercentage));
-                       event.setWebSocketSessionId(webSocketSessionId);
+			event.setProcessedPercentage(String.valueOf(processedPercentage));
+			event.setWebSocketSessionId(webSocketSessionId);
 
-                       if(properties.getSubtitlesRealTimeUpdatesEnabled()) {
-                    	   webSocketHandler.sendMessage(event);
-                       }
+			if (properties.getSubtitlesRealTimeUpdatesEnabled()) {
+				webSocketHandler.sendMessage(event);
+			}
 
-               }
+		}
 
-               return afterCorrection;
-       }
+		return afterCorrection;
+	}
 	
 	public void sendWebSocketCorrectionMessageToKafka(String webSocketSessionId, String message) {
 		SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
@@ -345,6 +347,27 @@ public class Util {
 		String formattedTimestamp = hour + ":" + minute + ":" + second + secondMillisecondDelimiter + millisecond;
 		return formattedTimestamp;
 	}
-	
 
+	public static SubtitleConversionFileDataResponse subtitleConversionFileDataToResponseObject(SubtitleConversionFileData conversionFileData) {
+		
+		SubtitleConversionFileDataResponse response = new SubtitleConversionFileDataResponse();
+		response.setDetectedEncoding(conversionFileData.getDetectedEncoding());
+		response.setDetectedSourceFormat(conversionFileData.getSourceFormat());
+		response.setFilename(conversionFileData.getFilename());
+		response.setNumberOfLines(conversionFileData.getLines().size());
+		
+		return response;
+		
+	}
+
+	public static String subtitleConversionFileDataResponseToJson(SubtitleConversionFileDataResponse conversionFileDataToResponseObject) {
+		ObjectMapper obj = new ObjectMapper();
+		try {
+			return obj.writeValueAsString(conversionFileDataToResponseObject);
+		} catch (JsonProcessingException e) {
+			log.error("Error converting SubtitleConversionFileDataResponse to json", e);
+			return null;
+		}
+	}
+	
 }

@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.subtitlescorrector.domain.S3BucketNames;
 import com.subtitlescorrector.domain.SubtitleConversionFileData;
 import com.subtitlescorrector.domain.SubtitleFileData;
+import com.subtitlescorrector.domain.SubtitleFormat;
 import com.subtitlescorrector.domain.SubtitleUnitData;
 import com.subtitlescorrector.service.redis.RedisService;
 import com.subtitlescorrector.service.s3.S3Service;
@@ -110,7 +111,7 @@ public class SaveSubtitleController {
 	}
 	
 	@RequestMapping(path = "/downloadConvertedFile")
-	public void downloadConvertedFile(@RequestParam("userId") String userId, HttpServletResponse response) {
+	public void downloadConvertedFile(@RequestParam("userId") String userId, @RequestParam("targetFormat") String targetFormat, HttpServletResponse response) {
 		
 		
 		SubtitleConversionFileData data = redisService.getUserSubtitleConversionData(userId);
@@ -119,7 +120,7 @@ public class SaveSubtitleController {
 		log.info("Downloading converted file...");
 		MDC.remove("filename");
 
-		List<String> lines = converterFactory.getConverter(data.getTargetFormat()).convertToListOfStrings(data.getLines());
+		List<String> lines = converterFactory.getConverter(SubtitleFormat.valueOf(SubtitleFormat.class, targetFormat)).convertToListOfStrings(data.getLines());
 		
 		File downloadableFile = new File(data.getFilename());
 		FileUtil.writeLinesToFile(downloadableFile, lines, StandardCharsets.UTF_8);

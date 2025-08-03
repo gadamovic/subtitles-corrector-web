@@ -1,6 +1,7 @@
 package com.subtitlescorrector.service.subtitles.corrections;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +31,15 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 			HttpServletRequest request, String originalFilename) {
 		
 		List<String> lines = FileUtil.loadTextFile(uploadedFile);
+		
+		Charset detectedEncoding = FileUtil.detectEncodingOfFile(uploadedFile);
+		
 		SubtitleFormat sourceFormat = Util.detectSubtitleFormat(lines);
-		SubtitleFormat targetFormat = conversionParameters.getTargetFormat();
 		
 		SubtitleConversionFileData conversionFileData = new SubtitleConversionFileData();
 		conversionFileData.setFilename(originalFilename);
 		conversionFileData.setSourceFormat(sourceFormat);
-		conversionFileData.setTargetFormat(targetFormat);
+		conversionFileData.setDetectedEncoding(detectedEncoding.displayName());
 		
 		conversionFileData.setLines(converterFactory.getConverter(sourceFormat).convertToSubtitleUnits(lines));
 		redisService.addUserSubtitleConversionData(conversionFileData, conversionParameters.getUserId());

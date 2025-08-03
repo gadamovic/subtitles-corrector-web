@@ -18,6 +18,7 @@ import com.subtitlescorrector.domain.AdditionalData;
 import com.subtitlescorrector.domain.BusinessOperation;
 import com.subtitlescorrector.domain.SubtitleConversionFileData;
 import com.subtitlescorrector.domain.SubtitleFileData;
+import com.subtitlescorrector.domain.SubtitleFormat;
 import com.subtitlescorrector.service.EmailService;
 import com.subtitlescorrector.service.S3ServiceMonitor;
 import com.subtitlescorrector.service.StorageService;
@@ -84,7 +85,7 @@ public class FileUploadController {
 			case CONVERSION:
 				conversionData = conversionService.applyConversionOperations(clientParameters.getConversionParameters(), storedFile, request,
 						file.getOriginalFilename());
-				return ResponseEntity.ok(Util.subtitleConversionFileDataToJson(conversionData));
+				return ResponseEntity.ok(Util.subtitleConversionFileDataResponseToJson(Util.subtitleConversionFileDataToResponseObject(conversionData)));
 			default: 
 				return getInvalidResponseEntity();
 			}
@@ -117,7 +118,7 @@ public class FileUploadController {
 		params.setConvertEToCH(Boolean.parseBoolean(request.getParameter("EToCH")));
 		params.setAiEnabled(Boolean.parseBoolean(request.getParameter("aiEnabled")));
 		params.setBusinessOperation(request.getParameter("businessOperation"));
-		params.setUserId(request.getParameter(request.getParameter("userId")));
+		params.setUserId(request.getParameter("userId"));
 		
 		return params;
 	}

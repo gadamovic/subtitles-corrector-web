@@ -15,6 +15,8 @@ public class SubtitleConversionFileData implements Serializable{
 	private SubtitleFormat sourceFormat;
 	
 	private SubtitleFormat targetFormat;
+	
+	private String detectedEncoding;
 
 	public String getFilename() {
 		return filename;
@@ -50,6 +52,14 @@ public class SubtitleConversionFileData implements Serializable{
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	public String getDetectedEncoding() {
+		return detectedEncoding;
+	}
+
+	public void setDetectedEncoding(String detectedEncoding) {
+		this.detectedEncoding = detectedEncoding;
 	}
 	
 

@@ -166,6 +166,14 @@ public class AdditionalData {
 			}
 		}
 	}
+	
+	public SubtitleFormat getTargetConversionFormat() {
+		return targetConversionFormat;
+	}
+
+	public void setTargetConversionFormat(SubtitleFormat targetConversionFormat) {
+		this.targetConversionFormat = targetConversionFormat;
+	}
 
 	/**
 	 * Decouple conversion related parameters from correction related parameters
