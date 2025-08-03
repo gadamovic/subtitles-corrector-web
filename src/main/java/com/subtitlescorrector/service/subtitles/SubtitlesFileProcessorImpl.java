@@ -96,7 +96,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			
 			List<String> lines = FileUtil.loadTextFile(storedFile);
 			
-			handleBOM(params, data, lines);
+			handleBOM(params, data, lines, params.getWebSocketSessionId());
 			populateSubtitleFileData(params, data, correctedFile, detectedEncoding, lines);
 			
 			//preprocessors are not considered as subtitle corrections. Corrections will be reported in <AppliedChanges> section, but not in the editor's content
@@ -153,7 +153,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		data.setLines(converterFactory.getConverter(format).convertToSubtitleUnits(lines));
 	}
 
-	private void handleBOM(AdditionalData params, SubtitleFileData data, List<String> lines) {
+	private void handleBOM(AdditionalData params, SubtitleFileData data, List<String> lines, String webSocketSessionId) {
 
 		if (lines.get(0).startsWith("\uFEFF")) {
 			
@@ -167,12 +167,20 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 				data.setKeepBom(true);
 			}else {
 				data.setKeepBom(false);
+				sendBOMRemovedMessage(webSocketSessionId);
 			}
 		} else {
 			data.setHasBom(false);
 			data.setKeepBom(false);
 		}
 
+	}
+
+	private void sendBOMRemovedMessage(String webSocketSessionId) {
+		SubtitleCorrectionEvent bomRemoved = new SubtitleCorrectionEvent();
+		bomRemoved.setCorrection("Removed BOM");
+		bomRemoved.setWebSocketSessionId(webSocketSessionId);
+		webSocketHandler.sendMessage(bomRemoved);
 	}
 
 	private void calculateEditOperationsAfterCorrections(SubtitleFileData data) {

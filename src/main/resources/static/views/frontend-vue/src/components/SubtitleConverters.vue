@@ -7,7 +7,8 @@
 
                 <form @submit.prevent enctype="multipart/form-data" class="box" style="background-color: #004266;">
 
-                    <label class="label has-text-white has-text-centered title is-5">Upload a subtitle file:</label>
+                    <label class="label has-text-white has-text-centered title is-5">Step 1: Upload a subtitle
+                        file:</label>
                     <br />
                     <div class="file has-name is-fullwidth field mb-3">
                         <label class="file-label">
@@ -30,35 +31,46 @@
                         <p class="title is-5 has-text-centered mb-3">Uploaded file's info</p>
 
                         <p v-if="this.subtitlesFilename != null">Filename: {{ this.subtitlesFilename }}</p>
-                        <p v-if="this.encoding != null">Detected encoding: {{ this.encoding }}</p>
+                        <p>
+                            <span v-if="this.encoding != null">File encoding: {{ this.encoding }}
+                                <span v-if="this.encoding == 'UTF-8'" class="icon has-text-success fas fa-check"></span>
+                            </span>
+                        </p>
+                        <p v-if="this.encoding != null">Source format: {{ this.sourceFormat }}</p>
 
                     </div>
 
-                    <div class="box mb-3" ref="formatsDiv" v-if="showUploadedFileData">
-                        <p class="title is-5 has-text-centered mb-3">Convert to:</p>
+                    <div v-if="showUploadedFileData">
+                        <label class="label has-text-white has-text-centered title is-5 mb-5">Step 2: Choose a
+                            format:</label>
+                        <div class="box mb-3" ref="formatsDiv">
 
-                        <div class="field">
-                            <label class="radio">
-                                <input type="radio" v-model="targetFormat" value="SRT" />
-                                Srt
-                            </label>
-                        </div>
+                            <p class="title is-5 has-text-centered mb-3">Convert to:</p>
+                            <p class="help is-info">Select the format you want to convert to</p>
+                            <div class="field">
+                                <label class="radio">
+                                    <input type="radio" v-model="targetFormat" value="SRT" />
+                                    Srt
+                                </label>
+                            </div>
 
-                        <div class="field">
-                            <label class="radio">
-                                <input type="radio" v-model="targetFormat" value="VTT" />
-                                VTT
-                            </label>
+                            <div class="field">
+                                <label class="radio">
+                                    <input type="radio" v-model="targetFormat" value="VTT" />
+                                    VTT
+                                </label>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="notification is-link is-light has-text-centered mb-5" v-if="this.showUploadedFileData">
-
-                        <a :disabled="this.targetFormat ? null : true"
-                            class="button is-link is-medium is-flex is-align-items-center is-justify-content-center"
-                            @click="downloadFile" style="max-width: 100%; overflow: hidden;" :title="subtitlesFilename">
-                            📥 Download&nbsp;
-                            <span style="
+                    <div v-if="showUploadedFileData && targetFormat != null">
+                        <label class="label has-text-white has-text-centered title is-5 mb-5">Step 3: Download!</label>
+                        <div class="notification is-link is-light has-text-centered mb-5">
+                            <a class="button is-link is-medium is-flex is-align-items-center is-justify-content-center"
+                                @click="downloadFile" style="max-width: 100%; overflow: hidden;"
+                                :title="subtitlesFilename">
+                                📥 Download&nbsp;
+                                <span style="
                                 display: inline-block;
                                 max-width: 300px;
                                 overflow: hidden;
@@ -66,10 +78,12 @@
                                 white-space: nowrap;
                                 vertical-align: bottom;
                             ">
-                                {{ subtitlesFilename }}
-                            </span>
-                        </a>
+                                    {{ subtitlesFilename }}
+                                </span>
+                            </a>
+                        </div>
                     </div>
+
 
                     <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled"
                         @click="upload">
@@ -121,7 +135,6 @@ export default {
 
             if (!isValid) {
                 this.error = 'Invalid file type. Allowed types are: ' + allowedExtensions;
-                //this.error = 'Invalid file type. Please upload a .srt, .sub, or .txt file.';
                 this.upload_button_enabled = false;
                 event.target.value = ''; // Clear the input
                 this.file = null;

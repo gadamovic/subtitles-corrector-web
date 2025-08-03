@@ -125,8 +125,6 @@ public class SaveSubtitleController {
 		File downloadableFile = new File(data.getFilename());
 		FileUtil.writeLinesToFile(downloadableFile, lines, StandardCharsets.UTF_8);
 
-		//s3Service.uploadFileToS3IfProd("v3_" + webSocketSessionIdAsFilename + "_" + data.getFilename(), S3BucketNames.SUBTITLES_UPLOADED_FILES.getBucketName(), downloadableFile, "ttl=7days");
-
         // Set response headers
         response.setContentType("application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + data.getFilename() + "\"");
