@@ -88,6 +88,9 @@
                     <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled"
                         @click="upload">
                     </GenericButton>
+                    <p class="has-text-white mt-2 is-size-7 has-text-centered">
+                        Supported formats: {{this.supportedFileFormatsStore.supportedFileFormats}}
+                    </p>
                     <!-- Error Message -->
                     <div class="notification is-danger has-text-centered" style="margin-bottom: 24px;" v-if="error">
                         {{ error }}
@@ -100,6 +103,7 @@
 </template>
 
 <script>
+import { useSupportedFileFormatsStore } from '@/stores/supportedFileFormatsStore';
 import GenericButton from './GenericButton.vue';
 
 export default {
@@ -117,8 +121,8 @@ export default {
             showUploadedFileData: false,
             encoding: null,
             subtitlesFilename: null,
-            numberOfSubtitleLines: null
-
+            numberOfSubtitleLines: null,
+            supportedFileFormatsStore: useSupportedFileFormatsStore(),
         }
     },
     methods: {
@@ -129,12 +133,11 @@ export default {
 
             this.file = event.target.files[0];
 
-            const allowedExtensions = ['.srt', '.vtt'/*, '.sub', '.txt'*/];
             const fileName = this.file.name.toLowerCase();
-            const isValid = allowedExtensions.some(ext => fileName.endsWith(ext));
+            const isValid = this.supportedFileFormatsStore.supportedFileFormats.some(ext => fileName.endsWith(ext));
 
             if (!isValid) {
-                this.error = 'Invalid file type. Allowed types are: ' + allowedExtensions;
+                this.error = 'Invalid file type. Allowed types are: ' + this.supportedFileFormatsStore.supportedFileFormats;
                 this.upload_button_enabled = false;
                 event.target.value = ''; // Clear the input
                 this.file = null;

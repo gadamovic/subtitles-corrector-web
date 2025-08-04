@@ -35,7 +35,7 @@ const routes = [
         path: '/converters',
         component: SubtitleConverters,
         meta: {
-            title: 'Subtitle converters',
+            title: 'Subtitle Converters',
             description: 'Convert between various subtitle file formats'
         }
     },

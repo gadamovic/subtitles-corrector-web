@@ -109,6 +109,9 @@
 
     <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled" @click="upload">
     </GenericButton>
+    <p class="has-text-white mt-2 is-size-7 has-text-centered">
+      Supported formats: {{this.supportedFileFormatsStore.supportedFileFormats}}
+    </p>
     <GenericButton :loading="false" button_text="Continue editing" :enabled="true" v-if="showDownloadLink"
       @click="showModalMethod"></GenericButton>
 
@@ -135,6 +138,7 @@ import { useLineVisibleFlagsStore } from '@/stores/subtitleLineVisibleFlagsStore
 import GenericButton from './GenericButton.vue';
 import ModalComponent from './ModalComponent.vue';
 import { useSubtitleDataStore } from '@/stores/subtitleDataStore';
+import { useSupportedFileFormatsStore } from '@/stores/supportedFileFormatsStore';
 import DownloadFileModalComponent from './DownloadFileModalComponent.vue';
 
 export default {
@@ -160,6 +164,7 @@ export default {
       showDownloadLink: false,
       loaderStore: useLoaderStore(),
       lineVisibleFlagsStore: useLineVisibleFlagsStore(),
+      supportedFileFormatsStore: useSupportedFileFormatsStore(),
       socket: WebSocket,
       stripBTags: false,
       stripITags: false,
@@ -183,13 +188,11 @@ export default {
 
       this.file = event.target.files[0];
 
-      const allowedExtensions = ['.srt', '.vtt'/*, '.sub', '.txt'*/];
       const fileName = this.file.name.toLowerCase();
-      const isValid = allowedExtensions.some(ext => fileName.endsWith(ext));
+      const isValid = this.supportedFileFormatsStore.supportedFileFormats.some(ext => fileName.endsWith(ext));
 
       if (!isValid) {
-        this.error = 'Invalid file type. Allowed types are: ' + allowedExtensions;
-        //this.error = 'Invalid file type. Please upload a .srt, .sub, or .txt file.';
+        this.error = 'Invalid file type. Allowed types are: ' + this.supportedFileFormatsStore.supportedFileFormats;
         this.upload_button_enabled = false;
         event.target.value = ''; // Clear the input
         this.file = null;
