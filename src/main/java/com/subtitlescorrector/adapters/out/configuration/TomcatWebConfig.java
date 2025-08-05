@@ -38,28 +38,10 @@ public class TomcatWebConfig implements WebServerFactoryCustomizer<TomcatServlet
 
 		factory.setContextPath(contextPath);
 
-		//TLS settings for production
 		if (properties.getTlsEnabled()) {
-
-			factory.addConnectorCustomizers(connector -> {
-				connector.setScheme(HTTPS_SCHEME);
-				connector.setSecure(true);
-				connector.setPort(TLS_PORT);
-			});
-			//TODO: Is this TLS or not?
-	        Connector httpConnector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
-	        httpConnector.setScheme(HTTP_SCHEME);
-	        httpConnector.setPort(NON_TLS_PORT);
-	        httpConnector.setSecure(false);
-			
-			factory.addAdditionalTomcatConnectors(httpConnector);
-
-			Ssl ssl = new Ssl();
-			ssl.setKeyStore(new File(properties.getKeystoreLocation()).getAbsolutePath());
-			ssl.setKeyStorePassword(System.getenv(VariablesEnum.TOMCAT_KEYSTORE_PASSWORD.getName()));
-			ssl.setKeyStoreType(PKCS12_KEYSTORE_TYPE);
-
-			factory.setSsl(ssl);
+			addHttpsConnector(factory);
+	        addAdditionalHttpConnector(factory);
+			addSslConfiguration(factory);
 		}
 		
 		if(properties.isProdEnvironment()) {
@@ -68,6 +50,32 @@ public class TomcatWebConfig implements WebServerFactoryCustomizer<TomcatServlet
 			factory.setBaseDirectory(new File("/home/logs/access_logs"));
 		}
 
+	}
+
+	private void addSslConfiguration(TomcatServletWebServerFactory factory) {
+		Ssl ssl = new Ssl();
+		ssl.setKeyStore(new File(properties.getKeystoreLocation()).getAbsolutePath());
+		ssl.setKeyStorePassword(System.getenv(VariablesEnum.TOMCAT_KEYSTORE_PASSWORD.getName()));
+		ssl.setKeyStoreType(PKCS12_KEYSTORE_TYPE);
+
+		factory.setSsl(ssl);
+	}
+
+	private void addAdditionalHttpConnector(TomcatServletWebServerFactory factory) {
+		Connector httpConnector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
+		httpConnector.setScheme(HTTP_SCHEME);
+		httpConnector.setPort(NON_TLS_PORT);
+		httpConnector.setSecure(false);
+		
+		factory.addAdditionalTomcatConnectors(httpConnector);
+	}
+
+	private void addHttpsConnector(TomcatServletWebServerFactory factory) {
+		factory.addConnectorCustomizers(connector -> {
+			connector.setScheme(HTTPS_SCHEME);
+			connector.setSecure(true);
+			connector.setPort(TLS_PORT);
+		});
 	}
 	
     private Valve remoteIpValve() {
