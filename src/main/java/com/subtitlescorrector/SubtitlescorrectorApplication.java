@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.subtitlescorrector.consumers.SubtitleCorrectionEventConsumerImpl;
+import com.subtitlescorrector.adapters.in.SubtitleCorrectionEventConsumerImpl;
 
 @SpringBootApplication
 public class SubtitlescorrectorApplication {

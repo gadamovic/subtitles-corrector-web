@@ -1,10 +1,9 @@
 package com.subtitlescorrector;
 
+import static com.subtitlescorrector.core.util.Util.generateS3Key;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-
-import static com.subtitlescorrector.util.Util.generateS3Key;
 
 public class UtilTests {
 

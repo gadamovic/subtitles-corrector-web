@@ -25,14 +25,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.kafka.core.KafkaTemplate;
 
-import com.subtitlescorrector.domain.AdditionalData;
-import com.subtitlescorrector.domain.SubtitleFileData;
+import com.subtitlescorrector.adapters.out.S3ServiceAdapter;
+import com.subtitlescorrector.core.domain.AdditionalData;
+import com.subtitlescorrector.core.domain.SubtitleFileData;
+import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
+import com.subtitlescorrector.core.service.corrections.SubtitlesFileProcessorImpl;
+import com.subtitlescorrector.core.util.Constants;
+import com.subtitlescorrector.core.util.Util;
 import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
-import com.subtitlescorrector.service.s3.S3Service;
-import com.subtitlescorrector.service.s3.S3ServiceImpl;
-import com.subtitlescorrector.service.subtitles.SubtitlesFileProcessorImpl;
-import com.subtitlescorrector.util.Constants;
-import com.subtitlescorrector.util.Util;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

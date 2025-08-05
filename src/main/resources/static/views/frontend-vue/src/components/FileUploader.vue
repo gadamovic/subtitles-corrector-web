@@ -109,12 +109,12 @@
 
     <GenericButton :loading="loading" button_text="Upload" :enabled="this.upload_button_enabled" @click="upload">
     </GenericButton>
+    <GenericButton :loading="false" button_text="Continue editing" :enabled="true" v-if="showDownloadLink"
+    @click="showModalMethod"></GenericButton>
+    
     <p class="has-text-white mt-2 is-size-7 has-text-centered">
       Supported formats: {{this.supportedFileFormatsStore.supportedFileFormats}}
     </p>
-    <GenericButton :loading="false" button_text="Continue editing" :enabled="true" v-if="showDownloadLink"
-      @click="showModalMethod"></GenericButton>
-
 
   </form>
 
