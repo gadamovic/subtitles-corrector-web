@@ -14,7 +14,7 @@ import com.subtitlescorrector.adapters.in.SaveSubtitleController;
 import com.subtitlescorrector.core.domain.ConversionParameters;
 import com.subtitlescorrector.core.domain.SubtitleConversionFileData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
-import com.subtitlescorrector.core.port.RedisServicePort;
+import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.service.converters.SubtitlesConverterFactory;
 import com.subtitlescorrector.core.util.FileUtil;
 import com.subtitlescorrector.core.util.Util;
@@ -28,7 +28,7 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 	SubtitlesConverterFactory converterFactory;
 	
 	@Autowired
-	RedisServicePort redisService;
+	ExternalCacheServicePort redisService;
 	
 	Logger log = LoggerFactory.getLogger(SubtitleConversionServiceImpl.class);
 	

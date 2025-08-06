@@ -9,7 +9,7 @@ import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.SubtitleFileData;
 import com.subtitlescorrector.core.port.EmailServicePort;
-import com.subtitlescorrector.core.port.RedisServicePort;
+import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -26,7 +26,7 @@ public class SubtitlesCorrectionServiceImpl implements SubtitlesCorrectionServic
 	SubtitlesFileProcessor processor;
 	
 	@Autowired
-	RedisServicePort redisService;
+	ExternalCacheServicePort redisService;
 	
 	@Autowired
 	ApplicationProperties properties;

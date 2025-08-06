@@ -7,7 +7,7 @@ import com.subtitlescorrector.core.domain.SubtitleConversionFileData;
 import com.subtitlescorrector.core.domain.SubtitleFileData;
 import com.subtitlescorrector.core.domain.SubtitleUnitData;
 
-public interface RedisServicePort {
+public interface ExternalCacheServicePort {
 
 	void updateLastS3UploadTimestamp(String ip);
 	public LocalDateTime getLastS3UploadTimestamp(String ip);

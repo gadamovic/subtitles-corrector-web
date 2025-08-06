@@ -17,4 +17,4 @@ Don't make any changes to HTML tags.
 Don't make ABSOLUTELY any corrections to words which have letters ð or đ in them.
 Don't change how proper nouns are spelled.
 
-Fix grammatical errors in this subtitle line:
+Fix grammatical errors in this subtitle lines:

@@ -7,14 +7,14 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 
-import com.subtitlescorrector.core.port.RedisServicePort;
+import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 
 //@Component
 @Deprecated
 public class WebSocketSessionListener {
 
 	@Autowired
-	RedisServicePort redisService;
+	ExternalCacheServicePort redisService;
 	
     @EventListener
     public void handleSessionConnected(SessionConnectedEvent event) {

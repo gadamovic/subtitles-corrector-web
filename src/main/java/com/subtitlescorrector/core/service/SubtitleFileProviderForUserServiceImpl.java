@@ -11,9 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.adapters.in.SaveSubtitleController;
+import com.subtitlescorrector.core.domain.SubtitleConversionFileData;
 import com.subtitlescorrector.core.domain.SubtitleFileData;
+import com.subtitlescorrector.core.domain.SubtitleFormat;
+import com.subtitlescorrector.core.domain.UserSubtitleConversionData;
 import com.subtitlescorrector.core.domain.UserSubtitleData;
-import com.subtitlescorrector.core.port.RedisServicePort;
+import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.service.converters.SubtitlesConverterFactory;
 import com.subtitlescorrector.core.util.FileUtil;
 import com.subtitlescorrector.core.util.Util;
@@ -22,7 +25,7 @@ import com.subtitlescorrector.core.util.Util;
 public class SubtitleFileProviderForUserServiceImpl implements SubtitleFileProviderForUser {
 
 	@Autowired
-	RedisServicePort redisService;
+	ExternalCacheServicePort redisService;
 	
 	@Autowired
 	SubtitlesConverterFactory converterFactory;
@@ -36,10 +39,6 @@ public class SubtitleFileProviderForUserServiceImpl implements SubtitleFileProvi
 		
 		SubtitleFileData data = redisService.getUserSubtitleCurrentVersion(userId);
 		userData.setSubtitleFileData(data);
-		
-		MDC.put("subtitle_name", data.getFilename());
-		log.info("Downloading corrected file...");
-		MDC.remove("subtitle_name");
 
 		List<String> lines = converterFactory.getConverter(data.getFormat()).convertToListOfStrings(data.getLines());
 		
@@ -52,6 +51,24 @@ public class SubtitleFileProviderForUserServiceImpl implements SubtitleFileProvi
 		userData.setFile(downloadableFile);
 		
 		return userData;
+	}
+
+	@Override
+	public UserSubtitleConversionData provideConversionFileForUser(String userId, String targetFormat) {
+		
+		UserSubtitleConversionData fileData = new UserSubtitleConversionData();
+		
+		SubtitleConversionFileData data = redisService.getUserSubtitleConversionData(userId);
+		
+		List<String> lines = converterFactory.getConverter(SubtitleFormat.valueOf(SubtitleFormat.class, targetFormat)).convertToListOfStrings(data.getLines());
+		
+		File downloadableFile = new File(data.getFilename());
+		FileUtil.writeLinesToFile(downloadableFile, lines, StandardCharsets.UTF_8);
+		
+		fileData.setData(data);
+		fileData.setFile(downloadableFile);
+		
+		return fileData;
 	}
 
 }

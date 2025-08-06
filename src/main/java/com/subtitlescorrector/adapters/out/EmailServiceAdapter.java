@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.EmailSendStatus;
 import com.subtitlescorrector.core.port.EmailServicePort;
-import com.subtitlescorrector.core.port.RedisServicePort;
+import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.util.Constants;
 
 @Service
@@ -26,7 +26,7 @@ public class EmailServiceAdapter implements EmailServicePort {
 	ApplicationProperties properties;
 	
 	@Autowired
-	RedisServicePort redisService;
+	ExternalCacheServicePort redisService;
 	
 	@Override
 	@Async

@@ -15,17 +15,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
-import com.subtitlescorrector.core.domain.BusinessOperation;
 import com.subtitlescorrector.core.domain.SubtitleConversionFileData;
 import com.subtitlescorrector.core.domain.SubtitleFileData;
-import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.port.EmailServicePort;
-import com.subtitlescorrector.core.port.RedisServicePort;
+import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.port.StorageSystemPort;
 import com.subtitlescorrector.core.service.CloudStorageRateLimiter;
 import com.subtitlescorrector.core.service.conversion.SubtitleConversionService;
 import com.subtitlescorrector.core.service.corrections.SubtitlesCorrectionService;
-import com.subtitlescorrector.core.service.corrections.SubtitlesFileProcessor;
 import com.subtitlescorrector.core.util.Util;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,7 +37,7 @@ public class FileUploadController {
 	StorageSystemPort fileSystemStorageService;
 		
 	@Autowired
-	RedisServicePort redisService;
+	ExternalCacheServicePort redisService;
 	
 	@Autowired
 	CloudStorageRateLimiter monitor;
@@ -57,7 +54,6 @@ public class FileUploadController {
 	@Autowired
 	SubtitleConversionService conversionService;
 	
-	
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
 	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		
@@ -72,7 +68,7 @@ public class FileUploadController {
 		}else {
 			redisService.updateLastS3UploadTimestamp(clientIp);
 		}
-				
+		
 		File storedFile = fileSystemStorageService.store(file);		
 		AdditionalData clientParameters = extractOptions(request);
 		

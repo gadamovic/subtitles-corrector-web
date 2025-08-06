@@ -9,14 +9,14 @@ import org.springframework.stereotype.Service;
 import com.subtitlescorrector.core.domain.SubtitleConversionFileData;
 import com.subtitlescorrector.core.domain.SubtitleFileData;
 import com.subtitlescorrector.core.domain.SubtitleUnitData;
-import com.subtitlescorrector.core.port.RedisServicePort;
+import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.util.Util;
 
 import io.micrometer.common.util.StringUtils;
 import redis.clients.jedis.Jedis;
 
 @Service
-public class RedisServiceAdapter implements RedisServicePort {
+public class RedisServiceAdapter implements ExternalCacheServicePort {
 
 	@Autowired
 	RedisConnectionProvider redisConnection;

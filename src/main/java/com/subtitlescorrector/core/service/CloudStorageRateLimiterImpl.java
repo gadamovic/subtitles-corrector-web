@@ -4,13 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
-import com.subtitlescorrector.core.port.RedisServicePort;
+import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 
 @Service
 public class CloudStorageRateLimiterImpl implements CloudStorageRateLimiter {
 
 	@Autowired
-	RedisServicePort redisPort;
+	ExternalCacheServicePort redisPort;
 	
 	@Autowired
 	ApplicationProperties properties;

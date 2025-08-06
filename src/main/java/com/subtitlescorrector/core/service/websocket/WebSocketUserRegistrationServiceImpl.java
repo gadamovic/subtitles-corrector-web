@@ -8,13 +8,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.subtitlescorrector.core.port.RedisServicePort;
+import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 
 @Service
 public class WebSocketUserRegistrationServiceImpl implements WebSocketUserRegistrationService {
 
 	@Autowired
-	RedisServicePort redisService;
+	ExternalCacheServicePort redisService;
 
 	Logger log = LoggerFactory.getLogger(WebSocketUserRegistrationServiceImpl.class);
 
