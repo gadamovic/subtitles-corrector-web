@@ -1,14 +1,15 @@
 package com.subtitlescorrector.core.service.corrections;
 
 import java.io.File;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
+import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.SubtitleFileData;
-import com.subtitlescorrector.core.port.EmailServicePort;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,16 +32,11 @@ public class SubtitlesCorrectionServiceImpl implements SubtitlesCorrectionServic
 	@Autowired
 	ApplicationProperties properties;
 	
-	public SubtitleFileData applyCorrectionOperations(AdditionalData clientParameters, File uploadedFile, HttpServletRequest request, String originalFileName) {
-				
-		String webSocketSessionId = redisService.getWebSocketSessionIdForUser(request.getParameter("webSocketUserId"));
+	public SubtitleFileData applyCorrectionOperations(AdditionalData clientParameters, File uploadedFile, List<String> lines, BomData bomData) {
 
-		clientParameters.setWebSocketSessionId(webSocketSessionId);
-		
-		SubtitleFileData data = processor.process(uploadedFile, clientParameters);
-
+		SubtitleFileData data = processor.process(uploadedFile, lines, clientParameters, bomData);
 		//save uploaded and server-corrected version as the first version
-		redisService.addUserSubtitleCurrentVersion(data, request.getParameter("webSocketUserId"));
+		redisService.addUserSubtitleCurrentVersion(data, clientParameters.getUserId());
 		
 		return data;
 		

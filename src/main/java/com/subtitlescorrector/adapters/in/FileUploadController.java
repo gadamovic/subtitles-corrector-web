@@ -15,12 +15,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
+import com.subtitlescorrector.core.domain.RequestValidatorStatus;
 import com.subtitlescorrector.core.domain.SubtitleConversionFileData;
 import com.subtitlescorrector.core.domain.SubtitleFileData;
+import com.subtitlescorrector.core.domain.exception.InvalidBusinessOperationException;
 import com.subtitlescorrector.core.port.EmailServicePort;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.port.StorageSystemPort;
-import com.subtitlescorrector.core.service.CloudStorageRateLimiter;
+import com.subtitlescorrector.core.service.RequestValidator;
+import com.subtitlescorrector.core.service.UploadFileEntryPoint;
 import com.subtitlescorrector.core.service.conversion.SubtitleConversionService;
 import com.subtitlescorrector.core.service.corrections.SubtitlesCorrectionService;
 import com.subtitlescorrector.core.util.Util;
@@ -40,66 +43,54 @@ public class FileUploadController {
 	ExternalCacheServicePort redisService;
 	
 	@Autowired
-	CloudStorageRateLimiter monitor;
+	RequestValidator validator;
 	
 	@Autowired
 	ApplicationProperties properties;
 	
 	@Autowired
-	EmailServicePort emailService;
-	
-	@Autowired
-	SubtitlesCorrectionService correctionService;
-	
-	@Autowired
-	SubtitleConversionService conversionService;
+	UploadFileEntryPoint uploadService;
 	
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
 	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		
 		String clientIp = request.getRemoteAddr();
 		
-		if(properties.isProdEnvironment() && !monitor.subtitleCorrectionAllowedForUser(clientIp)) {
-			SubtitleFileData data = new SubtitleFileData();
-			String message = "The limit for processed subtitle files has been reached for user: " + clientIp + ". Please try again later";
-			log.info(message);
-			data.setHttpResponseMessage(message);
-			return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(Util.subtitleFileDataToJson(data));
+		RequestValidatorStatus uploadRateCheck = validator.validateSubtitlesUploadRateLimit(clientIp);
+		RequestValidatorStatus fileSizeCheck = validator.validateFileSize(file);
+		
+		if(fileSizeCheck == RequestValidatorStatus.FILE_TOO_BIG) {
+			return getInvalidResponseEntity(HttpStatus.BAD_REQUEST, "Uploaded file is too big. Maximum allowed file size is: " + properties.getFileSizeUploadLimitKb() + "kb");
+		}
+		
+		if(properties.isProdEnvironment() && uploadRateCheck == RequestValidatorStatus.SUBTITLES_PROCESSED_LIMIT_EXCEEDED_FOR_IP) {
+			return getInvalidResponseEntity(HttpStatus.TOO_MANY_REQUESTS, "The limit for processed subtitle files has been reached for user: " + clientIp + ". Please try again later");
 		}else {
 			redisService.updateLastS3UploadTimestamp(clientIp);
 		}
 		
 		File storedFile = fileSystemStorageService.store(file);		
 		AdditionalData clientParameters = extractOptions(request);
+		clientParameters.setOriginalFilename(file.getOriginalFilename());
 		
-		emailService.sendEmailOnlyIfProduction("Ip: " + clientIp + "\nFilename: " + storedFile.getName(), properties.getAdminEmailAddress(),
-				"Somebody is uploading a subtitle for: " + clientParameters.getBusinessOperation().toString());
-
-		if (clientParameters.getBusinessOperation() != null) {
-			switch (clientParameters.getBusinessOperation()) {
-			case CORRECTION:
-				SubtitleFileData data = correctionService.applyCorrectionOperations(clientParameters, storedFile, request,
-						file.getOriginalFilename());
-				return ResponseEntity.ok(Util.subtitleFileDataToJson(data));
-			case CONVERSION:
-				SubtitleConversionFileData conversionData = conversionService.applyConversionOperations(clientParameters.getConversionParameters(), storedFile, request,
-						file.getOriginalFilename());
-				return ResponseEntity.ok(Util.subtitleConversionFileDataResponseToJson(Util.subtitleConversionFileDataToResponseObject(conversionData)));
-			default: 
-				return getInvalidResponseEntity();
-			}
-		}else {
-			return getInvalidResponseEntity();
+		String returnJson = "";
+		
+		try {
+			returnJson = uploadService.handleFileUpload(clientParameters, storedFile, request);
+			return ResponseEntity.ok(returnJson);
+		}catch(InvalidBusinessOperationException e) {
+			log.error("Invalid business operation!", e);
+			return getInvalidResponseEntity(HttpStatus.SERVICE_UNAVAILABLE, "Invalid business operation provided. Contact support for more information.");
 		}
 		
 	}
 
-	private ResponseEntity<String> getInvalidResponseEntity() {
+	private ResponseEntity<String> getInvalidResponseEntity(HttpStatus httpStatus, String message) {
 		SubtitleFileData data;
 		data = new SubtitleFileData();
-		data.setHttpResponseMessage("Invalid business operation provided. Contact support for more information.");
-		log.error("Invalid business operation!");
-		return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Util.subtitleFileDataToJson(data));
+		data.setHttpResponseMessage(message);
+		log.error(message);
+		return ResponseEntity.status(httpStatus).body(Util.subtitleFileDataToJson(data));
 	}
 
 	private AdditionalData extractOptions(HttpServletRequest request) {
@@ -117,7 +108,10 @@ public class FileUploadController {
 		params.setConvertEToCH(Boolean.parseBoolean(request.getParameter("EToCH")));
 		params.setAiEnabled(Boolean.parseBoolean(request.getParameter("aiEnabled")));
 		params.setBusinessOperation(request.getParameter("businessOperation"));
-		params.setUserId(request.getParameter("userId"));
+		params.setUserId(request.getParameter("webSocketUserId"));
+		
+		String webSocketSessionId = redisService.getWebSocketSessionIdForUser(request.getParameter("webSocketUserId"));
+		params.setWebSocketSessionId(webSocketSessionId);
 		
 		return params;
 	}

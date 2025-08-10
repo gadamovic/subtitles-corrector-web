@@ -9,18 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.subtitlescorrector.adapters.in.TestController;
 import com.subtitlescorrector.core.domain.ai.ChatResponse;
 import com.subtitlescorrector.core.port.AiServicePort;
-
-import reactor.core.publisher.Mono;
 
 @Service
 public class AiServiceAdapter implements AiServicePort {
 
 	private static final String GPT_4O_MINI_MODEL = "gpt-4o-mini";
+	private static final String GPT_4O_MODEL = "gpt-4o";
 
 	private static final String CHAT_COMPLETIONS_URI = "/chat/completions";
 
@@ -30,28 +26,45 @@ public class AiServiceAdapter implements AiServicePort {
 	WebClient openAiWebClient;
 	
 	@Override
-	public ChatResponse askOpenAi(String prompt) {
-	    String response = openAiWebClient.post()
-	        .uri(CHAT_COMPLETIONS_URI)
-	        .bodyValue(Map.of(
-	            "model", GPT_4O_MINI_MODEL,
-	            "temperature", 0,
-	            "messages", List.of(
-	                Map.of("role", "user", "content", prompt)
-	            )
-	        ))
-	        .retrieve()
-	        .bodyToMono(String.class).block();
-	    
-	    ObjectMapper mapper = new ObjectMapper();
-	    try {
-			ChatResponse chatResponse = mapper.readValue(response, ChatResponse.class);
-			return chatResponse;
-		} catch (JsonProcessingException e) {
-			log.error("Error deserializing json!\n" + response, e);
-			return null;
-		}
-	    
+	public ChatResponse askOpenAi(String system, String user) {
+		ChatResponse response = openAiWebClient.post()
+	            .uri(CHAT_COMPLETIONS_URI)
+	            .bodyValue(Map.of(
+	                    "model", GPT_4O_MINI_MODEL,
+	                    "temperature", 0.3,
+	                    "messages", List.of(
+	                        Map.of("role", "system", "content", system),
+	                        Map.of("role", "user", "content", user)
+	                    ),
+	                    "response_format", Map.of(
+	                        "type", "json_schema",
+	                        "json_schema", Map.of(
+	                            "name", "SubtitleCorrections",
+	                            "schema", Map.of(
+	                                "type", "object",
+	                                "properties", Map.of(
+	                                    "corrections", Map.of(
+	                                        "type", "array",
+	                                        "items", Map.of(
+	                                            "type", "object",
+	                                            "properties", Map.of(
+	                                                "number", Map.of("type", "string"),
+	                                                "correction", Map.of("type", "string"),
+	                                                "description", Map.of("type", "string")
+	                                            ),
+	                                            "required", List.of("number", "correction", "description")
+	                                        )
+	                                    )
+	                                ),
+	                                "required", List.of("corrections")
+	                            )
+	                        )
+	                    )
+	                ))
+	                .retrieve()
+	                .bodyToMono(ChatResponse.class)
+	                .block();
+	    return response;
 	}
 	
 }

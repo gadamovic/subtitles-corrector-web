@@ -29,6 +29,14 @@ public class SrtSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 		
 		lines = trimLines(lines);
 		
+		if (lines.get(0).startsWith("\uFEFF")) {
+			
+			// Remove BOM
+			String line = lines.get(0).substring(1);
+			lines.remove(0);
+			lines.add(0, line);
+		}
+		
 		List<SubtitleUnitData> dataList = new ArrayList<>();
 		SubtitleUnitData data = null;
 		int i = -1;
@@ -118,7 +126,7 @@ public class SrtSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 		}
 	}
 	
-	public List<String> convertToListOfStrings(List<SubtitleUnitData> lines){
+	public List<String> convertToListOfStrings(List<SubtitleUnitData> lines, boolean addBom){
 		
 		List<String> stringList = new ArrayList<String>(); 
 		
@@ -127,6 +135,10 @@ public class SrtSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 			stringList.add(getTimestampFrom(subtitle) + " --> " + getTimestampTo(subtitle));
 			stringList.add(subtitle.getText());
 			stringList.add("");
+		}
+		
+		if(addBom) {
+			stringList = Util.addBom(stringList);
 		}
 		
 		return stringList;

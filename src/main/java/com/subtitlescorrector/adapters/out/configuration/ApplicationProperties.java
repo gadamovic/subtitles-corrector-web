@@ -45,6 +45,7 @@ public class ApplicationProperties {
 	private static final String MAIL_SENDER_PROPERTIES_SMTP_SSL_TRUST_KEY = "mailSender.properties.mail.smtp.ssl.trust";
 
 	private static final String SUBTITLES_PER_USER_PER_TIME_INTERVAL_LIMIT_KEY = "subtitles.subtitles_per_user_per_time_interval_limit_key";
+	private static final String SUBTITLES_FILE_SIZE_PER_USER_KB_KEY = "subtitles.subtitles_file_size_per_user_kb_limit_key";
 	
 	public void init() {
 		
@@ -171,6 +172,10 @@ public class ApplicationProperties {
 
 	public Integer getSubtitlesPerUserPerTimeIntervalLimit() {
 		return Integer.parseInt(getProperty(SUBTITLES_PER_USER_PER_TIME_INTERVAL_LIMIT_KEY));
+	}
+
+	public double getFileSizeUploadLimitKb() {
+		return Integer.parseInt(getProperty(SUBTITLES_FILE_SIZE_PER_USER_KB_KEY));
 	}
 	
 }

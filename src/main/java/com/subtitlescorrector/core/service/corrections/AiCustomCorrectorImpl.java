@@ -26,6 +26,7 @@ import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.SubtitleFileData;
 import com.subtitlescorrector.core.domain.SubtitleUnitData;
 import com.subtitlescorrector.core.domain.ai.CorrectionResponse;
+import com.subtitlescorrector.core.domain.ai.CorrectionsWrapper;
 import com.subtitlescorrector.core.port.AiServicePort;
 import com.subtitlescorrector.core.service.websocket.WebSocketMessageSender;
 import com.subtitlescorrector.core.util.Util;
@@ -44,7 +45,7 @@ public class AiCustomCorrectorImpl implements AiCustomCorrector{
 
 	private static final String CORRECTION_AI_PROMPT_TXT_FILE_PATH = "openAiCorrectionPrompt.txt";
 
-	private static final int AI_PROCESSING_CHUNK_SIZE = 100;
+	private static final int AI_PROCESSING_CHUNK_SIZE = 70;
 
 	Logger log = LoggerFactory.getLogger(AiCustomCorrectorImpl.class);
 	
@@ -121,20 +122,17 @@ public class AiCustomCorrectorImpl implements AiCustomCorrector{
 			sb.append(subUnitData.getNumber()).append("\n").append(subUnitData.getText()).append("\n\n");
 		}
 		
+		String aiCorrectionResponseStr = ai.askOpenAi(promptTemplate, sb.toString()).getFirstChoiceMessage();
 		
-		String prompt = promptTemplate + "\n" + sb.toString();
-		
-		String aiCorrectionResponseStr = ai.askOpenAi(prompt).getFirstChoiceMessage();
-		
-		List<CorrectionResponse> aiCorrectionResponses = new ArrayList<>();
+		CorrectionsWrapper aiCorrectionsWrapper = new CorrectionsWrapper();
 		try {
-			aiCorrectionResponses = mapper.readValue(aiCorrectionResponseStr, new TypeReference<List<CorrectionResponse>>() {});
+			aiCorrectionsWrapper = mapper.readValue(aiCorrectionResponseStr, CorrectionsWrapper.class);
 		} catch (Exception e) {
 			log.error("Error deserializing json: " + aiCorrectionResponseStr, e);
 			return;
 		}
 		
-		Map<String, List<CorrectionResponse>> responsesByLineNumber = aiCorrectionResponses.stream()
+		Map<String, List<CorrectionResponse>> responsesByLineNumber = aiCorrectionsWrapper.getCorrections().stream()
 				.collect(Collectors.groupingBy(CorrectionResponse::getNumber));
 		
 		for(SubtitleUnitData subUnitData : entry.getValue()) {

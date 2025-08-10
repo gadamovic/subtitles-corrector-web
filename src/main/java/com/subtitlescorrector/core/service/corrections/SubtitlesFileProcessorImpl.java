@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
+import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.EditOperation;
 import com.subtitlescorrector.core.domain.SubtitleFileData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
@@ -65,7 +66,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	private static final Logger log = LoggerFactory.getLogger(SubtitlesFileProcessorImpl.class);
 	
 	@Override
-	public SubtitleFileData process(File storedFile, AdditionalData params) {
+	public SubtitleFileData process(File storedFile, List<String> lines, AdditionalData params, BomData bomData) {
 
 		SubtitleFileData data = new SubtitleFileData();
 		File correctedFile = new File(storedFile.getName());
@@ -77,10 +78,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			
 			Charset detectedEncoding = FileUtil.detectEncodingOfFile(storedFile);
 			
-			List<String> lines = FileUtil.loadTextFile(storedFile);
-			
-			handleBOM(params, data, lines, params.getWebSocketSessionId());
-			populateSubtitleFileData(params, data, correctedFile, detectedEncoding, lines);
+			populateSubtitleFileData(params, data, correctedFile, detectedEncoding, lines, bomData);
 			
 			//preprocessors are not considered as subtitle corrections. Corrections will be reported in <AppliedChanges> section, but not in the editor's content
 			//this are preparations of the content of the uploaded file. For example we don't want to keep any non-srt-relevant HTML
@@ -116,8 +114,6 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 
 			sendProcessingFinishedMessage(params.getWebSocketSessionId());
 			
-			FileUtil.writeLinesToFile(correctedFile, converterFactory.getConverter(data.getFormat()).convertToListOfStrings(data.getLines()), StandardCharsets.UTF_8);
-
 		}catch (Exception e) {
 			log.error("Error processing file!", e);
 		} finally {
@@ -128,42 +124,13 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	}
 
 	private void populateSubtitleFileData(AdditionalData params, SubtitleFileData data, File correctedFile,
-			Charset detectedEncoding, List<String> lines) {
+			Charset detectedEncoding, List<String> lines, BomData bomData) {
 		SubtitleFormat format = Util.detectSubtitleFormat(lines);
 		data.setFormat(format);
 		data.setDetectedCharset(detectedEncoding);
 		data.setFilename(correctedFile.getName());
 		data.setLines(converterFactory.getConverter(format).convertToSubtitleUnits(lines));
-	}
-
-	private void handleBOM(AdditionalData params, SubtitleFileData data, List<String> lines, String webSocketSessionId) {
-
-		if (lines.get(0).startsWith("\uFEFF")) {
-			
-			// Remove BOM
-			String line = lines.get(0).substring(1);
-			lines.remove(0);
-			lines.add(0, line);
-			
-			data.setHasBom(true);
-			if(params.getKeepBOM()) {
-				data.setKeepBom(true);
-			}else {
-				data.setKeepBom(false);
-				sendBOMRemovedMessage(webSocketSessionId);
-			}
-		} else {
-			data.setHasBom(false);
-			data.setKeepBom(false);
-		}
-
-	}
-
-	private void sendBOMRemovedMessage(String webSocketSessionId) {
-		SubtitleCorrectionEvent bomRemoved = new SubtitleCorrectionEvent();
-		bomRemoved.setCorrection("Removed BOM");
-		bomRemoved.setWebSocketSessionId(webSocketSessionId);
-		webSocketMessageSender.sendMessage(bomRemoved);
+		data.setBomData(bomData);
 	}
 
 	private void calculateEditOperationsAfterCorrections(SubtitleFileData data) {

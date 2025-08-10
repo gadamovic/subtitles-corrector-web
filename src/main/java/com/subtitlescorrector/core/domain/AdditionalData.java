@@ -18,17 +18,13 @@ public class AdditionalData {
 	private Boolean EToCH;
 	
 	private Boolean aiEnabled;
-
 	private int numberOfCorrectors;
-	
 	int processedLines = 0;
 	int totalNumberOfLines = 0;
-
 	private BusinessOperation businessOperation;
-	
 	private SubtitleFormat targetConversionFormat;
-	
 	private String userId;
+	private String originalFilename;
 	
 	public String getWebSocketSessionId() {
 		return webSocketSessionId;
@@ -185,6 +181,7 @@ public class AdditionalData {
 		ConversionParameters parameters = new ConversionParameters();
 		parameters.setTargetFormat(targetConversionFormat);
 		parameters.setUserId(userId);
+		parameters.setOriginalFilename(originalFilename);
 		
 		return parameters;
 	}
@@ -196,6 +193,12 @@ public class AdditionalData {
 	public String getUserId() {
 		return userId;
 	}
-	
-	
+
+	public String getOriginalFilename() {
+		return originalFilename;
+	}
+
+	public void setOriginalFilename(String originalFilename) {
+		this.originalFilename = originalFilename;
+	}
 }

@@ -166,7 +166,7 @@ export default {
 
             formData.append("businessOperation", "conversion");
             formData.append("file", this.file);
-            formData.append("userId", this.userId);
+            formData.append("webSocketUserId", this.userId);
             formData.append("targetFormat", this.targetFormat);
 
             try {

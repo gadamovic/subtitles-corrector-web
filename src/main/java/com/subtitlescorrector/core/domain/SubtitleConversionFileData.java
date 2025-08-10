@@ -17,6 +17,9 @@ public class SubtitleConversionFileData implements Serializable{
 	private SubtitleFormat targetFormat;
 	
 	private String detectedEncoding;
+	
+	private BomData bomData;
+
 
 	public String getFilename() {
 		return filename;
@@ -61,8 +64,13 @@ public class SubtitleConversionFileData implements Serializable{
 	public void setDetectedEncoding(String detectedEncoding) {
 		this.detectedEncoding = detectedEncoding;
 	}
-	
 
-	
+	public BomData getBomData() {
+		return bomData;
+	}
+
+	public void setBomData(BomData bomData) {
+		this.bomData = bomData;
+	}
 	
 }

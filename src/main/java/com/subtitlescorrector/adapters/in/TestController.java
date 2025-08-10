@@ -20,7 +20,7 @@ public class TestController {
 	
 	@RequestMapping(path = "/ai/test")
 	public void testAI() {
-		ChatResponse response = aiService.askOpenAi("This is api test.");
+		ChatResponse response = aiService.askOpenAi("This is api test.", "This is api test.");
 		log.info(response.getFirstChoiceMessage());
 	}
 	

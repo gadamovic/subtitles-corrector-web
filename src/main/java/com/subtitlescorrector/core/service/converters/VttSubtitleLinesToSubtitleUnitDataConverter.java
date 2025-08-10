@@ -120,7 +120,7 @@ public class VttSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 		}
 	}
 	
-	public List<String> convertToListOfStrings(List<SubtitleUnitData> lines){
+	public List<String> convertToListOfStrings(List<SubtitleUnitData> lines, boolean addBom){
 		
 		List<String> stringList = new ArrayList<String>(); 
 		

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.adapters.in.SaveSubtitleController;
+import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.ConversionParameters;
 import com.subtitlescorrector.core.domain.SubtitleConversionFileData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
@@ -33,25 +34,23 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 	Logger log = LoggerFactory.getLogger(SubtitleConversionServiceImpl.class);
 	
 	@Override
-	public SubtitleConversionFileData applyConversionOperations(ConversionParameters conversionParameters, File uploadedFile,
-			HttpServletRequest request, String originalFilename) {
+	public SubtitleConversionFileData applyConversionOperations(ConversionParameters conversionParameters, File uploadedFile, List<String> lines, BomData bomData) {
 		
 		log.info("Converting a file");
 		
-		MDC.put("subtitle_name", originalFilename);
+		MDC.put("subtitle_name", conversionParameters.getOriginalFilename());
 		log.info("Uploading file for conversion...");
 		MDC.remove("subtitle_name");
-		
-		List<String> lines = FileUtil.loadTextFile(uploadedFile);
 		
 		Charset detectedEncoding = FileUtil.detectEncodingOfFile(uploadedFile);
 		
 		SubtitleFormat sourceFormat = Util.detectSubtitleFormat(lines);
 		
 		SubtitleConversionFileData conversionFileData = new SubtitleConversionFileData();
-		conversionFileData.setFilename(originalFilename);
+		conversionFileData.setFilename(conversionParameters.getOriginalFilename());
 		conversionFileData.setSourceFormat(sourceFormat);
 		conversionFileData.setDetectedEncoding(detectedEncoding.displayName());
+		conversionFileData.setBomData(bomData);
 		
 		conversionFileData.setLines(converterFactory.getConverter(sourceFormat).convertToSubtitleUnits(lines));
 		redisService.addUserSubtitleConversionData(conversionFileData, conversionParameters.getUserId());

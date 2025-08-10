@@ -4,6 +4,6 @@ import com.subtitlescorrector.core.domain.ai.ChatResponse;
 
 public interface AiServicePort {
 
-	ChatResponse askOpenAi(String prompt);
+	ChatResponse askOpenAi(String system, String user);
 
 }
