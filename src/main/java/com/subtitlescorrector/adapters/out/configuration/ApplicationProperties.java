@@ -174,7 +174,7 @@ public class ApplicationProperties {
 		return Integer.parseInt(getProperty(SUBTITLES_PER_USER_PER_TIME_INTERVAL_LIMIT_KEY));
 	}
 
-	public double getFileSizeUploadLimitKb() {
+	public Integer getFileSizeUploadLimitKb() {
 		return Integer.parseInt(getProperty(SUBTITLES_FILE_SIZE_PER_USER_KB_KEY));
 	}
 	

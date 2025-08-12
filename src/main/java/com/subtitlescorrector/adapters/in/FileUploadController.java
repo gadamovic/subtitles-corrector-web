@@ -60,7 +60,7 @@ public class FileUploadController {
 		RequestValidatorStatus fileSizeCheck = validator.validateFileSize(file);
 		
 		if(fileSizeCheck == RequestValidatorStatus.FILE_TOO_BIG) {
-			return getInvalidResponseEntity(HttpStatus.BAD_REQUEST, "Uploaded file is too big. Maximum allowed file size is: " + properties.getFileSizeUploadLimitKb() + "kb");
+			return getInvalidResponseEntity(HttpStatus.PAYLOAD_TOO_LARGE, "Uploaded file is too big. Maximum allowed file size is: " + properties.getFileSizeUploadLimitKb() + "kb");
 		}
 		
 		if(properties.isProdEnvironment() && uploadRateCheck == RequestValidatorStatus.SUBTITLES_PROCESSED_LIMIT_EXCEEDED_FOR_IP) {
