@@ -16,9 +16,11 @@ import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.EditOperation;
+import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
 import com.subtitlescorrector.core.domain.SubtitleFileData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.SubtitleUnitData;
+import com.subtitlescorrector.core.domain.UserData;
 import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
 import com.subtitlescorrector.core.service.EditDistanceService;
 import com.subtitlescorrector.core.service.converters.SubtitlesConverterFactory;
@@ -27,7 +29,7 @@ import com.subtitlescorrector.core.service.preprocessing.PreProcessorsManager;
 import com.subtitlescorrector.core.service.websocket.WebSocketMessageSender;
 import com.subtitlescorrector.core.util.FileUtil;
 import com.subtitlescorrector.core.util.Util;
-import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
+
 
 @Component
 public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
@@ -57,7 +59,10 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 
 	@Autowired
 	private SubtitlesConverterFactory converterFactory;
-
+	
+	@Autowired
+	UserData user;
+	
 	@Autowired
 	public void setS3Service(SubtitlesCloudStoragePort s3Service) {
 		this.s3Service = s3Service;
@@ -73,7 +78,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 
 		try {
 			
-			String s3Key = params.getWebSocketSessionId() + "_" + storedFile.getName();
+			String s3Key = user.getWebSocketSessionId() + "_" + storedFile.getName();
 			s3Service.storeIfProd("v1_" + s3Key, storedFile);
 			
 			Charset detectedEncoding = FileUtil.detectEncodingOfFile(storedFile);
@@ -84,7 +89,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			//this are preparations of the content of the uploaded file. For example we don't want to keep any non-srt-relevant HTML
 			//because of security and show it in the editor (either as text before correction or after correction) where html is not escaped
 			for (PreProcessor preProcessor : preProcessorsManager.getPreProcessors()) {
-				data = preProcessor.process(data, params);
+				data = preProcessor.process(data);
 			}
 			
 			data.getLines().forEach(line -> line.setTextBeforeCorrection(line.getText()));
@@ -103,7 +108,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			}
 			
 			if (detectedEncoding != StandardCharsets.UTF_8) {
-				sendUpdatedEncodingLogMessage(storedFile, params.getWebSocketSessionId(), detectedEncoding);
+				sendUpdatedEncodingLogMessage(storedFile, detectedEncoding);
 			}
 			
 			if (params.getAiEnabled()) {
@@ -112,7 +117,7 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			
 			calculateEditOperationsAfterCorrections(data);
 
-			sendProcessingFinishedMessage(params.getWebSocketSessionId());
+			sendProcessingFinishedMessage();
 			
 		}catch (Exception e) {
 			log.error("Error processing file!", e);
@@ -123,12 +128,12 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		return data;
 	}
 
-	private void populateSubtitleFileData(AdditionalData params, SubtitleFileData data, File correctedFile,
+	private void populateSubtitleFileData(AdditionalData params, SubtitleFileData data, File subtitleFile,
 			Charset detectedEncoding, List<String> lines, BomData bomData) {
 		SubtitleFormat format = Util.detectSubtitleFormat(lines);
 		data.setFormat(format);
 		data.setDetectedCharset(detectedEncoding);
-		data.setFilename(correctedFile.getName());
+		data.setFilename(subtitleFile.getName());
 		data.setLines(converterFactory.getConverter(format).convertToSubtitleUnits(lines));
 		data.setBomData(bomData);
 	}
@@ -162,16 +167,15 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		}
 	}
 
-	private void sendUpdatedEncodingLogMessage(File storedFile, String webSocketSessionId, Charset detectedEncoding) {
+	private void sendUpdatedEncodingLogMessage(File storedFile, Charset detectedEncoding) {
 		log.info("Updated encoding of: {} to UTF-8!", storedFile.getName());
 
 		SubtitleCorrectionEvent encodingUpdate = new SubtitleCorrectionEvent();
 		encodingUpdate.setCorrection("Encoding updated: " + detectedEncoding + " -> UTF-8");
-		encodingUpdate.setWebSocketSessionId(webSocketSessionId);
 		webSocketMessageSender.sendMessage(encodingUpdate);
 	}
 
-	private void sendProcessingFinishedMessage(String webSocketSessionId) {
+	private void sendProcessingFinishedMessage() {
 		
 		//wait a bit to be sure that this is the last progress update message
 		try {
@@ -179,7 +183,6 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		} catch (InterruptedException e) {}
 		
 		SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
-		event.setWebSocketSessionId(webSocketSessionId);
 		event.setProcessedPercentage("100");
 		webSocketMessageSender.sendMessage(event);
 

@@ -2,7 +2,9 @@ package com.subtitlescorrector.core.port;
 
 import java.util.List;
 
-import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
+import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
+
+
 
 public interface SubtitleCorrectionEventConsumerPort {
 

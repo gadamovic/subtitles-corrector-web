@@ -5,6 +5,6 @@ import com.subtitlescorrector.core.domain.SubtitleFileData;
 
 public interface PreProcessor {
 
-	SubtitleFileData process(SubtitleFileData data, AdditionalData params);
+	SubtitleFileData process(SubtitleFileData data);
 	
 }

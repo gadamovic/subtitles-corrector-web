@@ -26,9 +26,10 @@ import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 
 import org.apache.kafka.common.serialization.StringDeserializer;
 
+import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
 import com.subtitlescorrector.core.domain.VariablesEnum;
 import com.subtitlescorrector.core.util.Constants;
-import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
+
 
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;

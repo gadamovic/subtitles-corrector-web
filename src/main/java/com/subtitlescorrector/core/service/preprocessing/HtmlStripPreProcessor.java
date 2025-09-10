@@ -13,12 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
-import com.subtitlescorrector.core.domain.AdditionalData;
+import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
 import com.subtitlescorrector.core.domain.SubtitleFileData;
 import com.subtitlescorrector.core.domain.SubtitleUnitData;
 import com.subtitlescorrector.core.service.websocket.WebSocketMessageSender;
 import com.subtitlescorrector.core.util.Util;
-import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
+
 
 @Service
 public class HtmlStripPreProcessor implements PreProcessor{
@@ -28,9 +28,6 @@ public class HtmlStripPreProcessor implements PreProcessor{
 	@Autowired
 	Util util;
 	
-//	@Autowired
-//	KafkaTemplate<Void, SubtitleCorrectionEvent> kafkaTemplate;
-	
 	@Autowired
 	ApplicationProperties properties;
 	
@@ -38,7 +35,7 @@ public class HtmlStripPreProcessor implements PreProcessor{
 	WebSocketMessageSender webSocketMessageSender;
 	
 	@Override
-	public SubtitleFileData process(SubtitleFileData data, AdditionalData params) {
+	public SubtitleFileData process(SubtitleFileData data) {
 		
 		Safelist safeList = new Safelist();
 		safeList.addTags("b", "br", "i", "font")
@@ -66,10 +63,8 @@ public class HtmlStripPreProcessor implements PreProcessor{
 					event.setEventTimestamp(Instant.now());
 
 					event.setProcessedPercentage("0");
-					event.setWebSocketSessionId(params.getWebSocketSessionId());
 					
 					if(properties.getSubtitlesRealTimeUpdatesEnabled()) {
-						//kafkaTemplate.send(Constants.SUBTITLES_CORRECTIONS_TOPIC_NAME, event);
 						webSocketMessageSender.sendMessage(event);
 					}
 					

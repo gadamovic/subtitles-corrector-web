@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.SubtitleUnitData;
-import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
+
 
 @Service
 public class HtmlTagsCorrector extends AbstractCorrector{
@@ -20,8 +20,6 @@ public class HtmlTagsCorrector extends AbstractCorrector{
 
 	@Override
 	public void correct(SubtitleUnitData subUnitData, AdditionalData params, float processedPercentage) {
-				
-		String webSocketSessionId = params.getWebSocketSessionId();
 
 		Safelist safeList = new Safelist();
 		
@@ -44,28 +42,28 @@ public class HtmlTagsCorrector extends AbstractCorrector{
 			safeList.removeTags("b");
 			
 			tmp = Jsoup.clean(beforeCorrection, "", safeList, outputSettings);
-			beforeCorrection = checkForChanges(tmp, beforeCorrection, "Removed <b> tag", processedPercentage, webSocketSessionId);
+			beforeCorrection = checkForChanges(tmp, beforeCorrection, "Removed <b> tag", processedPercentage);
 		}
 		
 		if(params.getStripITags()) {
 			safeList.removeTags("i");
 			
 			tmp = Jsoup.clean(beforeCorrection, "", safeList, outputSettings);
-			beforeCorrection = checkForChanges(tmp, beforeCorrection, "Removed <i> tag", processedPercentage, webSocketSessionId);
+			beforeCorrection = checkForChanges(tmp, beforeCorrection, "Removed <i> tag", processedPercentage);
 		}
 		
 		if(params.getStripUTags()) {
 			safeList.removeTags("u");
 			
 			tmp = Jsoup.clean(beforeCorrection, "", safeList, outputSettings);
-			beforeCorrection = checkForChanges(tmp, beforeCorrection, "Removed <u> tag", processedPercentage, webSocketSessionId);
+			beforeCorrection = checkForChanges(tmp, beforeCorrection, "Removed <u> tag", processedPercentage);
 		}
 		
 		if(params.getStripFontTags()) {
 			safeList.removeTags("font");
 			
 			tmp = Jsoup.clean(beforeCorrection, "", safeList, outputSettings);
-			beforeCorrection = checkForChanges(tmp, beforeCorrection, "Removed <font> tag", processedPercentage, webSocketSessionId);
+			beforeCorrection = checkForChanges(tmp, beforeCorrection, "Removed <font> tag", processedPercentage);
 		}
 		
 		

@@ -108,10 +108,6 @@ public class FileUploadController {
 		params.setConvertEToCH(Boolean.parseBoolean(request.getParameter("EToCH")));
 		params.setAiEnabled(Boolean.parseBoolean(request.getParameter("aiEnabled")));
 		params.setBusinessOperation(request.getParameter("businessOperation"));
-		params.setUserId(request.getParameter("webSocketUserId"));
-		
-		String webSocketSessionId = redisService.getWebSocketSessionIdForUser(request.getParameter("webSocketUserId"));
-		params.setWebSocketSessionId(webSocketSessionId);
 		
 		return params;
 	}

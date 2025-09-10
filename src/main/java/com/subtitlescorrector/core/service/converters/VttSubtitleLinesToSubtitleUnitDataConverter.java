@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.core.domain.AdditionalData;
+import com.subtitlescorrector.core.domain.SecondMillisecondDelimiterRegex;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.SubtitleTimestamp;
 import com.subtitlescorrector.core.domain.SubtitleUnitData;
@@ -49,8 +50,8 @@ public class VttSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 				String from = (line.substring(0, line.indexOf("-->") - 1));
 				String to = line.substring((line.lastIndexOf(" ") + 1), line.length());
 				
-				SubtitleTimestamp tsFrom = Util.parseSubtitleTimestampString(from, "\\.");
-				SubtitleTimestamp tsTo = Util.parseSubtitleTimestampString(to, "\\.");
+				SubtitleTimestamp tsFrom = util.parseSubtitleTimestampString(from, SecondMillisecondDelimiterRegex.DOT);
+				SubtitleTimestamp tsTo = util.parseSubtitleTimestampString(to, SecondMillisecondDelimiterRegex.DOT);
 				
 				tsFrom.setFormattedTimestamp(Util.formatTimestamp(tsFrom, "."));
 				tsTo.setFormattedTimestamp(Util.formatTimestamp(tsTo, "."));

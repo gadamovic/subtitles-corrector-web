@@ -1,6 +1,6 @@
 package com.subtitlescorrector.core.service.websocket;
 
-import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
+import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
 
 public interface WebSocketMessageSender {
 

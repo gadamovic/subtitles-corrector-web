@@ -13,6 +13,9 @@ public class SubtitlesConverterFactory {
 
 	@Autowired
 	VttSubtitleLinesToSubtitleUnitDataConverter vttConverter;
+	
+	@Autowired
+	AssSubtitleLinesToSubtitleUnitDataConverter assConverter;
 
 	public SubtitleLinesToSubtitleUnitDataConverter getConverter(SubtitleFormat format) {
 		switch (format) {
@@ -20,6 +23,8 @@ public class SubtitlesConverterFactory {
 			return srtConverter;
 		case VTT:
 			return vttConverter;
+		case ASS:
+			return assConverter;
 		default:
 			return null;
 		}

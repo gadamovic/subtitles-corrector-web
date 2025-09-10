@@ -24,7 +24,7 @@
     <label class="label has-text-white has-text-centered title is-5">Upload a subtitle file:</label> <br />
     <div class="file has-name is-fullwidth field mb-3">
       <label class="file-label">
-        <input class="file-input" type="file" name="file" accept=".srt, .vtt" @change="handleFileChange" />
+        <input class="file-input" type="file" name="file" :accept=this.supportedFileFormatsStore.supportedFileFormats @change="handleFileChange" />
         <span class="file-cta">
           <span class="file-icon">
             <i class="fas fa-upload"></i>

@@ -12,7 +12,7 @@
                     <br />
                     <div class="file has-name is-fullwidth field mb-3">
                         <label class="file-label">
-                            <input class="file-input" type="file" name="file" accept=".srt, .vtt"
+                            <input class="file-input" type="file" name="file" :accept="this.supportedFileFormatsStore.supportedFileFormats"
                                 @change="handleFileChange" />
                             <span class="file-cta">
                                 <span class="file-icon">
@@ -50,7 +50,7 @@
                             <div class="field">
                                 <label class="radio">
                                     <input type="radio" v-model="targetFormat" value="SRT" />
-                                    Srt
+                                    srt
                                 </label>
                             </div>
 
@@ -58,6 +58,14 @@
                                 <label class="radio">
                                     <input type="radio" v-model="targetFormat" value="VTT" />
                                     VTT
+                                </label>
+                            </div>
+
+                            
+                            <div class="field">
+                                <label class="radio">
+                                    <input type="radio" v-model="targetFormat" value="ASS" />
+                                    ass
                                 </label>
                             </div>
                         </div>

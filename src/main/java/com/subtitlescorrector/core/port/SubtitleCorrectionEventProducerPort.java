@@ -4,7 +4,9 @@ import java.util.concurrent.Future;
 
 import org.apache.kafka.clients.producer.RecordMetadata;
 
-import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
+import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
+
+
 
 public interface SubtitleCorrectionEventProducerPort {
 

@@ -10,13 +10,12 @@ import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.SubtitleFileData;
+import com.subtitlescorrector.core.domain.UserData;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Service that encapsulates general subtitle file correction operations. It is meant to decouple multiple
- * business capabilities that are supported in the application (currently correctors and convertsions)
+ * business capabilities that are supported in the application (currently correctors and conversions)
  * @author Gavrilo Adamovic
  *
  */
@@ -32,11 +31,14 @@ public class SubtitlesCorrectionServiceImpl implements SubtitlesCorrectionServic
 	@Autowired
 	ApplicationProperties properties;
 	
+	@Autowired
+	UserData user;
+	
 	public SubtitleFileData applyCorrectionOperations(AdditionalData clientParameters, File uploadedFile, List<String> lines, BomData bomData) {
 
 		SubtitleFileData data = processor.process(uploadedFile, lines, clientParameters, bomData);
 		//save uploaded and server-corrected version as the first version
-		redisService.addUserSubtitleCurrentVersion(data, clientParameters.getUserId());
+		redisService.addUserSubtitleCurrentVersion(data, user.getUserId());
 		
 		return data;
 		

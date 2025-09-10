@@ -20,9 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.subtitlescorrector.core.domain.AdditionalData;
+import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
 import com.subtitlescorrector.core.domain.SubtitleFileData;
 import com.subtitlescorrector.core.domain.SubtitleUnitData;
 import com.subtitlescorrector.core.domain.ai.CorrectionResponse;
@@ -30,7 +30,6 @@ import com.subtitlescorrector.core.domain.ai.CorrectionsWrapper;
 import com.subtitlescorrector.core.port.AiServicePort;
 import com.subtitlescorrector.core.service.websocket.WebSocketMessageSender;
 import com.subtitlescorrector.core.util.Util;
-import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
 
 import jakarta.annotation.PostConstruct;
 
@@ -71,15 +70,14 @@ public class AiCustomCorrectorImpl implements AiCustomCorrector{
 		
 		ObjectMapper mapper = new ObjectMapper();
 
-		String webSocketSessionId = params.getWebSocketSessionId();
-		webSocketMessageSender.sendMessage(createAiProcessingStartedEvent(webSocketSessionId));
+		webSocketMessageSender.sendMessage(createAiProcessingStartedEvent());
 		Map<Integer, List<SubtitleUnitData>> partitioned = partitionSubUnits(data.getLines(), AI_PROCESSING_CHUNK_SIZE);
 		
 		List<Future<?>> futures = new ArrayList<>();
 		
 		for(Map.Entry<Integer, List<SubtitleUnitData>> entry : partitioned.entrySet()) {
 			
-			Future<?> f = executorService.submit(() -> processOneChunk(mapper, webSocketSessionId, entry));
+			Future<?> f = executorService.submit(() -> processOneChunk(mapper, entry));
 			futures.add(f);
 				
 		}
@@ -90,7 +88,7 @@ public class AiCustomCorrectorImpl implements AiCustomCorrector{
 			} catch (Exception e) {}
 		});
 		
-		webSocketMessageSender.sendMessage(createAiProcessingEndedEvent(webSocketSessionId));
+		webSocketMessageSender.sendMessage(createAiProcessingEndedEvent());
 		
 		logAICorrectorFinished(data, start);
 		
@@ -99,11 +97,10 @@ public class AiCustomCorrectorImpl implements AiCustomCorrector{
 
 	/**
 	 * after sending same event for the second time, FE will know ai processing is completed
-	 * @param webSocketSessionId
 	 * @return
 	 */
-	private SubtitleCorrectionEvent createAiProcessingEndedEvent(String webSocketSessionId) {
-		return createAiProcessingStartedEvent(webSocketSessionId);
+	private SubtitleCorrectionEvent createAiProcessingEndedEvent() {
+		return createAiProcessingStartedEvent();
 	}
 
 	private void logAICorrectorFinished(SubtitleFileData data, Long start) {
@@ -114,8 +111,7 @@ public class AiCustomCorrectorImpl implements AiCustomCorrector{
 		MDC.remove("subtitle_name");
 	}
 
-	private void processOneChunk(ObjectMapper mapper, String webSocketSessionId,
-			Map.Entry<Integer, List<SubtitleUnitData>> entry) {
+	private void processOneChunk(ObjectMapper mapper, Map.Entry<Integer, List<SubtitleUnitData>> entry) {
 		
 		StringBuilder sb = new StringBuilder();
 		for(SubtitleUnitData subUnitData : entry.getValue()) {
@@ -144,7 +140,7 @@ public class AiCustomCorrectorImpl implements AiCustomCorrector{
 					responsesByLineNumber.get(number).get(0) : null;
 			
 			if(resp != null && !resp.getDescription().equals("-1")) {
-				line = util.checkForChanges(resp.getCorrection(), line, resp.getDescription(), 100, webSocketSessionId);
+				line = util.checkForChanges(resp.getCorrection(), line, resp.getDescription(), 100);
 			}
 			
 			subUnitData.setText(line);
@@ -160,13 +156,11 @@ public class AiCustomCorrectorImpl implements AiCustomCorrector{
 		
 	}
 
-	private SubtitleCorrectionEvent createAiProcessingStartedEvent(String webSocketSessionId) {
+	private SubtitleCorrectionEvent createAiProcessingStartedEvent() {
 		
 		SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
 		event.setCorrection("ai-processing-started");
 		event.setEventTimestamp(Instant.now());
-
-		event.setWebSocketSessionId(webSocketSessionId);
 		
 		return event;
 	}

@@ -2,7 +2,6 @@ package com.subtitlescorrector.core.domain;
 
 public class AdditionalData {
 
-	private String webSocketSessionId;
 	private Boolean stripBTags;
 	private Boolean stripITags;
 	private Boolean stripUTags;
@@ -23,17 +22,8 @@ public class AdditionalData {
 	int totalNumberOfLines = 0;
 	private BusinessOperation businessOperation;
 	private SubtitleFormat targetConversionFormat;
-	private String userId;
 	private String originalFilename;
 	
-	public String getWebSocketSessionId() {
-		return webSocketSessionId;
-	}
-
-	public void setWebSocketSessionId(String webSocketSessionId) {
-		this.webSocketSessionId = webSocketSessionId;
-	}
-
 	public Boolean getStripBTags() {
 		return stripBTags;
 	}
@@ -180,18 +170,9 @@ public class AdditionalData {
 		
 		ConversionParameters parameters = new ConversionParameters();
 		parameters.setTargetFormat(targetConversionFormat);
-		parameters.setUserId(userId);
 		parameters.setOriginalFilename(originalFilename);
 		
 		return parameters;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-
-	public String getUserId() {
-		return userId;
 	}
 
 	public String getOriginalFilename() {

@@ -33,7 +33,7 @@ import com.subtitlescorrector.core.service.corrections.SubtitlesFileProcessorImp
 import com.subtitlescorrector.core.util.Constants;
 import com.subtitlescorrector.core.util.FileUtil;
 import com.subtitlescorrector.core.util.Util;
-import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
+
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

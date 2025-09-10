@@ -10,7 +10,7 @@ import com.subtitlescorrector.core.domain.SubtitleUnitData;
 public class BrTagPreProcessor implements PreProcessor{
 
 	@Override
-	public SubtitleFileData process(SubtitleFileData data, AdditionalData params) {
+	public SubtitleFileData process(SubtitleFileData data) {
 		
 		for(SubtitleUnitData subUnitData : data.getLines()) {
 			

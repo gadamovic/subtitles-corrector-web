@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.core.domain.AdditionalData;
+import com.subtitlescorrector.core.domain.SecondMillisecondDelimiterRegex;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.SubtitleTimestamp;
 import com.subtitlescorrector.core.domain.SubtitleUnitData;
@@ -29,12 +30,18 @@ public class SrtSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 		
 		lines = trimLines(lines);
 		
-		if (lines.get(0).startsWith("\uFEFF")) {
-			
+		//there can be multiple BOMs
+		int b=0;
+		while (lines.get(0).startsWith("\uFEFF")) {
+			b++;
 			// Remove BOM
 			String line = lines.get(0).substring(1);
 			lines.remove(0);
 			lines.add(0, line);
+		}
+		
+		if(b > 1) {
+			log.info("There was more then one ({}) BOM in the file", b);
 		}
 		
 		List<SubtitleUnitData> dataList = new ArrayList<>();
@@ -44,6 +51,7 @@ public class SrtSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 		for(String line : lines) {
 			
 			//ignore multiple consecutive blank lines
+			//TODO: should also handle the case with random blank lines across the file
 			i++;
 			if(StringUtils.isBlank(line) && (i < lines.size()) && StringUtils.isBlank(lines.get(i + 1))) {
 				continue;
@@ -61,8 +69,8 @@ public class SrtSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 				String from = (line.substring(0, line.indexOf("-->") - 1));
 				String to = line.substring((line.lastIndexOf(" ") + 1), line.length());
 				
-				SubtitleTimestamp tsFrom = Util.parseSubtitleTimestampString(from, ",");
-				SubtitleTimestamp tsTo = Util.parseSubtitleTimestampString(to, ",");
+				SubtitleTimestamp tsFrom = util.parseSubtitleTimestampString(from, SecondMillisecondDelimiterRegex.COMMA);
+				SubtitleTimestamp tsTo = util.parseSubtitleTimestampString(to, SecondMillisecondDelimiterRegex.COMMA);
 				
 				tsFrom.setFormattedTimestamp(Util.formatTimestamp(tsFrom, ","));
 				tsTo.setFormattedTimestamp(Util.formatTimestamp(tsTo, ","));

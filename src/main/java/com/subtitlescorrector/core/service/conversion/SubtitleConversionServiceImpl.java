@@ -15,6 +15,7 @@ import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.ConversionParameters;
 import com.subtitlescorrector.core.domain.SubtitleConversionFileData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
+import com.subtitlescorrector.core.domain.UserData;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.service.converters.SubtitlesConverterFactory;
 import com.subtitlescorrector.core.util.FileUtil;
@@ -30,6 +31,9 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 	
 	@Autowired
 	ExternalCacheServicePort redisService;
+	
+	@Autowired
+	UserData user;
 	
 	Logger log = LoggerFactory.getLogger(SubtitleConversionServiceImpl.class);
 	
@@ -53,7 +57,7 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 		conversionFileData.setBomData(bomData);
 		
 		conversionFileData.setLines(converterFactory.getConverter(sourceFormat).convertToSubtitleUnits(lines));
-		redisService.addUserSubtitleConversionData(conversionFileData, conversionParameters.getUserId());
+		redisService.addUserSubtitleConversionData(conversionFileData, user.getUserId());
 		
 		return conversionFileData;
 	}

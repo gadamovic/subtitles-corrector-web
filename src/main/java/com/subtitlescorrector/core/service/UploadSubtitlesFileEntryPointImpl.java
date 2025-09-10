@@ -10,8 +10,10 @@ import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.BusinessOperation;
 import com.subtitlescorrector.core.domain.SubtitleConversionFileData;
+import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
 import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.SubtitleFileData;
+import com.subtitlescorrector.core.domain.UserData;
 import com.subtitlescorrector.core.domain.exception.InvalidBusinessOperationException;
 import com.subtitlescorrector.core.port.EmailServicePort;
 import com.subtitlescorrector.core.service.conversion.SubtitleConversionService;
@@ -19,7 +21,7 @@ import com.subtitlescorrector.core.service.corrections.SubtitlesCorrectionServic
 import com.subtitlescorrector.core.service.websocket.WebSocketMessageSender;
 import com.subtitlescorrector.core.util.FileUtil;
 import com.subtitlescorrector.core.util.Util;
-import com.subtitlescorrector.generated.avro.SubtitleCorrectionEvent;
+
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -55,7 +57,7 @@ public class UploadSubtitlesFileEntryPointImpl implements UploadFileEntryPoint {
 		
 		BomData bomData = new BomData();
 		
-		handleBOM(params, bomData, lines, params.getWebSocketSessionId());
+		handleBOM(params, bomData, lines);
 		
 		if (params.getBusinessOperation() != null) {
 			switch (params.getBusinessOperation()) {
@@ -80,9 +82,8 @@ public class UploadSubtitlesFileEntryPointImpl implements UploadFileEntryPoint {
 	 * @param params
 	 * @param data
 	 * @param lines
-	 * @param webSocketSessionId
 	 */
-	private void handleBOM(AdditionalData params, BomData data, List<String> lines, String webSocketSessionId) {
+	private void handleBOM(AdditionalData params, BomData data, List<String> lines) {
 
 		if (lines.get(0).startsWith("\uFEFF")) {
 			data.setHasBom(true);
@@ -91,7 +92,7 @@ public class UploadSubtitlesFileEntryPointImpl implements UploadFileEntryPoint {
 			}else {
 				data.setKeepBom(false);
 				if(params.getBusinessOperation() == BusinessOperation.CORRECTION) {
-					sendBOMRemovedMessage(webSocketSessionId);
+					sendBOMRemovedMessage();
 				}
 			}
 		} else {
@@ -100,10 +101,9 @@ public class UploadSubtitlesFileEntryPointImpl implements UploadFileEntryPoint {
 		}
 	}
 	
-	private void sendBOMRemovedMessage(String webSocketSessionId) {
+	private void sendBOMRemovedMessage() {
 		SubtitleCorrectionEvent bomRemoved = new SubtitleCorrectionEvent();
 		bomRemoved.setCorrection("Removed BOM");
-		bomRemoved.setWebSocketSessionId(webSocketSessionId);
 		webSocketMessageSender.sendMessage(bomRemoved);
 	}
 
