@@ -1,5 +1,6 @@
 package com.subtitlescorrector.adapters.in;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -22,10 +23,12 @@ public class UserDataAdvice {
     public void populateUserData(HttpServletRequest request) {
     	
     	String userId = request.getParameter("webSocketUserId");
-    	String webSocketSessionId = cache.getWebSocketSessionIdForUser(userId);
 		
-    	user.setUserId(userId);
-    	user.setWebSocketSessionId(webSocketSessionId);
+    	if(StringUtils.isNotBlank(userId)) {
+    		String webSocketSessionId = cache.getWebSocketSessionIdForUser(userId);
+    		user.setUserId(userId);
+    		user.setWebSocketSessionId(webSocketSessionId);    		
+    	}
     }
 	
 }
