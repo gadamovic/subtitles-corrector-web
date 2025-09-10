@@ -38,6 +38,8 @@ public class AssSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 		List<String> format = null;
 		int i = 1;
 		
+		Util.removeBomIfExists(lines);
+		
 		List<SubtitleUnitData> subsList = new ArrayList<>();
 		
 		for(String line : lines) {

@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.SecondMillisecondDelimiterRegex;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.SubtitleTimestamp;
@@ -29,6 +28,8 @@ public class VttSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 	public List<SubtitleUnitData> convertToSubtitleUnits(List<String> lines){
 		
 		lines = trimLines(lines);
+		
+		Util.removeBomIfExists(lines);
 		
 		List<SubtitleUnitData> dataList = new ArrayList<>();
 		SubtitleUnitData data = null;
@@ -132,6 +133,10 @@ public class VttSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 			stringList.add(getTimestampFrom(subtitle) + " --> " + getTimestampTo(subtitle));
 			stringList.add(subtitle.getText());
 			stringList.add("");
+		}
+		
+		if(addBom) {
+			stringList = Util.addBom(stringList);
 		}
 		
 		return stringList;

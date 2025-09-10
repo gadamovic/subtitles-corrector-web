@@ -477,4 +477,20 @@ public class Util {
 		return lines;
 	}
 	
+	public static void removeBomIfExists(List<String> lines) {
+		//there can be multiple BOMs
+		int b=0;
+		while (lines.get(0).startsWith("\uFEFF")) {
+			b++;
+			// Remove BOM
+			String line = lines.get(0).substring(1);
+			lines.remove(0);
+			lines.add(0, line);
+		}
+		
+		if(b > 1) {
+			log.info("There was more then one ({}) BOM in the file", b);
+		}
+	}
+	
 }
