@@ -10,18 +10,16 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.subtitlescorrector.adapters.in.SaveSubtitleController;
 import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.ConversionParameters;
 import com.subtitlescorrector.core.domain.SubtitleConversionFileData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.UserData;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
+import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
 import com.subtitlescorrector.core.service.converters.SubtitlesConverterFactory;
 import com.subtitlescorrector.core.util.FileUtil;
 import com.subtitlescorrector.core.util.Util;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class SubtitleConversionServiceImpl implements SubtitleConversionService {
@@ -35,6 +33,9 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 	@Autowired
 	UserData user;
 	
+	@Autowired
+	SubtitlesCloudStoragePort s3Service;
+	
 	Logger log = LoggerFactory.getLogger(SubtitleConversionServiceImpl.class);
 	
 	@Override
@@ -45,6 +46,9 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 		MDC.put("subtitle_name", conversionParameters.getOriginalFilename());
 		log.info("Uploading file for conversion...");
 		MDC.remove("subtitle_name");
+		
+		String s3Key = user.getWebSocketSessionId() + "_" + uploadedFile.getName();
+		s3Service.storeIfProd("pre-conversion_" + s3Key, uploadedFile);
 		
 		Charset detectedEncoding = FileUtil.detectEncodingOfFile(uploadedFile);
 		
