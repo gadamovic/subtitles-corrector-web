@@ -42,6 +42,29 @@ public class BasicViewController {
 		return "index";
 		
 	}
+	
+	@RequestMapping(path="to-srt-converter")
+	public String toSrtConverter(HttpServletRequest request) {
+		log.info("to-srt-converter");
+		return "index";
+		
+	}
+
+	@RequestMapping(path="to-vtt-converter")
+	public String toVttConverter(HttpServletRequest request) {
+		log.info("to-vtt-converter");
+		return "index";
+		
+	}
+
+	@RequestMapping(path="to-ass-converter")
+	public String toAssConverter(HttpServletRequest request) {
+		log.info("to-ass-converter");
+		return "index";
+		
+	}
+	
+	
 }
 
 

@@ -24,7 +24,7 @@
     <label class="label has-text-white has-text-centered title is-5">Upload a subtitle file:</label> <br />
     <div class="file has-name is-fullwidth field mb-3">
       <label class="file-label">
-        <input class="file-input" type="file" name="file" :accept=this.supportedFileFormatsStore.supportedFileFormats @change="handleFileChange" />
+        <input class="file-input" type="file" name="file" :accept=this.supportedFileFormatsStore.supportedFileFormatsInEditor @change="handleFileChange" />
         <span class="file-cta">
           <span class="file-icon">
             <i class="fas fa-upload"></i>
@@ -113,7 +113,7 @@
     @click="showModalMethod"></GenericButton>
     
     <p class="has-text-white mt-2 is-size-7 has-text-centered">
-      Supported formats: {{this.supportedFileFormatsStore.supportedFileFormats}}
+      Supported formats: {{this.supportedFileFormatsStore.supportedFileFormatsInEditor}}
     </p>
 
   </form>
@@ -138,7 +138,7 @@ import { useLineVisibleFlagsStore } from '@/stores/subtitleLineVisibleFlagsStore
 import GenericButton from './GenericButton.vue';
 import ModalComponent from './ModalComponent.vue';
 import { useSubtitleDataStore } from '@/stores/subtitleDataStore';
-import { useSupportedFileFormatsStore } from '@/stores/supportedFileFormatsStore';
+import { useSupportedFileFormatsInEditorStore } from '@/stores/supportedFileFormatsStore';
 import DownloadFileModalComponent from './DownloadFileModalComponent.vue';
 
 export default {
@@ -164,7 +164,7 @@ export default {
       showDownloadLink: false,
       loaderStore: useLoaderStore(),
       lineVisibleFlagsStore: useLineVisibleFlagsStore(),
-      supportedFileFormatsStore: useSupportedFileFormatsStore(),
+      supportedFileFormatsStore: useSupportedFileFormatsInEditorStore(),
       socket: WebSocket,
       stripBTags: false,
       stripITags: false,
@@ -189,10 +189,10 @@ export default {
       this.file = event.target.files[0];
 
       const fileName = this.file.name.toLowerCase();
-      const isValid = this.supportedFileFormatsStore.supportedFileFormats.some(ext => fileName.endsWith(ext));
+      const isValid = this.supportedFileFormatsStore.supportedFileFormatsInEditor.some(ext => fileName.endsWith(ext));
 
       if (!isValid) {
-        this.error = 'Invalid file type. Allowed types are: ' + this.supportedFileFormatsStore.supportedFileFormats;
+        this.error = 'Invalid file type. Allowed types are: ' + this.supportedFileFormatsStore.supportedFileFormatsInEditor;
         this.upload_button_enabled = false;
         event.target.value = ''; // Clear the input
         this.file = null;

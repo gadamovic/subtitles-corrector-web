@@ -3,6 +3,7 @@ package com.subtitlescorrector.core.service.converters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,15 +22,15 @@ public class AssSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 
 	private static final String EVENTS_SECTION_START = "[Events]";
 	private static final String FORMAT = "Format:";
-	private static final String DEFAULT_DIALOGUE_FORMAT_PLACEHOLDER = "Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text";
+	private static final String DEFAULT_DIALOGUE_FORMAT_PLACEHOLDER = "Layer,Start,End,Style,Name,MarginL,MarginR,MarginV,Effect,Text";
 
 	Logger log = LoggerFactory.getLogger(SrtSubtitleLinesToSubtitleUnitDataConverter.class);
 	
+    private static final Pattern STYLE_PATTERN = Pattern.compile("\\{.*?\\}");
+	
 	@Autowired
 	Util util;
-	
-	//TODO: <br> tags in texts and download button label shows source format in filename
-	
+		
 	@Override
 	public List<SubtitleUnitData> convertToSubtitleUnits(List<String> lines) {
 
@@ -61,11 +62,12 @@ public class AssSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 			
 			if(line.contains("Dialogue: ")) {
 				String tmp = line.substring("Dialogue: ".length());
-				String parts[] = tmp.split(",");
+				String parts[] = tmp.split(",", format.size());
 				
 				String start = parts[format.indexOf("Start")];
 				String end = parts[format.indexOf("End")];
 				String text = parts[format.indexOf("Text")];
+				text = STYLE_PATTERN.matcher(text).replaceAll("");
 				
 				SubtitleUnitData subUnit = new SubtitleUnitData();
 				subUnit.setFormat(SubtitleFormat.ASS);

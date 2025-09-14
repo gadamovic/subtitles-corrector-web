@@ -4,6 +4,9 @@ import Home from '../components/Home.vue'
 import PrivacyPolicy from '../components/PrivacyPolicy.vue'
 import TermsOfService from '../components/TermsOfService.vue'
 import SubtitleConverters from '../components/SubtitleConverters.vue'
+import ToSrtConverter from '@/components/ToSrtConverter.vue'
+import ToVttConverter from '@/components/ToVttConverter.vue'
+import ToAssConverter from '@/components/ToAssConverter.vue'
 
 const routes = [
     {
@@ -31,12 +34,36 @@ const routes = [
             description: 'Legal agreements that you comply with by using our app'
         }
     },
-        {
+    {
         path: '/converters',
         component: SubtitleConverters,
         meta: {
             title: 'Subtitle Converters',
             description: 'Convert between various subtitle file formats'
+        }
+    },
+    {
+        path: '/to-srt-converter',
+        component: ToSrtConverter,
+        meta: {
+            title: 'Srt converter',
+            description: 'Convert any subtitle format to srt. vtt to srt converter, ass to srt converter.'
+        }
+    },
+    {
+        path: '/to-vtt-converter',
+        component: ToVttConverter,
+        meta: {
+            title: 'Vtt converter',
+            description: 'Convert any subtitle format to vtt. srt to vtt converter, ass to vtt converter.'
+        }
+    },
+    {
+        path: '/to-ass-converter',
+        component: ToAssConverter,
+        meta: {
+            title: 'Ass converter',
+            description: 'Convert any subtitle format to ass. srt to ass converter, ass to ass converter.'
         }
     },
 ]

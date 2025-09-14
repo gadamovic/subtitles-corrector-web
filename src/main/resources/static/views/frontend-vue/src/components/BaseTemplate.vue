@@ -19,13 +19,19 @@
           <div class="navbar-end">
             <ul class="navbar-item box is-hidden-mobile is-hidden-tablet-only">
               <li><RouterLink class="navbar-item has-text-success" to="/"><strong>Home</strong></RouterLink></li>
-              <li><RouterLink class="navbar-item" to="/converters"><strong>Converters</strong></RouterLink></li>
+              <!-- <li><RouterLink class="navbar-item" to="/converters"><strong>Converters</strong></RouterLink></li> -->
+              <li><RouterLink class="navbar-item" to="/to-srt-converter"><strong>To srt converter</strong></RouterLink></li>
+              <li><RouterLink class="navbar-item" to="/to-vtt-converter"><strong>To vtt converter</strong></RouterLink></li>
+              <li><RouterLink class="navbar-item" to="/to-ass-converter"><strong>To ass converter</strong></RouterLink></li>
               <li><RouterLink class="navbar-item" to="/privacy-policy"><strong>Privacy Policy</strong></RouterLink></li>
               <li><RouterLink class="navbar-item" to="/terms-of-service"><strong>Terms of service</strong></RouterLink></li>
             </ul>
             <ul class="navbar-item is-hidden-desktop">
               <li><RouterLink class="navbar-item" to="/"><strong>Home</strong></RouterLink></li>
-              <li><RouterLink class="navbar-item" to="/converters"><strong>Converters</strong></RouterLink></li>
+              <!-- <li><RouterLink class="navbar-item" to="/converters"><strong>Converters</strong></RouterLink></li> -->
+              <li><RouterLink class="navbar-item" to="/to-srt-converter"><strong>To srt converter</strong></RouterLink></li>
+              <li><RouterLink class="navbar-item" to="/to-vtt-converter"><strong>To vtt converter</strong></RouterLink></li>
+              <li><RouterLink class="navbar-item" to="/to-ass-converter"><strong>To ass converter</strong></RouterLink></li>
               <li><RouterLink class="navbar-item" to="/privacy-policy"><strong>Privacy Policy</strong></RouterLink></li>
               <li><RouterLink class="navbar-item" to="/terms-of-service"><strong>Terms of service</strong></RouterLink></li>
             </ul>

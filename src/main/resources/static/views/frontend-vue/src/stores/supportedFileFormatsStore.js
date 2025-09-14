@@ -1,10 +1,10 @@
 
 import { defineStore } from 'pinia'
 
-export const useSupportedFileFormatsStore = defineStore('supportedFileFormatsStore', {
+export const useSupportedFileFormatsInEditorStore = defineStore('supportedFileFormatsInEditorStore', {
   state: () => {
     return {
-      supportedFileFormats: ['.srt', '.vtt', '.ass'],
+      supportedFileFormatsInEditor: ['.srt', '.vtt'],
     }
   }
 })
