@@ -56,7 +56,7 @@ public class DownloadSubtitlesFileServiceImpl implements DownloadSubtitlesFileSe
 		MDC.put("source_format", userData.getData().getSourceFormat().toString());
 		MDC.put("target_format", targetFormat);
 		log.info("Downloading converted file...");
-		MDC.remove("filename");
+		MDC.remove("subtitle_name");
 		MDC.remove("source_format");
 		MDC.remove("target_format");
 		
