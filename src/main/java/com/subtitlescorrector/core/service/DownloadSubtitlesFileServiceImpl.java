@@ -60,8 +60,7 @@ public class DownloadSubtitlesFileServiceImpl implements DownloadSubtitlesFileSe
 		MDC.remove("source_format");
 		MDC.remove("target_format");
 		
-		String webSocketSessionIdAsFilename = cacheService.getWebSocketSessionIdForUser(userId);
-		cloudStorageService.storeIfProd("post-conversion_" + webSocketSessionIdAsFilename + "_" + userData.getData().getFilename(), userData.getFile());
+		cloudStorageService.storeIfProd("post-conversion_" + userId + "_" + userData.getData().getFilename(), userData.getFile());
 		
 		responseWriter.writeFileToResponse(userData, response);
 		

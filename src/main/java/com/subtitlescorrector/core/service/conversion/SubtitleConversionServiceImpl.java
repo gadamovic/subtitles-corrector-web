@@ -47,7 +47,7 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 		log.info("Uploading file for conversion...");
 		MDC.remove("subtitle_name");
 		
-		String s3Key = user.getWebSocketSessionId() + "_" + uploadedFile.getName();
+		String s3Key = user.getUserId() + "_" + uploadedFile.getName();
 		s3Service.storeIfProd("pre-conversion_" + s3Key, uploadedFile);
 		
 		Charset detectedEncoding = FileUtil.detectEncodingOfFile(uploadedFile);
