@@ -244,7 +244,7 @@ export default {
       formData.append("aiEnabled", this.aiEnabled)
 
       try {
-        const response = await fetch("api/rest/1.0/upload", {
+        const response = await fetch("api/rest/1.0/corrections/upload", {
           method: "POST",
           body: formData,
         });

@@ -1,6 +1,8 @@
 package com.subtitlescorrector.core.service.preprocessing;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -14,8 +16,6 @@ import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
-import com.subtitlescorrector.core.domain.SubtitleFileData;
-import com.subtitlescorrector.core.domain.SubtitleUnitData;
 import com.subtitlescorrector.core.service.websocket.WebSocketMessageSender;
 import com.subtitlescorrector.core.util.Util;
 
@@ -35,7 +35,9 @@ public class HtmlStripPreProcessor implements PreProcessor{
 	WebSocketMessageSender webSocketMessageSender;
 	
 	@Override
-	public SubtitleFileData process(SubtitleFileData data) {
+	public List<String> process(List<String> data) {
+		
+		List<String> processed = new ArrayList<>();
 		
 		Safelist safeList = new Safelist();
 		safeList.addTags("b", "br", "i", "font")
@@ -44,11 +46,11 @@ public class HtmlStripPreProcessor implements PreProcessor{
 		OutputSettings outputSettings = new OutputSettings();
 		outputSettings.prettyPrint(false);
 		
-		for(SubtitleUnitData subUnitData : data.getLines()) {
+		for(String line : data) {
 			
-			String line = subUnitData.getText();
+			String text = line;
 			
-			Document document = Jsoup.parse(line);
+			Document document = Jsoup.parse(text);
 			for(Element element : document.body().getAllElements()) {
 				
 				if(element.tagName() != "#text" &&
@@ -72,13 +74,13 @@ public class HtmlStripPreProcessor implements PreProcessor{
 				
 			}
 			
-			line = Jsoup.clean(subUnitData.getText(), "", safeList, outputSettings);
+			text = Jsoup.clean(text, "", safeList, outputSettings);
 			
-			subUnitData.setText(line);
+			processed.add(text);
 			
 		}
 		
-		return data;
+		return processed;
 	}
 
 }

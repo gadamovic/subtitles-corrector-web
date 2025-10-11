@@ -10,14 +10,28 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.BomData;
+import com.subtitlescorrector.core.domain.BusinessOperation;
 import com.subtitlescorrector.core.domain.ConversionParameters;
-import com.subtitlescorrector.core.domain.SubtitleConversionFileData;
+import com.subtitlescorrector.core.domain.SubtitleConversionFileDataResponse;
+import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.UserData;
+import com.subtitlescorrector.core.domain.UserSubtitleConversionCurrentVersionMetadata;
+import com.subtitlescorrector.core.domain.UserSubtitleCorrectionCurrentVersionMetadata;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
 import com.subtitlescorrector.core.service.converters.SubtitlesConverterFactory;
+import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleFileData;
+import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleLinesToSubtitleUnitDataConverter;
+import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleUnitData;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleLinesToSubtitleUnitDataConverter;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleUnitData;
+import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitleLinesToSubtitleUnitDataConverter;
+import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleFileData;
+import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleUnitData;
 import com.subtitlescorrector.core.util.FileUtil;
 import com.subtitlescorrector.core.util.Util;
 
@@ -36,10 +50,26 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 	@Autowired
 	SubtitlesCloudStoragePort s3Service;
 	
+	@Autowired
+	SrtSubtitleLinesToSubtitleUnitDataConverter srtConverter;
+	
+	@Autowired
+	VttSubtitleLinesToSubtitleUnitDataConverter vttConverter;
+	
+	@Autowired
+	AssSubtitleLinesToSubtitleUnitDataConverter assConverter;
+	
+	
 	Logger log = LoggerFactory.getLogger(SubtitleConversionServiceImpl.class);
 	
 	@Override
-	public SubtitleConversionFileData applyConversionOperations(ConversionParameters conversionParameters, File uploadedFile, List<String> lines, BomData bomData) {
+	public SubtitleConversionFileDataResponse applyConversionOperations(ConversionParameters conversionParameters, File uploadedFile) {
+		
+		List<String> lines = FileUtil.loadTextFile(uploadedFile);
+		
+		BomData bomData = new BomData();
+		
+		handleBOM(conversionParameters, bomData, lines);
 		
 		log.info("Converting a file");
 		
@@ -54,16 +84,82 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 		
 		SubtitleFormat sourceFormat = Util.detectSubtitleFormat(lines);
 		
-		SubtitleConversionFileData conversionFileData = new SubtitleConversionFileData();
-		conversionFileData.setFilename(conversionParameters.getOriginalFilename());
-		conversionFileData.setSourceFormat(sourceFormat);
-		conversionFileData.setDetectedEncoding(detectedEncoding.displayName());
-		conversionFileData.setBomData(bomData);
+		SubtitleConversionFileDataResponse response = new SubtitleConversionFileDataResponse();
 		
-		conversionFileData.setLines(converterFactory.getConverter(sourceFormat).convertToSubtitleUnits(lines));
-		redisService.addUserSubtitleConversionData(conversionFileData, user.getUserId());
+		String subtitleFileDataJson = null;
 		
-		return conversionFileData;
+		switch (sourceFormat) {
+		case SRT:
+			List<SrtSubtitleUnitData> srtData = srtConverter.convertToSubtitleUnits(lines);
+			SrtSubtitleConversionFileData srtFileData = new SrtSubtitleConversionFileData();
+			srtFileData.setFilename(conversionParameters.getOriginalFilename());
+			srtFileData.setSourceFormat(sourceFormat);
+			srtFileData.setDetectedEncoding(detectedEncoding.displayName());
+			srtFileData.setBomData(bomData);
+			srtFileData.setLines(srtData);
+
+			response.setNumberOfLines(srtData.size());
+
+			subtitleFileDataJson = Util.srtSubtitleConversionFileDataToJson(srtFileData);
+			break;
+		case VTT:
+			List<VttSubtitleUnitData> vttData = vttConverter.convertToSubtitleUnits(lines);
+			VttSubtitleConversionFileData vttFileData = new VttSubtitleConversionFileData();
+			vttFileData.setFilename(conversionParameters.getOriginalFilename());
+			vttFileData.setSourceFormat(sourceFormat);
+			vttFileData.setDetectedEncoding(detectedEncoding.displayName());
+			vttFileData.setBomData(bomData);
+			vttFileData.setLines(vttData);
+			
+			response.setNumberOfLines(vttData.size());
+			
+			subtitleFileDataJson = Util.vttSubtitleConversionFileDataToJson(vttFileData);
+			break;
+		case ASS:
+			List<AssSubtitleUnitData> assData = assConverter.convertToSubtitleUnits(lines);
+			AssSubtitleConversionFileData assFileData = new AssSubtitleConversionFileData();
+			assFileData.setFilename(conversionParameters.getOriginalFilename());
+			assFileData.setSourceFormat(sourceFormat);
+			assFileData.setDetectedEncoding(detectedEncoding.displayName());
+			assFileData.setBomData(bomData);
+			assFileData.setLines(assData);
+			
+			response.setNumberOfLines(assData.size());
+			
+			subtitleFileDataJson = Util.assSubtitleConversionFileDataToJson(assFileData);
+			break;
+		}
+		
+		UserSubtitleConversionCurrentVersionMetadata metadata = new UserSubtitleConversionCurrentVersionMetadata();
+		metadata.setBomData(bomData);
+		metadata.setFilename(conversionParameters.getOriginalFilename());
+		metadata.setSourceFormat(sourceFormat);
+
+		redisService.addUserSubtitleConversionData(subtitleFileDataJson, user.getUserId());
+		redisService.addUsersLastUpdatedSubtitleConversionFileMetadata(metadata, user.getUserId());
+		
+		response.setDetectedSourceFormat(sourceFormat);
+		response.setDetectedEncoding(detectedEncoding.displayName());
+		response.setFilename(conversionParameters.getOriginalFilename());
+		
+		return response;
+	}
+	
+	/**
+	 * BOM is actually added and removed in converters. Here we just set BOM related parameters to SubtitleFileData object
+	 * and send message about correction to the client if needed
+	 * @param params
+	 * @param data
+	 * @param lines
+	 */
+	private void handleBOM(ConversionParameters params, BomData data, List<String> lines) {
+
+		if (lines.get(0).startsWith("\uFEFF")) {
+			data.setHasBom(true);
+			data.setKeepBom(false);
+		}else {
+			data.setHasBom(false);
+		}
 	}
 
 }

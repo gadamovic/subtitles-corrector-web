@@ -16,8 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.RequestValidatorStatus;
-import com.subtitlescorrector.core.domain.SubtitleConversionFileData;
-import com.subtitlescorrector.core.domain.SubtitleFileData;
+import com.subtitlescorrector.core.domain.SubtitleConversionFileDataResponse;
 import com.subtitlescorrector.core.domain.exception.InvalidBusinessOperationException;
 import com.subtitlescorrector.core.port.EmailServicePort;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
@@ -25,16 +24,18 @@ import com.subtitlescorrector.core.port.StorageSystemPort;
 import com.subtitlescorrector.core.service.RequestValidator;
 import com.subtitlescorrector.core.service.UploadFileEntryPoint;
 import com.subtitlescorrector.core.service.conversion.SubtitleConversionService;
+import com.subtitlescorrector.core.service.conversion.VttSubtitleConversionFileData;
 import com.subtitlescorrector.core.service.corrections.SubtitlesCorrectionService;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.util.Util;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping(path = "/api/rest/1.0")
-public class FileUploadController {
+@RequestMapping(path = "/api/rest/1.0/conversions")
+public class ConversionsController {
 
-	Logger log = LoggerFactory.getLogger(FileUploadController.class);
+	Logger log = LoggerFactory.getLogger(ConversionsController.class);
 
 	@Autowired
 	StorageSystemPort fileSystemStorageService;
@@ -49,12 +50,18 @@ public class FileUploadController {
 	ApplicationProperties properties;
 	
 	@Autowired
-	UploadFileEntryPoint uploadService;
+	SubtitleConversionService conversionService;
+	
+	@Autowired
+	EmailServicePort emailService;
 	
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
-	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+	public ResponseEntity<SubtitleConversionFileDataResponse> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		
 		String clientIp = request.getRemoteAddr();
+		
+		emailService.sendEmailOnlyIfProduction("Ip: " + clientIp + "\nFilename: " + file.getOriginalFilename(), properties.getAdminEmailAddress(),
+				"Somebody is uploading a subtitle for CONVERSION");
 		
 		RequestValidatorStatus uploadRateCheck = validator.validateSubtitlesUploadRateLimit(clientIp);
 		RequestValidatorStatus fileSizeCheck = validator.validateFileSize(file);
@@ -72,25 +79,17 @@ public class FileUploadController {
 		File storedFile = fileSystemStorageService.store(file);		
 		AdditionalData clientParameters = extractOptions(request);
 		clientParameters.setOriginalFilename(file.getOriginalFilename());
-		
-		String returnJson = "";
-		
-		try {
-			returnJson = uploadService.handleFileUpload(clientParameters, storedFile, request);
-			return ResponseEntity.ok(returnJson);
-		}catch(InvalidBusinessOperationException e) {
-			log.error("Invalid business operation!", e);
-			return getInvalidResponseEntity(HttpStatus.SERVICE_UNAVAILABLE, "Invalid business operation provided. Contact support for more information.");
-		}
-		
+
+		SubtitleConversionFileDataResponse response = conversionService.applyConversionOperations(clientParameters.getConversionParameters(), storedFile);
+
+		return ResponseEntity.ok(response);
 	}
 
-	private ResponseEntity<String> getInvalidResponseEntity(HttpStatus httpStatus, String message) {
-		SubtitleFileData data;
-		data = new SubtitleFileData();
+	private ResponseEntity<SubtitleConversionFileDataResponse> getInvalidResponseEntity(HttpStatus httpStatus, String message) {
+		SubtitleConversionFileDataResponse data = new SubtitleConversionFileDataResponse();
 		data.setHttpResponseMessage(message);
 		log.error(message);
-		return ResponseEntity.status(httpStatus).body(Util.subtitleFileDataToJson(data));
+		return ResponseEntity.status(httpStatus).body(data);
 	}
 
 	private AdditionalData extractOptions(HttpServletRequest request) {

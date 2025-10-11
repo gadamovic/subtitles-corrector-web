@@ -3,12 +3,14 @@ package com.subtitlescorrector.core.domain;
 import java.io.File;
 import java.util.List;
 
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
+
 public class SubtitlesFileProcessorResponse {
 
 	SubtitlesProcessingStatus status;
 	String downloadUrl;
 	File file;
-	SubtitleFileData data;
+	SrtSubtitleFileData data;
 	
 	public SubtitlesProcessingStatus getStatus() {
 		return status;
@@ -28,10 +30,10 @@ public class SubtitlesFileProcessorResponse {
 	public void setFile(File file) {
 		this.file = file;
 	}
-	public SubtitleFileData getData() {
+	public SrtSubtitleFileData getData() {
 		return data;
 	}
-	public void setData(SubtitleFileData data) {
+	public void setData(SrtSubtitleFileData data) {
 		this.data = data;
 	}
 

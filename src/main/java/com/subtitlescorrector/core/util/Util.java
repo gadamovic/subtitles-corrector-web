@@ -30,14 +30,22 @@ import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.CompositeEditOperation;
 import com.subtitlescorrector.core.domain.EditOperation;
 import com.subtitlescorrector.core.domain.SecondMillisecondDelimiterRegex;
-import com.subtitlescorrector.core.domain.SubtitleConversionFileData;
 import com.subtitlescorrector.core.domain.SubtitleConversionFileDataResponse;
 import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
-import com.subtitlescorrector.core.domain.SubtitleFileData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.SubtitleTimestamp;
-import com.subtitlescorrector.core.domain.SubtitleUnitData;
 import com.subtitlescorrector.core.domain.TimeUnit;
+import com.subtitlescorrector.core.domain.UserSubtitleConversionCurrentVersionMetadata;
+import com.subtitlescorrector.core.domain.UserSubtitleCorrectionCurrentVersionMetadata;
+import com.subtitlescorrector.core.service.conversion.AssSubtitleConversionFileData;
+import com.subtitlescorrector.core.service.conversion.SrtSubtitleConversionFileData;
+import com.subtitlescorrector.core.service.conversion.VttSubtitleConversionFileData;
+import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileDataWebDto;
+import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileLineDataWebDto;
+import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleFileData;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleUnitData;
+import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleFileData;
 import com.subtitlescorrector.core.service.websocket.WebSocketMessageSender;
 
 
@@ -156,7 +164,7 @@ public class Util {
 
 	}
 
-	public static String subtitleFileDataToJson(SubtitleFileData data) {
+	public static String srtSubtitleFileDataToJson(SrtSubtitleFileData data) {
 		ObjectMapper obj = new ObjectMapper();
 		try {
 			return obj.writeValueAsString(data);
@@ -166,18 +174,60 @@ public class Util {
 		}
 	}
 
-	public static SubtitleFileData jsonToSubtitleFileData(String json) {
+	public static SrtSubtitleFileData jsonToSrtSubtitleFileData(String json) {
 		ObjectMapper obj = new ObjectMapper();
 
 		try {
-			return obj.readValue(json, SubtitleFileData.class);
+			return obj.readValue(json, SrtSubtitleFileData.class);
 		} catch (IOException e) {
 			log.error("Error deserializing saying: " + json, e);
 			return null;
 		}
 	}
 	
-	public static String subtitleConversionFileDataToJson(SubtitleConversionFileData data) { 
+	public static String vttSubtitleFileDataToJson(VttSubtitleFileData data) {
+		ObjectMapper obj = new ObjectMapper();
+		try {
+			return obj.writeValueAsString(data);
+		} catch (JsonProcessingException e) {
+			log.error("Error converting SubtitleFileData to json", e);
+			return null;
+		}
+	}
+
+	public static VttSubtitleFileData jsonToVttSubtitleFileData(String json) {
+		ObjectMapper obj = new ObjectMapper();
+
+		try {
+			return obj.readValue(json, VttSubtitleFileData.class);
+		} catch (IOException e) {
+			log.error("Error deserializing saying: " + json, e);
+			return null;
+		}
+	}
+	
+	public static String assSubtitleFileDataToJson(AssSubtitleFileData data) {
+		ObjectMapper obj = new ObjectMapper();
+		try {
+			return obj.writeValueAsString(data);
+		} catch (JsonProcessingException e) {
+			log.error("Error converting SubtitleFileData to json", e);
+			return null;
+		}
+	}
+
+	public static AssSubtitleFileData jsonToAssSubtitleFileData(String json) {
+		ObjectMapper obj = new ObjectMapper();
+
+		try {
+			return obj.readValue(json, AssSubtitleFileData.class);
+		} catch (IOException e) {
+			log.error("Error deserializing saying: " + json, e);
+			return null;
+		}
+	}
+	
+	public static String vttSubtitleConversionFileDataToJson(VttSubtitleConversionFileData data) { 
 		ObjectMapper obj = new ObjectMapper();
 		try {
 			return obj.writeValueAsString(data);
@@ -187,17 +237,100 @@ public class Util {
 		}
 	}
 
-	public static SubtitleConversionFileData jsonToSubtitleConversionFileData(String json) {
+	public static VttSubtitleConversionFileData jsonToVttSubtitleConversionFileData(String json) {
 		ObjectMapper obj = new ObjectMapper();
 
 		try {
-			return obj.readValue(json, SubtitleConversionFileData.class);
+			return obj.readValue(json, VttSubtitleConversionFileData.class);
 		} catch (IOException e) {
 			log.error("Error deserializing SubtitleConversionFileData: " + json, e);
 			return null;
 		}
 	}
 	
+	public static String assSubtitleConversionFileDataToJson(AssSubtitleConversionFileData data) { 
+		ObjectMapper obj = new ObjectMapper();
+		try {
+			return obj.writeValueAsString(data);
+		} catch (JsonProcessingException e) {
+			log.error("Error converting AssSubtitleConversionFileData to json", e);
+			return null;
+		}
+	}
+
+	public static AssSubtitleConversionFileData jsonToAssSubtitleConversionFileData(String json) {
+		ObjectMapper obj = new ObjectMapper();
+
+		try {
+			return obj.readValue(json, AssSubtitleConversionFileData.class);
+		} catch (IOException e) {
+			log.error("Error deserializing AssSubtitleConversionFileData: " + json, e);
+			return null;
+		}
+	}
+	
+	public static String srtSubtitleConversionFileDataToJson(SrtSubtitleConversionFileData data) { 
+		ObjectMapper obj = new ObjectMapper();
+		try {
+			return obj.writeValueAsString(data);
+		} catch (JsonProcessingException e) {
+			log.error("Error converting SrtSubtitleConversionFileData to json", e);
+			return null;
+		}
+	}
+
+	public static SrtSubtitleConversionFileData jsonToSrtSubtitleConversionFileData(String json) {
+		ObjectMapper obj = new ObjectMapper();
+
+		try {
+			return obj.readValue(json, SrtSubtitleConversionFileData.class);
+		} catch (IOException e) {
+			log.error("Error deserializing SrtSubtitleConversionFileData: " + json, e);
+			return null;
+		}
+	}
+
+	public static UserSubtitleCorrectionCurrentVersionMetadata jsonToSubtitleCurrentVersionMetadata(String json) {
+		ObjectMapper obj = new ObjectMapper();
+
+		try {
+			return obj.readValue(json, UserSubtitleCorrectionCurrentVersionMetadata.class);
+		} catch (IOException e) {
+			log.error("Error deserializing UserSubtitleCurrentVersionMetadata: " + json, e);
+			return null;
+		}
+	}
+	
+	public static String userSubtitleCurrentVersionMetadataToJson(UserSubtitleCorrectionCurrentVersionMetadata data) { 
+		ObjectMapper obj = new ObjectMapper();
+		try {
+			return obj.writeValueAsString(data);
+		} catch (JsonProcessingException e) {
+			log.error("Error converting SubtitleCurrentVersionMetadataToJson to json", e);
+			return null;
+		}
+	}
+	
+	public static String userSubtitleConversionCurrentVersionMetadataToJson(UserSubtitleConversionCurrentVersionMetadata data) { 
+		ObjectMapper obj = new ObjectMapper();
+		try {
+			return obj.writeValueAsString(data);
+		} catch (JsonProcessingException e) {
+			log.error("Error converting SubtitleCurrentConversionVersionMetadataToJson to json", e);
+			return null;
+		}
+	}
+	
+	public static UserSubtitleConversionCurrentVersionMetadata jsonToUserSubtitleConversionCurrentVersionMetadata(String json) {
+		ObjectMapper obj = new ObjectMapper();
+
+		try {
+			return obj.readValue(json, UserSubtitleConversionCurrentVersionMetadata.class);
+		} catch (IOException e) {
+			log.error("Error deserializing UserSubtitleConversionCurrentVersionMetadata: " + json, e);
+			return null;
+		}
+	}
 
 	public static String generateS3Key(String postfix) {
 
@@ -433,7 +566,7 @@ public class Util {
 	}
 	
 
-	public static SubtitleConversionFileDataResponse subtitleConversionFileDataToResponseObject(SubtitleConversionFileData conversionFileData) {
+	public static SubtitleConversionFileDataResponse subtitleConversionFileDataToResponseObject(VttSubtitleConversionFileData conversionFileData) {
 		
 		SubtitleConversionFileDataResponse response = new SubtitleConversionFileDataResponse();
 		response.setDetectedEncoding(conversionFileData.getDetectedEncoding());
@@ -458,8 +591,18 @@ public class Util {
 	/**
 	 * For html line breaks are represented as br tags, so put them back to \n
 	 */
-	public static void convertBrTagsToNewLineCharacters(SubtitleFileData subtitleData) {
-		for(SubtitleUnitData data : subtitleData.getLines()) {
+	public static void convertBrTagsToNewLineCharacters(SrtSubtitleFileData subtitleData) {
+		for(SrtSubtitleUnitData data : subtitleData.getLines()) {
+			data.setText(data.getText().replace("<br>", "\n"));
+			data.setTextBeforeCorrection(data.getTextBeforeCorrection().replace("<br>", "\n"));
+		}
+	}
+	
+	/**
+	 * For html line breaks are represented as br tags, so put them back to \n
+	 */
+	public static void convertBrTagsToNewLineCharacters(SubtitleCorrectionFileDataWebDto subtitleData) {
+		for(SubtitleCorrectionFileLineDataWebDto data : subtitleData.getLines()) {
 			data.setText(data.getText().replace("<br>", "\n"));
 			data.setTextBeforeCorrection(data.getTextBeforeCorrection().replace("<br>", "\n"));
 		}

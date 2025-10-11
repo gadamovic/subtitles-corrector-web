@@ -151,7 +151,7 @@ export default {
             formData.append("targetFormat", this.targetFormat);
 
             try {
-                const response = await fetch("api/rest/1.0/upload", {
+                const response = await fetch("api/rest/1.0/conversions/upload", {
                     method: "POST",
                     body: formData,
                 });

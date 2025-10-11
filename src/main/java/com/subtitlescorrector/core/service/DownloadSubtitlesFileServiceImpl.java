@@ -36,12 +36,12 @@ public class DownloadSubtitlesFileServiceImpl implements DownloadSubtitlesFileSe
 
 		UserSubtitleData userData = subtitleFileProvider.provideFileForUser(userId);
 
-		MDC.put("subtitle_name", userData.getSubtitleFileData().getFilename());
+		MDC.put("subtitle_name", userData.getFileMetadata().getFilename());
 		log.info("Downloading corrected file...");
 		MDC.remove("subtitle_name");
 		
 		String webSocketSessionIdAsFilename = cacheService.getWebSocketSessionIdForUser(userId);
-		cloudStorageService.storeIfProd("v3_" + webSocketSessionIdAsFilename + "_" + userData.getSubtitleFileData().getFilename(), userData.getFile());
+		cloudStorageService.storeIfProd("v3_" + webSocketSessionIdAsFilename + "_" + userData.getFileMetadata().getFilename(), userData.getFile());
 
 		responseWriter.writeFileToResponse(userData, response);
 		
@@ -52,15 +52,15 @@ public class DownloadSubtitlesFileServiceImpl implements DownloadSubtitlesFileSe
 
 		UserSubtitleConversionData userData = subtitleFileProvider.provideConversionFileForUser(userId, targetFormat);
 		
-		MDC.put("subtitle_name", userData.getData().getFilename());
-		MDC.put("source_format", userData.getData().getSourceFormat().toString());
+		MDC.put("subtitle_name", userData.getMetadata().getFilename());
+		MDC.put("source_format", userData.getMetadata().getSourceFormat().toString());
 		MDC.put("target_format", targetFormat);
 		log.info("Downloading converted file...");
 		MDC.remove("subtitle_name");
 		MDC.remove("source_format");
 		MDC.remove("target_format");
 		
-		cloudStorageService.storeIfProd("post-conversion_" + userId + "_" + userData.getData().getFilename(), userData.getFile());
+		cloudStorageService.storeIfProd("post-conversion_" + userId + "_" + userData.getMetadata().getFilename(), userData.getFile());
 		
 		responseWriter.writeFileToResponse(userData, response);
 		

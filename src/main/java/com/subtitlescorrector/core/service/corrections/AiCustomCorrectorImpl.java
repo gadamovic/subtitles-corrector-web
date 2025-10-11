@@ -21,12 +21,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
-import com.subtitlescorrector.core.domain.SubtitleFileData;
-import com.subtitlescorrector.core.domain.SubtitleUnitData;
 import com.subtitlescorrector.core.domain.ai.CorrectionResponse;
 import com.subtitlescorrector.core.domain.ai.CorrectionsWrapper;
+import com.subtitlescorrector.core.domain.ai.LineForAiCorrection;
 import com.subtitlescorrector.core.port.AiServicePort;
 import com.subtitlescorrector.core.service.websocket.WebSocketMessageSender;
 import com.subtitlescorrector.core.util.Util;
@@ -63,7 +61,7 @@ public class AiCustomCorrectorImpl implements AiCustomCorrector{
 	String promptTemplate = null;
 	
 	@Override
-	public SubtitleFileData correct(SubtitleFileData data, AdditionalData params) {
+	public List<LineForAiCorrection> correct(List<LineForAiCorrection> lines, CorrectorParameters params) {
 		
 		log.info("AI corrector started...");
 		Long start = System.currentTimeMillis();
@@ -71,11 +69,11 @@ public class AiCustomCorrectorImpl implements AiCustomCorrector{
 		ObjectMapper mapper = new ObjectMapper();
 
 		webSocketMessageSender.sendMessage(createAiProcessingStartedEvent());
-		Map<Integer, List<SubtitleUnitData>> partitioned = partitionSubUnits(data.getLines(), AI_PROCESSING_CHUNK_SIZE);
+		Map<Integer, List<LineForAiCorrection>> partitioned = partitionSubUnits(lines, AI_PROCESSING_CHUNK_SIZE);
 		
 		List<Future<?>> futures = new ArrayList<>();
 		
-		for(Map.Entry<Integer, List<SubtitleUnitData>> entry : partitioned.entrySet()) {
+		for(Map.Entry<Integer, List<LineForAiCorrection>> entry : partitioned.entrySet()) {
 			
 			Future<?> f = executorService.submit(() -> processOneChunk(mapper, entry));
 			futures.add(f);
@@ -90,9 +88,9 @@ public class AiCustomCorrectorImpl implements AiCustomCorrector{
 		
 		webSocketMessageSender.sendMessage(createAiProcessingEndedEvent());
 		
-		logAICorrectorFinished(data, start);
+		logAICorrectorFinished(start);
 		
-		return data;
+		return lines;
 	}
 
 	/**
@@ -103,19 +101,17 @@ public class AiCustomCorrectorImpl implements AiCustomCorrector{
 		return createAiProcessingStartedEvent();
 	}
 
-	private void logAICorrectorFinished(SubtitleFileData data, Long start) {
+	private void logAICorrectorFinished(Long start) {
 		MDC.put("execution_time", Long.toString(System.currentTimeMillis() - start));
-		MDC.put("subtitle_name", data.getFilename());
 		log.info("AI corrector finished...");
 		MDC.remove("execution_time");
-		MDC.remove("subtitle_name");
 	}
 
-	private void processOneChunk(ObjectMapper mapper, Map.Entry<Integer, List<SubtitleUnitData>> entry) {
+	private void processOneChunk(ObjectMapper mapper, Map.Entry<Integer, List<LineForAiCorrection>> entry) {
 		
 		StringBuilder sb = new StringBuilder();
-		for(SubtitleUnitData subUnitData : entry.getValue()) {
-			sb.append(subUnitData.getNumber()).append("\n").append(subUnitData.getText()).append("\n\n");
+		for(LineForAiCorrection aiLine : entry.getValue()) {
+			sb.append(aiLine.getNumber()).append("\n").append(aiLine.getText()).append("\n\n");
 		}
 		
 		String aiCorrectionResponseStr = ai.askOpenAi(promptTemplate, sb.toString()).getFirstChoiceMessage();
@@ -131,10 +127,10 @@ public class AiCustomCorrectorImpl implements AiCustomCorrector{
 		Map<String, List<CorrectionResponse>> responsesByLineNumber = aiCorrectionsWrapper.getCorrections().stream()
 				.collect(Collectors.groupingBy(CorrectionResponse::getNumber));
 		
-		for(SubtitleUnitData subUnitData : entry.getValue()) {
+		for(LineForAiCorrection aiLine : entry.getValue()) {
 			
-			String line = subUnitData.getText();
-			String number = subUnitData.getNumber().toString();
+			String line = aiLine.getText();
+			String number = aiLine.getNumber().toString();
 			
 			CorrectionResponse resp = (responsesByLineNumber.containsKey(number) && !responsesByLineNumber.get(number).isEmpty()) ?
 					responsesByLineNumber.get(number).get(0) : null;
@@ -143,11 +139,11 @@ public class AiCustomCorrectorImpl implements AiCustomCorrector{
 				line = util.checkForChanges(resp.getCorrection(), line, resp.getDescription(), 100);
 			}
 			
-			subUnitData.setText(line);
+			aiLine.setText(line);
 		}
 	}
 	
-	private Map<Integer, List<SubtitleUnitData>> partitionSubUnits(List<SubtitleUnitData> data, int chunkSize) {
+	private Map<Integer, List<LineForAiCorrection>> partitionSubUnits(List<LineForAiCorrection> data, int chunkSize) {
 		
 		AtomicInteger i = new AtomicInteger(0);
 		return data.stream().collect(Collectors.groupingBy((d) -> i.getAndIncrement() / chunkSize,

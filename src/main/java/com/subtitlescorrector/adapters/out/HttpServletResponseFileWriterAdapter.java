@@ -21,12 +21,12 @@ public class HttpServletResponseFileWriterAdapter implements HttpServletResponse
 	
 	@Override
 	public void writeFileToResponse(UserSubtitleData data, HttpServletResponse response) {
-       writeResponse(data.getFile(), data.getSubtitleFileData().getFilename(), response);
+       writeResponse(data.getFile(), data.getFileMetadata().getFilename(), response);
 	}
 	
 	@Override
 	public void writeFileToResponse(UserSubtitleConversionData data, HttpServletResponse response) {
-		writeResponse(data.getFile(), data.getData().getFilename(), response);
+		writeResponse(data.getFile(), data.getMetadata().getFilename(), response);
 	}
 	
 	private void writeResponse(File file, String filename, HttpServletResponse response) {

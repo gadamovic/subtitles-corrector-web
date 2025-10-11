@@ -5,10 +5,10 @@ import java.util.List;
 
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.BomData;
-import com.subtitlescorrector.core.domain.SubtitleFileData;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
 
 public interface SubtitlesFileProcessor {
 
-	SubtitleFileData process(File storedFile, List<String> lines, AdditionalData processOptions, BomData bomData);
+	SrtSubtitleFileData process(File storedFile, List<String> lines, AdditionalData processOptions, BomData bomData);
 
 }

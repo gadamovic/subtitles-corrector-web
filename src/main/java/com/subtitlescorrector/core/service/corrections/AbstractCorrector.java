@@ -7,9 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
-import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
-import com.subtitlescorrector.core.domain.SubtitleUnitData;
 import com.subtitlescorrector.core.service.websocket.WebSocketMessageSender;
 
 
@@ -23,13 +21,13 @@ public abstract class AbstractCorrector {
 	
 	private static final Logger log = LoggerFactory.getLogger(AbstractCorrector.class);
 	
-	public abstract void correct(SubtitleUnitData subUnit, AdditionalData params, float processedPercentage);
+	public abstract String correct(String text, CorrectorParameters params, float processedPercentage);
 
-	public void process(SubtitleUnitData subUnit, AdditionalData params) {
+	public String process(String text, CorrectorParameters params) {
 		
 		float processedPercentage = ((float) params.getProcessedLines() / (float) params.getTotalNumberOfLines()) * 100;
 		
-		correct(subUnit, params, processedPercentage);
+		return correct(text, params, processedPercentage);
 				
 	}
 	

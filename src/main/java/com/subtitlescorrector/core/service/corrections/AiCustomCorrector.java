@@ -1,10 +1,11 @@
 package com.subtitlescorrector.core.service.corrections;
 
-import com.subtitlescorrector.core.domain.AdditionalData;
-import com.subtitlescorrector.core.domain.SubtitleFileData;
+import java.util.List;
+
+import com.subtitlescorrector.core.domain.ai.LineForAiCorrection;
 
 public interface AiCustomCorrector {
 
-	SubtitleFileData correct(SubtitleFileData data, AdditionalData params);
+	List<LineForAiCorrection> correct(List<LineForAiCorrection> lines, CorrectorParameters params);
 
 }

@@ -27,9 +27,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import com.subtitlescorrector.adapters.out.S3ServiceAdapter;
 import com.subtitlescorrector.core.domain.AdditionalData;
-import com.subtitlescorrector.core.domain.SubtitleFileData;
 import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
-import com.subtitlescorrector.core.service.corrections.SubtitlesFileProcessorImpl;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitlesFileProcessor;
 import com.subtitlescorrector.core.util.Constants;
 import com.subtitlescorrector.core.util.FileUtil;
 import com.subtitlescorrector.core.util.Util;
@@ -40,7 +40,7 @@ import com.subtitlescorrector.core.util.Util;
 public class SubtitleOverallProcessingIntegrationTest {
 
 	@Autowired
-	SubtitlesFileProcessorImpl processor;
+	SrtSubtitlesFileProcessor processor;
 
 	private AdditionalData data;
 
@@ -49,7 +49,7 @@ public class SubtitleOverallProcessingIntegrationTest {
 	@Test
 	void test() {
 
-		SubtitleFileData fileData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+		SrtSubtitleFileData fileData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
 		
 		assertEquals(fileData.getDetectedCharset(), StandardCharsets.UTF_8);
 		assertEquals(fileData.getLines().size(), 8);

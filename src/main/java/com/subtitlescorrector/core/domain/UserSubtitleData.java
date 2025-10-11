@@ -2,15 +2,18 @@ package com.subtitlescorrector.core.domain;
 
 import java.io.File;
 
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
+
 public class UserSubtitleData {
 
-	private SubtitleFileData subtitleFileData;
+	private UserSubtitleCorrectionCurrentVersionMetadata fileMetadata;
 	private File file;
-	public SubtitleFileData getSubtitleFileData() {
-		return subtitleFileData;
+
+	public UserSubtitleCorrectionCurrentVersionMetadata getFileMetadata() {
+		return fileMetadata;
 	}
-	public void setSubtitleFileData(SubtitleFileData subtitleFileData) {
-		this.subtitleFileData = subtitleFileData;
+	public void setFileMetadata(UserSubtitleCorrectionCurrentVersionMetadata fileMetadata) {
+		this.fileMetadata = fileMetadata;
 	}
 	public File getFile() {
 		return file;

@@ -5,12 +5,7 @@ import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Safelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-
-import com.subtitlescorrector.core.domain.AdditionalData;
-import com.subtitlescorrector.core.domain.SubtitleUnitData;
 
 
 @Service
@@ -19,7 +14,7 @@ public class HtmlTagsCorrector extends AbstractCorrector{
 	Logger log = LoggerFactory.getLogger(HtmlTagsCorrector.class);
 
 	@Override
-	public void correct(SubtitleUnitData subUnitData, AdditionalData params, float processedPercentage) {
+	public String correct(String text, CorrectorParameters params, float processedPercentage) {
 
 		Safelist safeList = new Safelist();
 		
@@ -30,10 +25,9 @@ public class HtmlTagsCorrector extends AbstractCorrector{
 		OutputSettings outputSettings = new OutputSettings();
 		outputSettings.prettyPrint(false);
 		
-		
-		String line = subUnitData.getText();
+	
 		String tmp = "";
-		String beforeCorrection = line;
+		String beforeCorrection = text;
 		
 		safeList.addTags("b", "br", "i", "u", "font")
 		.addAttributes("font", "color", "face", "size");
@@ -67,7 +61,7 @@ public class HtmlTagsCorrector extends AbstractCorrector{
 		}
 		
 		
-		subUnitData.setText(beforeCorrection);
+		return beforeCorrection;
 	}
 		
 	

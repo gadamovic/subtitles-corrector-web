@@ -1,4 +1,4 @@
-package com.subtitlescorrector.core.service.corrections;
+package com.subtitlescorrector.core.service.corrections.ass;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,13 +18,15 @@ import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.EditOperation;
 import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
-import com.subtitlescorrector.core.domain.SubtitleFileData;
-import com.subtitlescorrector.core.domain.SubtitleFormat;
-import com.subtitlescorrector.core.domain.SubtitleUnitData;
 import com.subtitlescorrector.core.domain.UserData;
+import com.subtitlescorrector.core.domain.ai.LineForAiCorrection;
 import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
 import com.subtitlescorrector.core.service.EditDistanceService;
-import com.subtitlescorrector.core.service.converters.SubtitlesConverterFactory;
+import com.subtitlescorrector.core.service.corrections.AbstractCorrector;
+import com.subtitlescorrector.core.service.corrections.AdditionalDataToCorrectorParametersAdapter;
+import com.subtitlescorrector.core.service.corrections.AiCustomCorrector;
+import com.subtitlescorrector.core.service.corrections.CorrectorsManager;
+import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitlesFileProcessor;
 import com.subtitlescorrector.core.service.preprocessing.PreProcessor;
 import com.subtitlescorrector.core.service.preprocessing.PreProcessorsManager;
 import com.subtitlescorrector.core.service.websocket.WebSocketMessageSender;
@@ -32,7 +35,7 @@ import com.subtitlescorrector.core.util.Util;
 
 
 @Component
-public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
+public class AssSubtitlesFileProcessor{
 
 	@Autowired
 	ApplicationProperties properties;
@@ -58,22 +61,27 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 	AiCustomCorrector aiCorrector;
 
 	@Autowired
-	private SubtitlesConverterFactory converterFactory;
+	AssSubtitleLinesToSubtitleUnitDataConverter converter;
 	
 	@Autowired
 	UserData user;
+	
+	@Autowired
+	AdditionalDataToCorrectorParametersAdapter adapter;
+	
+	@Autowired
+	AssFileSubtitleDataToLinesForAiCorrectionAdapter aiAdapter;
 	
 	@Autowired
 	public void setS3Service(SubtitlesCloudStoragePort s3Service) {
 		this.s3Service = s3Service;
 	}
 
-	private static final Logger log = LoggerFactory.getLogger(SubtitlesFileProcessorImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(VttSubtitlesFileProcessor.class);
 	
-	@Override
-	public SubtitleFileData process(File storedFile, List<String> lines, AdditionalData params, BomData bomData) {
+	public AssSubtitleFileData process(File storedFile, List<String> lines, AdditionalData params, BomData bomData) {
 
-		SubtitleFileData data = new SubtitleFileData();
+		AssSubtitleFileData data = new AssSubtitleFileData();
 		File correctedFile = new File(storedFile.getName());
 
 		try {
@@ -89,7 +97,11 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			//this are preparations of the content of the uploaded file. For example we don't want to keep any non-srt-relevant HTML
 			//because of security and show it in the editor (either as text before correction or after correction) where html is not escaped
 			for (PreProcessor preProcessor : preProcessorsManager.getPreProcessors()) {
-				data = preProcessor.process(data);
+				List<String> tmp = preProcessor.process(data.getLines().stream().map(AssSubtitleUnitData::getText).collect(Collectors.toList()));
+				for(int i = 0; i < tmp.size(); i++) {
+					AssSubtitleUnitData vttData = data.getLines().get(i);
+					vttData.setText(tmp.get(i));
+				}
 			}
 			
 			data.getLines().forEach(line -> line.setTextBeforeCorrection(line.getText()));
@@ -98,10 +110,10 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			
 			params.setTotalNumberOfLines(data.getLines().size());
 						
-			for(SubtitleUnitData subUnit : data.getLines()) {
+			for(AssSubtitleUnitData subUnit : data.getLines()) {
 				for(AbstractCorrector corrector : correctors) {
 					
-					corrector.process(subUnit, params);
+					subUnit.setText(corrector.process(subUnit.getText(), adapter.adapt(params)));
 					
 				}
 				params.setProcessedLines(params.getProcessedLines() + 1);
@@ -112,7 +124,14 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 			}
 			
 			if (params.getAiEnabled()) {
-				aiCorrector.correct(data, params);
+				List<LineForAiCorrection> corrected = aiCorrector.correct(aiAdapter.adapt(data), adapter.adapt(params));
+				
+				// Put back corrected lines to VttSubtitleUnitData
+				List<AssSubtitleUnitData> uncorrected = data.getLines();
+				for(int i = 0; i < uncorrected.size(); i++) {
+					uncorrected.get(i).setText(corrected.get(i).getText());
+				}
+				
 			}
 			
 			calculateEditOperationsAfterCorrections(data);
@@ -128,18 +147,16 @@ public class SubtitlesFileProcessorImpl implements SubtitlesFileProcessor {
 		return data;
 	}
 
-	private void populateSubtitleFileData(AdditionalData params, SubtitleFileData data, File subtitleFile,
+	private void populateSubtitleFileData(AdditionalData params, AssSubtitleFileData data, File subtitleFile,
 			Charset detectedEncoding, List<String> lines, BomData bomData) {
-		SubtitleFormat format = Util.detectSubtitleFormat(lines);
-		data.setFormat(format);
 		data.setDetectedCharset(detectedEncoding);
 		data.setFilename(subtitleFile.getName());
-		data.setLines(converterFactory.getConverter(format).convertToSubtitleUnits(lines));
+		data.setLines(converter.convertToSubtitleUnits(lines));
 		data.setBomData(bomData);
 	}
 
-	private void calculateEditOperationsAfterCorrections(SubtitleFileData data) {
-		for(SubtitleUnitData subData : data.getLines()) {
+	private void calculateEditOperationsAfterCorrections(AssSubtitleFileData data) {
+		for(AssSubtitleUnitData subData : data.getLines()) {
 			
 			String original = subData.getTextBeforeCorrection();
 			String corrected = subData.getText();

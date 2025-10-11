@@ -1,8 +1,13 @@
-package com.subtitlescorrector.core.domain;
+package com.subtitlescorrector.core.service.corrections.vtt.domain;
 
 import java.util.List;
 
-public class SubtitleUnitData {
+import com.subtitlescorrector.core.domain.CompositeEditOperation;
+import com.subtitlescorrector.core.domain.EditOperation;
+import com.subtitlescorrector.core.domain.SubtitleFormat;
+import com.subtitlescorrector.core.domain.SubtitleTimestamp;
+
+public class VttSubtitleUnitData {
 
 	SubtitleFormat format; 
 	Integer number;

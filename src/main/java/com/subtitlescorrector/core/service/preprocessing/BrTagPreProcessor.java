@@ -1,25 +1,26 @@
 package com.subtitlescorrector.core.service.preprocessing;
 
-import org.springframework.stereotype.Service;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.subtitlescorrector.core.domain.AdditionalData;
-import com.subtitlescorrector.core.domain.SubtitleFileData;
-import com.subtitlescorrector.core.domain.SubtitleUnitData;
+import org.springframework.stereotype.Service;
 
 @Service
 public class BrTagPreProcessor implements PreProcessor{
 
 	@Override
-	public SubtitleFileData process(SubtitleFileData data) {
+	public List<String> process(List<String> data) {
 		
-		for(SubtitleUnitData subUnitData : data.getLines()) {
+		List<String> processed = new ArrayList<>();
+		
+		for(String line : data) {
 			
-			String text = subUnitData.getText().replace("\n", "<br>");
-			subUnitData.setText(text);
+			String text = line.replace("\n", "<br>");
+			processed.add(text);
 			
 		}
 		
-		return data;
+		return processed;
 	}
 
 }

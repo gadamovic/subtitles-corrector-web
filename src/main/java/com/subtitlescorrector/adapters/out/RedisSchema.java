@@ -64,4 +64,8 @@ public class RedisSchema {
 		return RedisKeys.USER_SUBTITLE_CURRENT_VERSION.getKey() + ":" + userId;
 	}
 	
+	public static String createUserSubtitleCurrentVersionFileMetadataKey(String userId) {
+		return RedisKeys.USER_SUBTITLE_CURRENT_VERSION_FILE_METADATA.getKey() + ":" + userId;
+	}
+	
 }

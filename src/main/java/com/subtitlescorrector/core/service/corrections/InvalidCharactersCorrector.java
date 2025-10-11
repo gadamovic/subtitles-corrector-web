@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.core.domain.AdditionalData;
-import com.subtitlescorrector.core.domain.SubtitleUnitData;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleUnitData;
 
 @Service
 public class InvalidCharactersCorrector extends AbstractCorrector{
@@ -13,15 +13,13 @@ public class InvalidCharactersCorrector extends AbstractCorrector{
 	Logger log = LoggerFactory.getLogger(InvalidCharactersCorrector.class);
 
 	@Override
-	public void correct(SubtitleUnitData subUnit, AdditionalData params, float processedPercentage) {
+	public String correct(String text, CorrectorParameters params, float processedPercentage) {
 		
-		String line = subUnit.getText();
-					
 		String tmp = "";
-		String beforeCorrection = line;
+		String beforeCorrection = text;
 		
 		//NOTE: there are characters in this empty-looking quotes, but some editors doesn't print them
-		tmp = line.replace("", "ž");
+		tmp = text.replace("", "ž");
 		beforeCorrection = checkForChanges(tmp, beforeCorrection, "\"\" -> ž", processedPercentage);
 		
 		tmp = beforeCorrection.replace("", "Ž");
@@ -49,7 +47,7 @@ public class InvalidCharactersCorrector extends AbstractCorrector{
 			beforeCorrection = checkForChanges(tmp, beforeCorrection, "Æ -> Ć", processedPercentage);
 		}
 		
-		if(params.getConverteToch()) {
+		if(params.getConvertEToch()) {
 			tmp = beforeCorrection.replace("è", "č");
 			beforeCorrection = checkForChanges(tmp, beforeCorrection, "è -> č", processedPercentage);
 		}
@@ -59,7 +57,7 @@ public class InvalidCharactersCorrector extends AbstractCorrector{
 			beforeCorrection = checkForChanges(tmp, beforeCorrection, "È -> Č", processedPercentage);
 		}
 		
-		subUnit.setText(beforeCorrection);
+		return beforeCorrection;
 
 	}
 	

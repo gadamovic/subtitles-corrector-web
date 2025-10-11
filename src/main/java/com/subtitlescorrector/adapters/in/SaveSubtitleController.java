@@ -8,9 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.subtitlescorrector.core.domain.SubtitleFileData;
+import com.subtitlescorrector.core.domain.UserSubtitleCorrectionCurrentVersionMetadata;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.service.DownloadSubtitlesFileService;
+import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileDataWebDto;
+import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleFileData;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
+import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleFileData;
 import com.subtitlescorrector.core.util.Util;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,9 +32,32 @@ public class SaveSubtitleController {
 	DownloadSubtitlesFileService downloadService;
 
 	@RequestMapping(path = "/save")
-	public void save(@RequestBody SubtitleFileData subtitleData, @RequestParam("userId") String userId) {
+	public void save(@RequestBody SubtitleCorrectionFileDataWebDto subtitleData, @RequestParam("userId") String userId) {
 		Util.convertBrTagsToNewLineCharacters(subtitleData);
-		redisService.addUserSubtitleCurrentVersion(subtitleData, userId);
+		
+		UserSubtitleCorrectionCurrentVersionMetadata metadata = redisService.getUsersLastUpdatedSubtitleFileMetadata(userId);
+		String currentJson = redisService.getUserSubtitleCurrentVersionJson(userId);
+		String updatedJson = null;
+		
+		switch(metadata.getFormat()) {
+		case SRT:
+			SrtSubtitleFileData srtData = Util.jsonToSrtSubtitleFileData(currentJson);
+			srtData.merge(subtitleData);
+			updatedJson = Util.srtSubtitleFileDataToJson(srtData);
+			break;
+		case VTT:
+			VttSubtitleFileData vttData = Util.jsonToVttSubtitleFileData(currentJson);
+			vttData.merge(subtitleData);
+			updatedJson = Util.vttSubtitleFileDataToJson(vttData);
+			break;
+		case ASS:
+			AssSubtitleFileData assData = Util.jsonToAssSubtitleFileData(currentJson);
+			assData.merge(subtitleData);
+			updatedJson = Util.assSubtitleFileDataToJson(assData);
+			break;
+		}
+		
+		redisService.addUserSubtitleCurrentVersion(updatedJson, userId);
 	}
 
 	@RequestMapping(path = "/downloadFile")

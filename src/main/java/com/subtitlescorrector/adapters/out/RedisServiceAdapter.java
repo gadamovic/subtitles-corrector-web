@@ -6,10 +6,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.subtitlescorrector.core.domain.SubtitleConversionFileData;
-import com.subtitlescorrector.core.domain.SubtitleFileData;
-import com.subtitlescorrector.core.domain.SubtitleUnitData;
+import com.subtitlescorrector.core.domain.UserSubtitleConversionCurrentVersionMetadata;
+import com.subtitlescorrector.core.domain.UserSubtitleCorrectionCurrentVersionMetadata;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
+import com.subtitlescorrector.core.service.conversion.AssSubtitleConversionFileData;
+import com.subtitlescorrector.core.service.conversion.SrtSubtitleConversionFileData;
+import com.subtitlescorrector.core.service.conversion.VttSubtitleConversionFileData;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleUnitData;
 import com.subtitlescorrector.core.util.Util;
 
 import io.micrometer.common.util.StringUtils;
@@ -102,36 +106,85 @@ public class RedisServiceAdapter implements ExternalCacheServicePort {
 		return numberOfSubtitlesInt;
 	}
 	
-	public void addUserSubtitleCurrentVersion(SubtitleFileData data, String userId) {
+	public void addUserSubtitleCurrentVersion(String jsonData, String userId) {
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
 			
-			jedis.setex(RedisSchema.createUserSubtitleCurrentVersionKey(userId), USER_SUBTITLE_CURRENT_VERSION_CACHE_TTL, Util.subtitleFileDataToJson(data));
+			jedis.setex(RedisSchema.createUserSubtitleCurrentVersionKey(userId), USER_SUBTITLE_CURRENT_VERSION_CACHE_TTL, jsonData);
 			
 		}
 	}
 	
 	
-	public void addUserSubtitleConversionData(SubtitleConversionFileData data, String userId) {
+	public void addUserSubtitleConversionData(String data, String userId) {
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
 			
-			jedis.setex(RedisSchema.createUserSubtitleConversionDataKey(userId), USER_SUBTITLE_CONVERSION_DATA_CACHE_TTL, Util.subtitleConversionFileDataToJson(data));
+			jedis.setex(RedisSchema.createUserSubtitleConversionDataKey(userId), USER_SUBTITLE_CONVERSION_DATA_CACHE_TTL, data);
 			
 		}
 	}
 	
-	public SubtitleFileData getUserSubtitleCurrentVersion(String userId) {
+	public String getUserSubtitleCurrentVersionJson(String userId) {
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
 			
 			String jsonResult = jedis.get(RedisSchema.createUserSubtitleCurrentVersionKey(userId));
-			return Util.jsonToSubtitleFileData(jsonResult);
+			return jsonResult;
 		}
 	}
 	
-	public SubtitleConversionFileData getUserSubtitleConversionData(String userId) {
+	public VttSubtitleConversionFileData getVttUserSubtitleConversionData(String userId) {
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
 			
 			String jsonResult = jedis.get(RedisSchema.createUserSubtitleCurrentVersionKey(userId));
-			return Util.jsonToSubtitleConversionFileData(jsonResult);
+			return Util.jsonToVttSubtitleConversionFileData(jsonResult);
+		}
+	}
+	
+	public AssSubtitleConversionFileData getAssUserSubtitleConversionData(String userId) {
+		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
+			
+			String jsonResult = jedis.get(RedisSchema.createUserSubtitleCurrentVersionKey(userId));
+			return Util.jsonToAssSubtitleConversionFileData(jsonResult);
+		}
+	}
+	
+	public SrtSubtitleConversionFileData getSrtUserSubtitleConversionData(String userId) {
+		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
+			
+			String jsonResult = jedis.get(RedisSchema.createUserSubtitleCurrentVersionKey(userId));
+			return Util.jsonToSrtSubtitleConversionFileData(jsonResult);
+		}
+	}
+
+	@Override
+	public UserSubtitleCorrectionCurrentVersionMetadata getUsersLastUpdatedSubtitleFileMetadata(String userId) {
+		
+		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
+			String jsonResult = jedis.get(RedisSchema.createUserSubtitleCurrentVersionFileMetadataKey(userId));
+			return Util.jsonToSubtitleCurrentVersionMetadata(jsonResult);
+		}
+	}
+
+	@Override
+	public void addUsersLastUpdatedSubtitleFileMetadata(UserSubtitleCorrectionCurrentVersionMetadata metadata, String userId) {
+		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
+			jedis.setex(RedisSchema.createUserSubtitleCurrentVersionFileMetadataKey(userId), USER_SUBTITLE_CURRENT_VERSION_CACHE_TTL, Util.userSubtitleCurrentVersionMetadataToJson(metadata));
+		}
+	}
+
+	@Override
+	public void addUsersLastUpdatedSubtitleConversionFileMetadata(UserSubtitleConversionCurrentVersionMetadata metadata,
+			String userId) {
+		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
+			jedis.setex(RedisSchema.createUserSubtitleCurrentVersionFileMetadataKey(userId), USER_SUBTITLE_CURRENT_VERSION_CACHE_TTL, Util.userSubtitleConversionCurrentVersionMetadataToJson(metadata));
+		}
+	}
+	
+	@Override
+	public UserSubtitleConversionCurrentVersionMetadata getUsersLastUpdatedSubtitleConversionFileMetadata(String userId) {
+		
+		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
+			String jsonResult = jedis.get(RedisSchema.createUserSubtitleCurrentVersionFileMetadataKey(userId));
+			return Util.jsonToUserSubtitleConversionCurrentVersionMetadata(jsonResult);
 		}
 	}
 	

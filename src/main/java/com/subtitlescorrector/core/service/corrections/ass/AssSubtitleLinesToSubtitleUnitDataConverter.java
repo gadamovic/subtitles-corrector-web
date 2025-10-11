@@ -1,4 +1,4 @@
-package com.subtitlescorrector.core.service.converters;
+package com.subtitlescorrector.core.service.corrections.ass;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
 import com.subtitlescorrector.core.domain.SecondMillisecondDelimiterRegex;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.SubtitleTimestamp;
-import com.subtitlescorrector.core.domain.SubtitleUnitData;
 import com.subtitlescorrector.core.domain.TimeUnit;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleLinesToSubtitleUnitDataConverter;
 import com.subtitlescorrector.core.util.Util;
 
 @Service
-public class AssSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLinesToSubtitleUnitDataConverter{
+public class AssSubtitleLinesToSubtitleUnitDataConverter {
 
 	private static final String EVENTS_SECTION_START = "[Events]";
 	private static final String FORMAT = "Format:";
@@ -31,8 +31,7 @@ public class AssSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 	@Autowired
 	Util util;
 		
-	@Override
-	public List<SubtitleUnitData> convertToSubtitleUnits(List<String> lines) {
+	public List<AssSubtitleUnitData> convertToSubtitleUnits(List<String> lines) {
 
 		boolean foundEventsSection = false;
 		boolean foundFormat = false;
@@ -41,7 +40,7 @@ public class AssSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 		
 		Util.removeBomIfExists(lines);
 		
-		List<SubtitleUnitData> subsList = new ArrayList<>();
+		List<AssSubtitleUnitData> subsList = new ArrayList<>();
 		
 		for(String line : lines) {
 		
@@ -69,7 +68,7 @@ public class AssSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 				String text = parts[format.indexOf("Text")];
 				text = STYLE_PATTERN.matcher(text).replaceAll("");
 				
-				SubtitleUnitData subUnit = new SubtitleUnitData();
+				AssSubtitleUnitData subUnit = new AssSubtitleUnitData();
 				subUnit.setFormat(SubtitleFormat.ASS);
 				subUnit.setNumber(i++);
 				subUnit.setText(text);
@@ -88,14 +87,13 @@ public class AssSubtitleLinesToSubtitleUnitDataConverter implements SubtitleLine
 		return subsList;
 	}
 
-	@Override
-	public List<String> convertToListOfStrings(List<SubtitleUnitData> lines, boolean addBom) {
+	public List<String> convertToListOfStrings(List<AssSubtitleUnitData> lines, boolean addBom) {
 		
 		List<String> stringList = new ArrayList<String>(); 
 		
 		stringList.addAll(createDefaultAssHeader());
 		
-		for(SubtitleUnitData subtitle : lines) {
+		for(AssSubtitleUnitData subtitle : lines) {
 
 			String line = "Dialogue: " + DEFAULT_DIALOGUE_FORMAT_PLACEHOLDER;
 			String from = Util.formatTimestamp(subtitle.getTimestampFrom(), ".", TimeUnit.CENTISECOND);

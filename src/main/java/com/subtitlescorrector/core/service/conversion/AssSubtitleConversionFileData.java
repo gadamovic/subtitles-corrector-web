@@ -1,16 +1,19 @@
-package com.subtitlescorrector.core.domain;
+package com.subtitlescorrector.core.service.conversion;
 
-import java.io.Serializable;
-import java.nio.charset.Charset;
 import java.util.List;
 
-public class SubtitleConversionFileData implements Serializable{
+import com.subtitlescorrector.core.domain.BomData;
+import com.subtitlescorrector.core.domain.SubtitleFormat;
+import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleUnitData;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleUnitData;
+
+public class AssSubtitleConversionFileData {
 
 	private static final long serialVersionUID = -2406499811554095114L;
 
 	private String filename;
 	
-	private List<SubtitleUnitData> lines;
+	private List<AssSubtitleUnitData> lines;
 	
 	private SubtitleFormat sourceFormat;
 	
@@ -29,11 +32,11 @@ public class SubtitleConversionFileData implements Serializable{
 		this.filename = filename;
 	}
 
-	public List<SubtitleUnitData> getLines() {
+	public List<AssSubtitleUnitData> getLines() {
 		return lines;
 	}
 
-	public void setLines(List<SubtitleUnitData> lines) {
+	public void setLines(List<AssSubtitleUnitData> lines) {
 		this.lines = lines;
 	}
 
