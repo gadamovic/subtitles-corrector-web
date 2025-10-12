@@ -2,35 +2,22 @@ package com.subtitlescorrector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.CompletableFuture;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.kafka.core.KafkaTemplate;
 
-import com.subtitlescorrector.adapters.out.S3ServiceAdapter;
 import com.subtitlescorrector.core.domain.AdditionalData;
-import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitlesFileProcessor;
-import com.subtitlescorrector.core.util.Constants;
 import com.subtitlescorrector.core.util.FileUtil;
 import com.subtitlescorrector.core.util.Util;
 
@@ -46,6 +33,49 @@ public class SubtitleOverallProcessingIntegrationTest {
 
 	private File testFile;
 
+	/**
+	 * 1. Correction
+	 * 1.0 For ALL subtitle formats
+	 * 1.1 File without BOM, with b,i,u,font html tags and with æ, Æ, è and È. 
+	 *   Validate if html tags are stripped and invalid characters replaced.
+	 * 1.2 File with BOM, with b,i,u,font html tags and with æ, Æ, è and È. 
+	 *   Validate if html tags are stripped and invalid characters replaced.
+	 * 1.3 File with BOM, when remove BOM, validate if BOM is removed
+	 * 1.4 File with BOM, when keep BOM, validate if BOM is kept
+	 * 1.5 File with multiple BOMs, when remove BOM, validate if all BOMs are removed
+	 * 1.6 File with multiple BOMs, when keep BOM, validate that only 1 BOM is kept
+	 * 1.7 File when uploaded and subtitles shifted, validate if shifted correctly
+	 * 1.8 File when uploaded and edited in editor, check if saves file with edits
+	 * 1.9 AI corrections for all formats
+	 * 1.10 Srt file with invalid timestamp delimiters should be fixed
+	 * 1.11 Srt file with multiple consecutive blank lines at the beginning
+	 * 1.12 Srt file with multiple consecutive blank lines in the middle (TBA)
+	 * 1.13 File with other then UTF-8 encoding should be converted to UTF-8
+	 * 1.14 Vtt file with header, confirm it stays valid and contains header after correction
+	 * 1.15 Vtt file without header, confirm valid after correction
+	 * 1.16 Validate big file gets rejected
+	 * 1.17 Validate number of requests exceeded rejects upload
+	 * 1.18 Validate contact form on homepage works correctly
+	 * 1.19 Validate feedback form after download works correctly
+	 * 
+	 * 2. Conversion
+	 * 2.1 Srt -> Vtt
+	 * 2.2 Srt with BOM -> Vtt, should keep BOM
+	 * 2.3 Srt -> Ass
+	 * 2.4 Srt with BOM -> Ass, should keep BOM
+	 * 2.5 Vtt -> Srt
+	 * 2.6 Vtt with BOM -> Srt, should keep BOM
+	 * 2.7 Vtt -> Ass
+	 * 2.8 Vtt with BOM -> Ass, should keep BOM
+	 * 2.9 Ass -> Srt
+	 * 2.10 Ass with BOM -> Srt, should keep BOM
+	 * 2.11 Ass -> Vtt
+	 * 2.12 Ass with BOM -> Vtt, should keep BOM
+	 * 
+	 * 
+	 * 
+	 */
+	
 	@Test
 	void test() {
 
