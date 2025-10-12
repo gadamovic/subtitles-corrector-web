@@ -1,11 +1,14 @@
 package com.subtitlescorrector.core.service.conversion;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
+import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleFileData;
 import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleUnitData;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleUnitData;
+import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleFileData;
 
 public class AssSubtitleConversionFileData {
 
@@ -74,6 +77,20 @@ public class AssSubtitleConversionFileData {
 
 	public void setBomData(BomData bomData) {
 		this.bomData = bomData;
+	}
+	
+	public AssSubtitleFileData toSubtitleFileData() {
+
+		AssSubtitleFileData assFileData = new AssSubtitleFileData();
+
+		assFileData.setBomData(bomData);
+		assFileData.setDetectedCharset(Charset.forName(detectedEncoding));
+		assFileData.setFilename(filename);
+		assFileData.setLines(lines);
+		assFileData.setFormat(sourceFormat);
+
+		return assFileData;
+
 	}
 	
 }

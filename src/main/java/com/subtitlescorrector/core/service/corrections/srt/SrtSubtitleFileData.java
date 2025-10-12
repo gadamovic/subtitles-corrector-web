@@ -7,6 +7,8 @@ import java.util.List;
 
 import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
+import com.subtitlescorrector.core.service.conversion.SrtSubtitleConversionFileData;
+import com.subtitlescorrector.core.service.conversion.VttSubtitleConversionFileData;
 import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileDataWebDto;
 import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileLineDataWebDto;
 
@@ -112,6 +114,19 @@ public class SrtSubtitleFileData implements Serializable{
 			
 		}
 		
+	}
+	
+	public SrtSubtitleConversionFileData toSubtitleFileConversionData() {
+		
+		SrtSubtitleConversionFileData srtConversionData = new SrtSubtitleConversionFileData();
+		
+		srtConversionData.setBomData(bomData);
+		srtConversionData.setDetectedEncoding(detectedCharset.displayName());
+		srtConversionData.setFilename(filename);
+		srtConversionData.setLines(lines);
+		srtConversionData.setSourceFormat(format);
+		
+		return srtConversionData;
 	}
 
 }

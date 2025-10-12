@@ -87,9 +87,9 @@ public class VttSubtitlesFileProcessor{
 	
 	public VttSubtitleFileData process(File storedFile, List<String> lines, AdditionalData params, BomData bomData) {
 
-		VttSubtitleFileData data = new VttSubtitleFileData();
 		File correctedFile = new File(storedFile.getName());
-
+		VttSubtitleFileData data = converter.convertToSubtitleUnits(lines);
+		
 		try {
 			
 			String s3Key = user.getWebSocketSessionId() + "_" + storedFile.getName();
@@ -157,7 +157,6 @@ public class VttSubtitlesFileProcessor{
 			Charset detectedEncoding, List<String> lines, BomData bomData) {
 		data.setDetectedCharset(detectedEncoding);
 		data.setFilename(subtitleFile.getName());
-		data.setLines(converter.convertToSubtitleUnits(lines));
 		data.setBomData(bomData);
 	}
 

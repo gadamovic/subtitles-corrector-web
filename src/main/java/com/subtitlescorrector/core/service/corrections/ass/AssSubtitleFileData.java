@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
+import com.subtitlescorrector.core.service.conversion.AssSubtitleConversionFileData;
+import com.subtitlescorrector.core.service.conversion.SrtSubtitleConversionFileData;
 import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileDataWebDto;
 import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileLineDataWebDto;
 
@@ -109,6 +111,19 @@ public class AssSubtitleFileData {
 			
 		}
 		
+	}
+	
+	public AssSubtitleConversionFileData toSubtitleFileConversionData() {
+		
+		AssSubtitleConversionFileData assConversionData = new AssSubtitleConversionFileData();
+		
+		assConversionData.setBomData(bomData);
+		assConversionData.setDetectedEncoding(detectedCharset.displayName());
+		assConversionData.setFilename(filename);
+		assConversionData.setLines(lines);
+		assConversionData.setSourceFormat(format);
+		
+		return assConversionData;
 	}
 
 	

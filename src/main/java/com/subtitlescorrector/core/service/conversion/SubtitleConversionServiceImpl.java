@@ -90,41 +90,35 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 		
 		switch (sourceFormat) {
 		case SRT:
-			List<SrtSubtitleUnitData> srtData = srtParser.convertToSubtitleUnits(lines);
-			SrtSubtitleConversionFileData srtFileData = new SrtSubtitleConversionFileData();
+			SrtSubtitleConversionFileData srtFileData = srtParser.convertToSubtitleUnits(lines).toSubtitleFileConversionData();
 			srtFileData.setFilename(conversionParameters.getOriginalFilename());
 			srtFileData.setSourceFormat(sourceFormat);
 			srtFileData.setDetectedEncoding(detectedEncoding.displayName());
 			srtFileData.setBomData(bomData);
-			srtFileData.setLines(srtData);
 
-			response.setNumberOfLines(srtData.size());
+			response.setNumberOfLines(srtFileData.getLines().size());
 
 			subtitleFileDataJson = Util.srtSubtitleConversionFileDataToJson(srtFileData);
 			break;
 		case VTT:
-			List<VttSubtitleUnitData> vttData = vttParser.convertToSubtitleUnits(lines);
-			VttSubtitleConversionFileData vttFileData = new VttSubtitleConversionFileData();
+			VttSubtitleConversionFileData vttFileData = vttParser.convertToSubtitleUnits(lines).toSubtitleFileConversionData();
 			vttFileData.setFilename(conversionParameters.getOriginalFilename());
 			vttFileData.setSourceFormat(sourceFormat);
 			vttFileData.setDetectedEncoding(detectedEncoding.displayName());
 			vttFileData.setBomData(bomData);
-			vttFileData.setLines(vttData);
 			
-			response.setNumberOfLines(vttData.size());
+			response.setNumberOfLines(vttFileData.getLines().size());
 			
 			subtitleFileDataJson = Util.vttSubtitleConversionFileDataToJson(vttFileData);
 			break;
 		case ASS:
-			List<AssSubtitleUnitData> assData = assParser.convertToSubtitleUnits(lines);
-			AssSubtitleConversionFileData assFileData = new AssSubtitleConversionFileData();
+			AssSubtitleConversionFileData assFileData = assParser.convertToSubtitleUnits(lines).toSubtitleFileConversionData();
 			assFileData.setFilename(conversionParameters.getOriginalFilename());
 			assFileData.setSourceFormat(sourceFormat);
 			assFileData.setDetectedEncoding(detectedEncoding.displayName());
 			assFileData.setBomData(bomData);
-			assFileData.setLines(assData);
 			
-			response.setNumberOfLines(assData.size());
+			response.setNumberOfLines(assFileData.getLines().size());
 			
 			subtitleFileDataJson = Util.assSubtitleConversionFileDataToJson(assFileData);
 			break;

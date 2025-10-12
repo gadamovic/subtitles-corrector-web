@@ -31,13 +31,13 @@ public class SubtitlesFileConverter {
 
 		switch (targetFormat) {
 		case SRT:
-			return srtParser.convertToListOfStrings(srtData.getLines(), srtData.getBomData().getHasBom());
+			return srtParser.convertToListOfStrings(srtData.toSubtitleFileData(), srtData.getBomData().getHasBom());
 		case VTT:
 			VttSubtitleConversionFileData vttData = convertSrtToVtt(srtData);
-			return vttParser.convertToListOfStrings(vttData.getLines(), vttData.getBomData().getHasBom());
+			return vttParser.convertToListOfStrings(vttData.toSubtitleFileData(), vttData.getBomData().getHasBom());
 		case ASS:
 			AssSubtitleConversionFileData assData = convertSrtToAss(srtData);
-			return assParser.convertToListOfStrings(assData.getLines(), assData.getBomData().getHasBom());
+			return assParser.convertToListOfStrings(assData.toSubtitleFileData(), assData.getBomData().getHasBom());
 		}
 
 		return Collections.emptyList();
@@ -48,12 +48,12 @@ public class SubtitlesFileConverter {
 		switch (targetFormat) {
 		case SRT:
 			SrtSubtitleConversionFileData srtData = convertVttToSrt(vttData);
-			return srtParser.convertToListOfStrings(srtData.getLines(), srtData.getBomData().getHasBom());
+			return srtParser.convertToListOfStrings(srtData.toSubtitleFileData(), srtData.getBomData().getHasBom());
 		case VTT:
-			return vttParser.convertToListOfStrings(vttData.getLines(), vttData.getBomData().getHasBom());
+			return vttParser.convertToListOfStrings(vttData.toSubtitleFileData(), vttData.getBomData().getHasBom());
 		case ASS:
 			AssSubtitleConversionFileData assData = convertVttToAss(vttData);
-			return assParser.convertToListOfStrings(assData.getLines(), assData.getBomData().getHasBom());
+			return assParser.convertToListOfStrings(assData.toSubtitleFileData(), assData.getBomData().getHasBom());
 		}
 		
 		return Collections.emptyList();
@@ -65,12 +65,12 @@ public class SubtitlesFileConverter {
 		switch (targetFormat) {
 		case SRT:
 			SrtSubtitleConversionFileData srtData = convertAssToSrt(assData);
-			return srtParser.convertToListOfStrings(srtData.getLines(), srtData.getBomData().getHasBom());
+			return srtParser.convertToListOfStrings(srtData.toSubtitleFileData(), srtData.getBomData().getHasBom());
 		case VTT:
 			VttSubtitleConversionFileData vttData = convertAssToVtt(assData);
-			return vttParser.convertToListOfStrings(vttData.getLines(), vttData.getBomData().getHasBom());
+			return vttParser.convertToListOfStrings(vttData.toSubtitleFileData(), vttData.getBomData().getHasBom());
 		case ASS:
-			return assParser.convertToListOfStrings(assData.getLines(), assData.getBomData().getHasBom());
+			return assParser.convertToListOfStrings(assData.toSubtitleFileData(), assData.getBomData().getHasBom());
 		}
 
 		return Collections.emptyList();

@@ -25,7 +25,9 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 	@Autowired
 	Util util;
 	
-	public List<SrtSubtitleUnitData> convertToSubtitleUnits(List<String> lines){
+	public SrtSubtitleFileData convertToSubtitleUnits(List<String> lines){
+		
+		SrtSubtitleFileData fileData = new SrtSubtitleFileData();
 		
 		lines = trimLines(lines);
 		
@@ -89,8 +91,8 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 			
 			
 		}
-		
-		return dataList;
+		fileData.setLines(dataList);
+		return fileData;
 	}
 
 	private List<String> trimLines(List<String> lines) {
@@ -121,7 +123,9 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 		}
 	}
 	
-	public List<String> convertToListOfStrings(List<SrtSubtitleUnitData> lines, boolean addBom){
+	public List<String> convertToListOfStrings(SrtSubtitleFileData data, boolean addBom){
+		
+		List<SrtSubtitleUnitData> lines = data.getLines();
 		
 		List<String> stringList = new ArrayList<String>(); 
 		

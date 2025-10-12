@@ -1,10 +1,13 @@
 package com.subtitlescorrector.core.service.conversion;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
+import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleFileData;
 import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleUnitData;
 
 public class VttSubtitleConversionFileData implements Serializable{
@@ -22,6 +25,11 @@ public class VttSubtitleConversionFileData implements Serializable{
 	private String detectedEncoding;
 	
 	private BomData bomData;
+	
+	/**
+	 * Everything that goes above the start of subtitle lines
+	 */
+	List<String> header;
 
 
 	public String getFilename() {
@@ -74,6 +82,29 @@ public class VttSubtitleConversionFileData implements Serializable{
 
 	public void setBomData(BomData bomData) {
 		this.bomData = bomData;
+	}
+
+	public List<String> getHeader() {
+		return header;
+	}
+
+	public void setHeader(List<String> header) {
+		this.header = header;
+	}
+	
+	public VttSubtitleFileData toSubtitleFileData() {
+
+		VttSubtitleFileData vttFileData = new VttSubtitleFileData();
+
+		vttFileData.setBomData(bomData);
+		vttFileData.setDetectedCharset(Charset.forName(detectedEncoding));
+		vttFileData.setFilename(filename);
+		vttFileData.setLines(lines);
+		vttFileData.setFormat(sourceFormat);
+		vttFileData.setHeader(header);
+
+		return vttFileData;
+
 	}
 	
 }

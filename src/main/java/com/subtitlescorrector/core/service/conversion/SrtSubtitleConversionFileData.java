@@ -1,9 +1,11 @@
 package com.subtitlescorrector.core.service.conversion;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleUnitData;
 
 public class SrtSubtitleConversionFileData {
@@ -11,17 +13,16 @@ public class SrtSubtitleConversionFileData {
 	private static final long serialVersionUID = -2406499811554095114L;
 
 	private String filename;
-	
-	private List<SrtSubtitleUnitData> lines;
-	
-	private SubtitleFormat sourceFormat;
-	
-	private SubtitleFormat targetFormat;
-	
-	private String detectedEncoding;
-	
-	private BomData bomData;
 
+	private List<SrtSubtitleUnitData> lines;
+
+	private SubtitleFormat sourceFormat;
+
+	private SubtitleFormat targetFormat;
+
+	private String detectedEncoding;
+
+	private BomData bomData;
 
 	public String getFilename() {
 		return filename;
@@ -74,5 +75,19 @@ public class SrtSubtitleConversionFileData {
 	public void setBomData(BomData bomData) {
 		this.bomData = bomData;
 	}
-	
+
+	public SrtSubtitleFileData toSubtitleFileData() {
+
+		SrtSubtitleFileData srtFileData = new SrtSubtitleFileData();
+
+		srtFileData.setBomData(bomData);
+		srtFileData.setDetectedCharset(Charset.forName(detectedEncoding));
+		srtFileData.setFilename(filename);
+		srtFileData.setLines(lines);
+		srtFileData.setFormat(sourceFormat);
+
+		return srtFileData;
+
+	}
+
 }

@@ -63,15 +63,15 @@ public class SubtitleFileProviderForUserServiceImpl implements SubtitleFileProvi
 		
 		switch(metadata.getFormat()) {
 		case SRT:
-			lines = srtParser.convertToListOfStrings(Util.jsonToSrtSubtitleFileData(subtitleFileJson).getLines(), 
+			lines = srtParser.convertToListOfStrings(Util.jsonToSrtSubtitleFileData(subtitleFileJson), 
 					metadata.getBomData().getHasBom() && metadata.getBomData().getKeepBom());
 			break;
 		case VTT:
-			lines = vttParser.convertToListOfStrings(Util.jsonToVttSubtitleFileData(subtitleFileJson).getLines(), 
+			lines = vttParser.convertToListOfStrings(Util.jsonToVttSubtitleFileData(subtitleFileJson), 
 					metadata.getBomData().getHasBom() && metadata.getBomData().getKeepBom());
 			break;
 		case ASS:
-			lines = assParser.convertToListOfStrings(Util.jsonToAssSubtitleFileData(subtitleFileJson).getLines(), 
+			lines = assParser.convertToListOfStrings(Util.jsonToAssSubtitleFileData(subtitleFileJson), 
 					metadata.getBomData().getHasBom() && metadata.getBomData().getKeepBom());
 		}
 				

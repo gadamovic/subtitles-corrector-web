@@ -159,7 +159,7 @@ public class SrtSubtitlesFileProcessor {
 			Charset detectedEncoding, List<String> lines, BomData bomData) {
 		data.setDetectedCharset(detectedEncoding);
 		data.setFilename(subtitleFile.getName());
-		data.setLines(converter.convertToSubtitleUnits(lines));
+		data.setLines(converter.convertToSubtitleUnits(lines).getLines());
 		data.setBomData(bomData);
 	}
 

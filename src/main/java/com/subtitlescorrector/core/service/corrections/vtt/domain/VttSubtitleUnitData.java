@@ -17,6 +17,7 @@ public class VttSubtitleUnitData {
 	SubtitleTimestamp timestampToShifted;
 	String text;
 	String textBeforeCorrection;
+	String cues;
 	
 	List<List<EditOperation>> editOperations;
 	List<CompositeEditOperation> compEditOperations;
@@ -85,13 +86,19 @@ public class VttSubtitleUnitData {
 	public void setTimestampToShifted(SubtitleTimestamp timestampToShifted) {
 		this.timestampToShifted = timestampToShifted;
 	}
+	public String getCues() {
+		return cues;
+	}
+	public void setCues(String cues) {
+		this.cues = cues;
+	}
 	@Override
 	public String toString() {
-		return "SubtitleUnitData [format=" + format + ", number=" + number + ", timestampFrom=" + timestampFrom
+		return "VttSubtitleUnitData [format=" + format + ", number=" + number + ", timestampFrom=" + timestampFrom
 				+ ", timestampTo=" + timestampTo + ", timestampFromShifted=" + timestampFromShifted
 				+ ", timestampToShifted=" + timestampToShifted + ", text=" + text + ", textBeforeCorrection="
-				+ textBeforeCorrection + ", editOperations=" + editOperations + ", compEditOperations="
-				+ compEditOperations + "]";
+				+ textBeforeCorrection + ", cues=" + cues + ", editOperations=" + editOperations
+				+ ", compEditOperations=" + compEditOperations + "]";
 	}
 
 	

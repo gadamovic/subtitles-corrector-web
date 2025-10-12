@@ -1,6 +1,7 @@
 package com.subtitlescorrector.core.service.corrections.vtt;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 import com.subtitlescorrector.core.domain.SecondMillisecondDelimiterRegex;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.SubtitleTimestamp;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleUnitData;
 import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleFileData;
 import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleUnitData;
 import com.subtitlescorrector.core.util.Util;
@@ -21,12 +21,16 @@ import io.micrometer.common.util.StringUtils;
 @Service
 public class VttSubtitleLinesToSubtitleUnitDataParser {
 
+	private static final String WEBVTT_MARK = "WEBVTT";
+
 	Logger log = LoggerFactory.getLogger(VttSubtitleLinesToSubtitleUnitDataParser.class);
 
 	@Autowired
 	Util util;
 	
-	public List<VttSubtitleUnitData> convertToSubtitleUnits(List<String> lines){
+	public VttSubtitleFileData convertToSubtitleUnits(List<String> lines){
+		
+		VttSubtitleFileData fileData = new VttSubtitleFileData();
 		
 		lines = trimLines(lines);
 		
@@ -50,7 +54,22 @@ public class VttSubtitleLinesToSubtitleUnitDataParser {
 				data.setFormat(SubtitleFormat.VTT);
 				
 				String from = (line.substring(0, line.indexOf("-->") - 1));
-				String to = line.substring((line.lastIndexOf(" ") + 1), line.length());
+				String to = line.substring(line.indexOf(" --> ") + " --> ".length());
+				
+				if(to.contains(" ")) {
+					String toSplit[] = to.split(" ");
+					
+					to = toSplit[0];
+					String cues = "";
+					
+					for(int j = 1; j < toSplit.length; j++) {
+						cues += (" " + toSplit[j]);
+					}
+					
+					cues = cues.substring(1);
+					data.setCues(cues);
+					
+				}
 				
 				SubtitleTimestamp tsFrom = util.parseSubtitleTimestampString(from, SecondMillisecondDelimiterRegex.DOT);
 				SubtitleTimestamp tsTo = util.parseSubtitleTimestampString(to, SecondMillisecondDelimiterRegex.DOT);
@@ -62,6 +81,10 @@ public class VttSubtitleLinesToSubtitleUnitDataParser {
 				data.setTimestampTo(tsTo);
 
 				continue;
+			}
+			
+			if(!line.equals(WEBVTT_MARK) && !foundFirstSubtitleLine) {
+				fileData.addLineToHeader(line);
 			}
 			
 			//ignore multiple consecutive blank lines or any blank lines before the first subtitle line is found
@@ -92,11 +115,47 @@ public class VttSubtitleLinesToSubtitleUnitDataParser {
 			
 		}
 		
-		return dataList;
+		fileData.setHeader(trimHeader(fileData.getHeader()));
+		fileData.setLines(dataList);
+		return fileData;
+	}
+
+	private List<String> trimHeader(List<String> header) {
+		
+		if(header == null || header.size() == 0) {
+			return header;
+		}
+		
+		int startIndex = 0;
+		int endIndex = header.size() - 1;
+		for (int i = 0; i < header.size(); i++) {
+			if (StringUtils.isNotBlank(header.get(i))) {
+				startIndex = i;
+				break;
+			}
+		}
+
+		for (int i = header.size() - 1; i >= 0; i--) {
+			if (StringUtils.isNotBlank(header.get(i))) {
+				endIndex = i;
+				break;
+			}			
+		}
+		
+		if((startIndex == endIndex) && (StringUtils.isBlank(header.get(startIndex)))) {
+			return Collections.emptyList();
+		}
+		
+		return header.subList(startIndex, endIndex + 1);
+
 	}
 
 	private List<String> trimLines(List<String> lines) {
 				
+		if(lines == null || lines.size() == 0) {
+			return lines;
+		}
+		
 		int firstValidIndex = 0;
 		
 		for(String line : lines) {
@@ -123,15 +182,29 @@ public class VttSubtitleLinesToSubtitleUnitDataParser {
 		}
 	}
 	
-	public List<String> convertToListOfStrings(List<VttSubtitleUnitData> lines, boolean addBom){
+	public List<String> convertToListOfStrings(VttSubtitleFileData data, boolean addBom){
+		
+		List<VttSubtitleUnitData> lines = data.getLines();
 		
 		List<String> stringList = new ArrayList<String>(); 
 		
-		stringList.add("WEBVTT");
+		stringList.add(WEBVTT_MARK);
 		stringList.add("");
 		
+		if(data.getHeader() != null && data.getHeader().size() > 0) {
+			stringList.addAll(data.getHeader());
+			stringList.add("");
+		}
+		
 		for(VttSubtitleUnitData subtitle : lines) {
-			stringList.add(getTimestampFrom(subtitle) + " --> " + getTimestampTo(subtitle));
+			
+			StringBuilder sb = new StringBuilder(getTimestampFrom(subtitle)).append(" --> ").append(getTimestampTo(subtitle));
+			if(StringUtils.isNotBlank(subtitle.getCues())) {
+				sb.append(" ").append(subtitle.getCues());
+			}
+			
+			stringList.add(sb.toString());
+			
 			stringList.add(subtitle.getText());
 			stringList.add("");
 		}

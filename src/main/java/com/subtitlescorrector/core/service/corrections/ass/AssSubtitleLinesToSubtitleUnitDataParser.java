@@ -31,8 +31,10 @@ public class AssSubtitleLinesToSubtitleUnitDataParser {
 	@Autowired
 	Util util;
 		
-	public List<AssSubtitleUnitData> convertToSubtitleUnits(List<String> lines) {
+	public AssSubtitleFileData convertToSubtitleUnits(List<String> lines) {
 
+		AssSubtitleFileData fileData = new AssSubtitleFileData();
+		
 		boolean foundEventsSection = false;
 		boolean foundFormat = false;
 		List<String> format = null;
@@ -83,11 +85,13 @@ public class AssSubtitleLinesToSubtitleUnitDataParser {
 			}
 			
 		}
-			
-		return subsList;
+		fileData.setLines(subsList);
+		return fileData;
 	}
 
-	public List<String> convertToListOfStrings(List<AssSubtitleUnitData> lines, boolean addBom) {
+	public List<String> convertToListOfStrings(AssSubtitleFileData data, boolean addBom) {
+		
+		List<AssSubtitleUnitData> lines = data.getLines();
 		
 		List<String> stringList = new ArrayList<String>(); 
 		
