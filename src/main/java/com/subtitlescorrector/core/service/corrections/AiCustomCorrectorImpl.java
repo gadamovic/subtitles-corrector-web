@@ -19,6 +19,8 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
@@ -73,9 +75,16 @@ public class AiCustomCorrectorImpl implements AiCustomCorrector{
 		
 		List<Future<?>> futures = new ArrayList<>();
 		
+		// Get and then pass request attributes from current thread to the new one
+		// so session scoped data could be obtained
+		RequestAttributes context = RequestContextHolder.getRequestAttributes();
+		
 		for(Map.Entry<Integer, List<LineForAiCorrection>> entry : partitioned.entrySet()) {
 			
-			Future<?> f = executorService.submit(() -> processOneChunk(mapper, entry));
+			Future<?> f = executorService.submit(() -> {
+				RequestContextHolder.setRequestAttributes(context);
+				processOneChunk(mapper, entry);
+			});
 			futures.add(f);
 				
 		}
