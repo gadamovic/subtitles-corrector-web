@@ -14,17 +14,17 @@ import com.subtitlescorrector.core.domain.SecondMillisecondDelimiterRegex;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.SubtitleTimestamp;
 import com.subtitlescorrector.core.domain.TimeUnit;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleLinesToSubtitleUnitDataConverter;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleLinesToSubtitleUnitDataParser;
 import com.subtitlescorrector.core.util.Util;
 
 @Service
-public class AssSubtitleLinesToSubtitleUnitDataConverter {
+public class AssSubtitleLinesToSubtitleUnitDataParser {
 
 	private static final String EVENTS_SECTION_START = "[Events]";
 	private static final String FORMAT = "Format:";
 	private static final String DEFAULT_DIALOGUE_FORMAT_PLACEHOLDER = "Layer,Start,End,Style,Name,MarginL,MarginR,MarginV,Effect,Text";
 
-	Logger log = LoggerFactory.getLogger(SrtSubtitleLinesToSubtitleUnitDataConverter.class);
+	Logger log = LoggerFactory.getLogger(SrtSubtitleLinesToSubtitleUnitDataParser.class);
 	
     private static final Pattern STYLE_PATTERN = Pattern.compile("\\{.*?\\}");
 	

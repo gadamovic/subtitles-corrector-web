@@ -30,7 +30,7 @@ import com.subtitlescorrector.core.service.corrections.AiCustomCorrector;
 import com.subtitlescorrector.core.service.corrections.CorrectorsManager;
 import com.subtitlescorrector.core.service.corrections.SubtitlesFileProcessor;
 import com.subtitlescorrector.core.service.corrections.vtt.VttFileSubtitleDataToLinesForAiCorrectionAdapter;
-import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitleLinesToSubtitleUnitDataConverter;
+import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitleLinesToSubtitleUnitDataParser;
 import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitlesFileProcessor;
 import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleFileData;
 import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleUnitData;
@@ -69,7 +69,7 @@ public class SrtSubtitlesFileProcessor {
 	AiCustomCorrector aiCorrector;
 
 	@Autowired
-	SrtSubtitleLinesToSubtitleUnitDataConverter converter;
+	SrtSubtitleLinesToSubtitleUnitDataParser converter;
 	
 	@Autowired
 	UserData user;

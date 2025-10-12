@@ -18,12 +18,13 @@ import com.subtitlescorrector.core.domain.UserSubtitleData;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.service.conversion.AssSubtitleConversionFileData;
 import com.subtitlescorrector.core.service.conversion.SrtSubtitleConversionFileData;
+import com.subtitlescorrector.core.service.conversion.SubtitlesFileConverter;
 import com.subtitlescorrector.core.service.conversion.VttSubtitleConversionFileData;
 import com.subtitlescorrector.core.service.converters.SubtitlesConverterFactory;
-import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleLinesToSubtitleUnitDataConverter;
+import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleLinesToSubtitleUnitDataParser;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleLinesToSubtitleUnitDataConverter;
-import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitleLinesToSubtitleUnitDataConverter;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleLinesToSubtitleUnitDataParser;
+import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitleLinesToSubtitleUnitDataParser;
 import com.subtitlescorrector.core.util.FileUtil;
 import com.subtitlescorrector.core.util.Util;
 
@@ -37,13 +38,16 @@ public class SubtitleFileProviderForUserServiceImpl implements SubtitleFileProvi
 	SubtitlesConverterFactory converterFactory;
 	
 	@Autowired
-	SrtSubtitleLinesToSubtitleUnitDataConverter srtConverter;
+	SrtSubtitleLinesToSubtitleUnitDataParser srtParser;
 	
 	@Autowired
-	VttSubtitleLinesToSubtitleUnitDataConverter vttConverter;
+	VttSubtitleLinesToSubtitleUnitDataParser vttParser;
 	
 	@Autowired
-	AssSubtitleLinesToSubtitleUnitDataConverter assConverter;
+	AssSubtitleLinesToSubtitleUnitDataParser assParser;
+	
+	@Autowired
+	SubtitlesFileConverter converter;
 	
 	Logger log = LoggerFactory.getLogger(SubtitleFileProviderForUserServiceImpl.class);
 	
@@ -59,15 +63,15 @@ public class SubtitleFileProviderForUserServiceImpl implements SubtitleFileProvi
 		
 		switch(metadata.getFormat()) {
 		case SRT:
-			lines = srtConverter.convertToListOfStrings(Util.jsonToSrtSubtitleFileData(subtitleFileJson).getLines(), 
+			lines = srtParser.convertToListOfStrings(Util.jsonToSrtSubtitleFileData(subtitleFileJson).getLines(), 
 					metadata.getBomData().getHasBom() && metadata.getBomData().getKeepBom());
 			break;
 		case VTT:
-			lines = vttConverter.convertToListOfStrings(Util.jsonToVttSubtitleFileData(subtitleFileJson).getLines(), 
+			lines = vttParser.convertToListOfStrings(Util.jsonToVttSubtitleFileData(subtitleFileJson).getLines(), 
 					metadata.getBomData().getHasBom() && metadata.getBomData().getKeepBom());
 			break;
 		case ASS:
-			lines = assConverter.convertToListOfStrings(Util.jsonToAssSubtitleFileData(subtitleFileJson).getLines(), 
+			lines = assParser.convertToListOfStrings(Util.jsonToAssSubtitleFileData(subtitleFileJson).getLines(), 
 					metadata.getBomData().getHasBom() && metadata.getBomData().getKeepBom());
 		}
 				
@@ -90,15 +94,15 @@ public class SubtitleFileProviderForUserServiceImpl implements SubtitleFileProvi
 		switch(metadata.getSourceFormat()) {
 		case SRT:
 			SrtSubtitleConversionFileData srtData = redisService.getSrtUserSubtitleConversionData(userId);
-			lines = srtConverter.convertToListOfStrings(srtData.getLines(), metadata.getBomData().getHasBom() && metadata.getBomData().getKeepBom());
+			lines = converter.convertAndReturnTextLines(srtData, SubtitleFormat.valueOf(targetFormat));
 			break;
 		case VTT:
 			VttSubtitleConversionFileData vttData = redisService.getVttUserSubtitleConversionData(userId);
-			lines = vttConverter.convertToListOfStrings(vttData.getLines(), metadata.getBomData().getHasBom() && metadata.getBomData().getKeepBom());
+			lines = converter.convertAndReturnTextLines(vttData, SubtitleFormat.valueOf(targetFormat));
 			break;
 		case ASS:
 			AssSubtitleConversionFileData assData = redisService.getAssUserSubtitleConversionData(userId);
-			lines = assConverter.convertToListOfStrings(assData.getLines(), metadata.getBomData().getHasBom() && metadata.getBomData().getKeepBom());
+			lines = converter.convertAndReturnTextLines(assData, SubtitleFormat.valueOf(targetFormat));
 			break;
 		}
 	

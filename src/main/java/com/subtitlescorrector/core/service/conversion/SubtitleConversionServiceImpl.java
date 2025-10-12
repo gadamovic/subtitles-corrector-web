@@ -24,12 +24,12 @@ import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
 import com.subtitlescorrector.core.service.converters.SubtitlesConverterFactory;
 import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleFileData;
-import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleLinesToSubtitleUnitDataConverter;
+import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleLinesToSubtitleUnitDataParser;
 import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleUnitData;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleLinesToSubtitleUnitDataConverter;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleLinesToSubtitleUnitDataParser;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleUnitData;
-import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitleLinesToSubtitleUnitDataConverter;
+import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitleLinesToSubtitleUnitDataParser;
 import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleFileData;
 import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleUnitData;
 import com.subtitlescorrector.core.util.FileUtil;
@@ -51,13 +51,13 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 	SubtitlesCloudStoragePort s3Service;
 	
 	@Autowired
-	SrtSubtitleLinesToSubtitleUnitDataConverter srtConverter;
+	SrtSubtitleLinesToSubtitleUnitDataParser srtParser;
 	
 	@Autowired
-	VttSubtitleLinesToSubtitleUnitDataConverter vttConverter;
+	VttSubtitleLinesToSubtitleUnitDataParser vttParser;
 	
 	@Autowired
-	AssSubtitleLinesToSubtitleUnitDataConverter assConverter;
+	AssSubtitleLinesToSubtitleUnitDataParser assParser;
 	
 	
 	Logger log = LoggerFactory.getLogger(SubtitleConversionServiceImpl.class);
@@ -90,7 +90,7 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 		
 		switch (sourceFormat) {
 		case SRT:
-			List<SrtSubtitleUnitData> srtData = srtConverter.convertToSubtitleUnits(lines);
+			List<SrtSubtitleUnitData> srtData = srtParser.convertToSubtitleUnits(lines);
 			SrtSubtitleConversionFileData srtFileData = new SrtSubtitleConversionFileData();
 			srtFileData.setFilename(conversionParameters.getOriginalFilename());
 			srtFileData.setSourceFormat(sourceFormat);
@@ -103,7 +103,7 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 			subtitleFileDataJson = Util.srtSubtitleConversionFileDataToJson(srtFileData);
 			break;
 		case VTT:
-			List<VttSubtitleUnitData> vttData = vttConverter.convertToSubtitleUnits(lines);
+			List<VttSubtitleUnitData> vttData = vttParser.convertToSubtitleUnits(lines);
 			VttSubtitleConversionFileData vttFileData = new VttSubtitleConversionFileData();
 			vttFileData.setFilename(conversionParameters.getOriginalFilename());
 			vttFileData.setSourceFormat(sourceFormat);
@@ -116,7 +116,7 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 			subtitleFileDataJson = Util.vttSubtitleConversionFileDataToJson(vttFileData);
 			break;
 		case ASS:
-			List<AssSubtitleUnitData> assData = assConverter.convertToSubtitleUnits(lines);
+			List<AssSubtitleUnitData> assData = assParser.convertToSubtitleUnits(lines);
 			AssSubtitleConversionFileData assFileData = new AssSubtitleConversionFileData();
 			assFileData.setFilename(conversionParameters.getOriginalFilename());
 			assFileData.setSourceFormat(sourceFormat);

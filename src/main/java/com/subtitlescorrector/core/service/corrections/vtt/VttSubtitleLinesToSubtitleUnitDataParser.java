@@ -19,9 +19,9 @@ import com.subtitlescorrector.core.util.Util;
 import io.micrometer.common.util.StringUtils;
 
 @Service
-public class VttSubtitleLinesToSubtitleUnitDataConverter {
+public class VttSubtitleLinesToSubtitleUnitDataParser {
 
-	Logger log = LoggerFactory.getLogger(VttSubtitleLinesToSubtitleUnitDataConverter.class);
+	Logger log = LoggerFactory.getLogger(VttSubtitleLinesToSubtitleUnitDataParser.class);
 
 	@Autowired
 	Util util;

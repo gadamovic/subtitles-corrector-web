@@ -18,9 +18,9 @@ import com.subtitlescorrector.core.util.Util;
 import io.micrometer.common.util.StringUtils;
 
 @Service
-public class SrtSubtitleLinesToSubtitleUnitDataConverter{
+public class SrtSubtitleLinesToSubtitleUnitDataParser{
 
-	Logger log = LoggerFactory.getLogger(SrtSubtitleLinesToSubtitleUnitDataConverter.class);
+	Logger log = LoggerFactory.getLogger(SrtSubtitleLinesToSubtitleUnitDataParser.class);
 
 	@Autowired
 	Util util;

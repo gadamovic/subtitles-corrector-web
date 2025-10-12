@@ -61,7 +61,7 @@ public class AssSubtitlesFileProcessor{
 	AiCustomCorrector aiCorrector;
 
 	@Autowired
-	AssSubtitleLinesToSubtitleUnitDataConverter converter;
+	AssSubtitleLinesToSubtitleUnitDataParser converter;
 	
 	@Autowired
 	UserData user;

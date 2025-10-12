@@ -67,7 +67,7 @@ public class VttSubtitlesFileProcessor{
 	AiCustomCorrector aiCorrector;
 
 	@Autowired
-	VttSubtitleLinesToSubtitleUnitDataConverter converter;
+	VttSubtitleLinesToSubtitleUnitDataParser converter;
 	
 	@Autowired
 	UserData user;
