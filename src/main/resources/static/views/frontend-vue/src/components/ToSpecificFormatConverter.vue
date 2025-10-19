@@ -145,7 +145,6 @@ export default {
 
             const formData = new FormData();
 
-            formData.append("businessOperation", "conversion");
             formData.append("file", this.file);
             formData.append("webSocketUserId", this.userId);
             formData.append("targetFormat", this.targetFormat);

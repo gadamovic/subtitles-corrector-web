@@ -5,10 +5,10 @@ import java.util.List;
 
 import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
-import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleFileData;
-import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleUnitData;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleUnitData;
-import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleFileData;
+import com.subtitlescorrector.core.domain.ass.AssSubtitleFileData;
+import com.subtitlescorrector.core.domain.ass.AssSubtitleUnitData;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
+import com.subtitlescorrector.core.domain.vtt.VttSubtitleFileData;
 
 public class AssSubtitleConversionFileData {
 

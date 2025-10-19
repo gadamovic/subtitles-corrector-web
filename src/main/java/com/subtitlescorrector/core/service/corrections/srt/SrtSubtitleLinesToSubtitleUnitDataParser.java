@@ -12,7 +12,10 @@ import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.SecondMillisecondDelimiterRegex;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.SubtitleTimestamp;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
 import com.subtitlescorrector.core.service.converters.SubtitleLinesToSubtitleUnitDataConverter;
+import com.subtitlescorrector.core.util.SubtitleTimestampUtils;
 import com.subtitlescorrector.core.util.Util;
 
 import io.micrometer.common.util.StringUtils;
@@ -23,7 +26,7 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 	Logger log = LoggerFactory.getLogger(SrtSubtitleLinesToSubtitleUnitDataParser.class);
 
 	@Autowired
-	Util util;
+	SubtitleTimestampUtils util;
 	
 	public SrtSubtitleFileData convertToSubtitleUnits(List<String> lines){
 		
@@ -61,8 +64,8 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 				SubtitleTimestamp tsFrom = util.parseSubtitleTimestampString(from, SecondMillisecondDelimiterRegex.COMMA);
 				SubtitleTimestamp tsTo = util.parseSubtitleTimestampString(to, SecondMillisecondDelimiterRegex.COMMA);
 				
-				tsFrom.setFormattedTimestamp(Util.formatTimestamp(tsFrom, ","));
-				tsTo.setFormattedTimestamp(Util.formatTimestamp(tsTo, ","));
+				tsFrom.setFormattedTimestamp(SubtitleTimestampUtils.formatTimestamp(tsFrom, ","));
+				tsTo.setFormattedTimestamp(SubtitleTimestampUtils.formatTimestamp(tsTo, ","));
 				
 				data.setTimestampFrom(tsFrom);
 				data.setTimestampTo(tsTo);
@@ -154,7 +157,7 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 			timestamp = data.getTimestampFrom();
 		}
 		
-		String formattedTimestamp = Util.formatTimestamp(timestamp, ",");
+		String formattedTimestamp = SubtitleTimestampUtils.formatTimestamp(timestamp, ",");
 		
 		return formattedTimestamp;
 		
@@ -170,7 +173,7 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 			timestamp = data.getTimestampTo();
 		}
 		
-		String formattedTimestamp = Util.formatTimestamp(timestamp, ",");
+		String formattedTimestamp = SubtitleTimestampUtils.formatTimestamp(timestamp, ",");
 		
 		return formattedTimestamp;
 	}

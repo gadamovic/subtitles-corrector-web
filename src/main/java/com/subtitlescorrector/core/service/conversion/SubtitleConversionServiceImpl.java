@@ -10,29 +10,20 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.BomData;
-import com.subtitlescorrector.core.domain.BusinessOperation;
 import com.subtitlescorrector.core.domain.ConversionParameters;
 import com.subtitlescorrector.core.domain.SubtitleConversionFileDataResponse;
-import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.UserData;
 import com.subtitlescorrector.core.domain.UserSubtitleConversionCurrentVersionMetadata;
-import com.subtitlescorrector.core.domain.UserSubtitleCorrectionCurrentVersionMetadata;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
 import com.subtitlescorrector.core.service.converters.SubtitlesConverterFactory;
-import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleFileData;
 import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleLinesToSubtitleUnitDataParser;
-import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleUnitData;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleLinesToSubtitleUnitDataParser;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleUnitData;
 import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitleLinesToSubtitleUnitDataParser;
-import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleFileData;
-import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleUnitData;
 import com.subtitlescorrector.core.util.FileUtil;
+import com.subtitlescorrector.core.util.JsonSerializationUtil;
 import com.subtitlescorrector.core.util.Util;
 
 @Service
@@ -98,7 +89,7 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 
 			response.setNumberOfLines(srtFileData.getLines().size());
 
-			subtitleFileDataJson = Util.srtSubtitleConversionFileDataToJson(srtFileData);
+			subtitleFileDataJson = JsonSerializationUtil.srtSubtitleConversionFileDataToJson(srtFileData);
 			break;
 		case VTT:
 			VttSubtitleConversionFileData vttFileData = vttParser.convertToSubtitleUnits(lines).toSubtitleFileConversionData();
@@ -109,7 +100,7 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 			
 			response.setNumberOfLines(vttFileData.getLines().size());
 			
-			subtitleFileDataJson = Util.vttSubtitleConversionFileDataToJson(vttFileData);
+			subtitleFileDataJson = JsonSerializationUtil.vttSubtitleConversionFileDataToJson(vttFileData);
 			break;
 		case ASS:
 			AssSubtitleConversionFileData assFileData = assParser.convertToSubtitleUnits(lines).toSubtitleFileConversionData();
@@ -120,7 +111,7 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 			
 			response.setNumberOfLines(assFileData.getLines().size());
 			
-			subtitleFileDataJson = Util.assSubtitleConversionFileDataToJson(assFileData);
+			subtitleFileDataJson = JsonSerializationUtil.assSubtitleConversionFileDataToJson(assFileData);
 			break;
 		}
 		

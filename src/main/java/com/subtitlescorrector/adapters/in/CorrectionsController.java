@@ -16,17 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.RequestValidatorStatus;
-import com.subtitlescorrector.core.domain.exception.InvalidBusinessOperationException;
 import com.subtitlescorrector.core.port.EmailServicePort;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.port.StorageSystemPort;
 import com.subtitlescorrector.core.service.RequestValidator;
-import com.subtitlescorrector.core.service.UploadFileEntryPoint;
-import com.subtitlescorrector.core.service.conversion.SubtitleConversionService;
-import com.subtitlescorrector.core.service.conversion.VttSubtitleConversionFileData;
 import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileDataWebDto;
 import com.subtitlescorrector.core.service.corrections.SubtitlesCorrectionService;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.util.Util;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -78,7 +73,7 @@ public class CorrectionsController {
 		}
 		
 		File storedFile = fileSystemStorageService.store(file);		
-		AdditionalData clientParameters = extractOptions(request);
+		AdditionalData clientParameters = Util.extractOptions(request);
 		clientParameters.setOriginalFilename(file.getOriginalFilename());
 		
 		SubtitleCorrectionFileDataWebDto response = correctionService.applyCorrectionOperations(clientParameters, storedFile);
@@ -94,23 +89,5 @@ public class CorrectionsController {
 		return ResponseEntity.status(httpStatus).body(data);
 	}
 
-	private AdditionalData extractOptions(HttpServletRequest request) {
-		
-		AdditionalData params = new AdditionalData();
-		
-		params.setStripBTags(Boolean.parseBoolean(request.getParameter("stripBTags")));
-		params.setStripITags(Boolean.parseBoolean(request.getParameter("stripITags")));
-		params.setStripFontTags(Boolean.parseBoolean(request.getParameter("stripFontTags")));
-		params.setStripUTags(Boolean.parseBoolean(request.getParameter("stripUTags")));
-		params.setKeepBOM(Boolean.parseBoolean(request.getParameter("keepBOM")));
-		params.setConvertAeToTj(Boolean.parseBoolean(request.getParameter("aeToTj")));
-		params.setConvertAEToTJ(Boolean.parseBoolean(request.getParameter("AEToTJ")));
-		params.setConverteToch(Boolean.parseBoolean(request.getParameter("eToch")));
-		params.setConvertEToCH(Boolean.parseBoolean(request.getParameter("EToCH")));
-		params.setAiEnabled(Boolean.parseBoolean(request.getParameter("aiEnabled")));
-		params.setBusinessOperation(request.getParameter("businessOperation"));
-		
-		return params;
-	}
 }
 

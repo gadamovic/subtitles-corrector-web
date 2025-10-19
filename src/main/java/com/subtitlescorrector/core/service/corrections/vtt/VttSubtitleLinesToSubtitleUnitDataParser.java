@@ -12,8 +12,9 @@ import org.springframework.stereotype.Service;
 import com.subtitlescorrector.core.domain.SecondMillisecondDelimiterRegex;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.SubtitleTimestamp;
-import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleFileData;
-import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleUnitData;
+import com.subtitlescorrector.core.domain.vtt.VttSubtitleFileData;
+import com.subtitlescorrector.core.domain.vtt.VttSubtitleUnitData;
+import com.subtitlescorrector.core.util.SubtitleTimestampUtils;
 import com.subtitlescorrector.core.util.Util;
 
 import io.micrometer.common.util.StringUtils;
@@ -26,7 +27,7 @@ public class VttSubtitleLinesToSubtitleUnitDataParser {
 	Logger log = LoggerFactory.getLogger(VttSubtitleLinesToSubtitleUnitDataParser.class);
 
 	@Autowired
-	Util util;
+	SubtitleTimestampUtils util;
 	
 	public VttSubtitleFileData convertToSubtitleUnits(List<String> lines){
 		
@@ -74,8 +75,8 @@ public class VttSubtitleLinesToSubtitleUnitDataParser {
 				SubtitleTimestamp tsFrom = util.parseSubtitleTimestampString(from, SecondMillisecondDelimiterRegex.DOT);
 				SubtitleTimestamp tsTo = util.parseSubtitleTimestampString(to, SecondMillisecondDelimiterRegex.DOT);
 				
-				tsFrom.setFormattedTimestamp(Util.formatTimestamp(tsFrom, "."));
-				tsTo.setFormattedTimestamp(Util.formatTimestamp(tsTo, "."));
+				tsFrom.setFormattedTimestamp(SubtitleTimestampUtils.formatTimestamp(tsFrom, "."));
+				tsTo.setFormattedTimestamp(SubtitleTimestampUtils.formatTimestamp(tsTo, "."));
 				
 				data.setTimestampFrom(tsFrom);
 				data.setTimestampTo(tsTo);
@@ -227,7 +228,7 @@ public class VttSubtitleLinesToSubtitleUnitDataParser {
 			timestamp = data.getTimestampFrom();
 		}
 		
-		String formattedTimestamp = Util.formatTimestamp(timestamp, ".");
+		String formattedTimestamp = SubtitleTimestampUtils.formatTimestamp(timestamp, ".");
 		
 		return formattedTimestamp;
 		
@@ -243,7 +244,7 @@ public class VttSubtitleLinesToSubtitleUnitDataParser {
 			timestamp = data.getTimestampTo();
 		}
 		
-		String formattedTimestamp = Util.formatTimestamp(timestamp, ".");
+		String formattedTimestamp = SubtitleTimestampUtils.formatTimestamp(timestamp, ".");
 		
 		return formattedTimestamp;
 	}

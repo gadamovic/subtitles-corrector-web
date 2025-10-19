@@ -22,11 +22,10 @@ import com.subtitlescorrector.core.service.conversion.SubtitlesFileConverter;
 import com.subtitlescorrector.core.service.conversion.VttSubtitleConversionFileData;
 import com.subtitlescorrector.core.service.converters.SubtitlesConverterFactory;
 import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleLinesToSubtitleUnitDataParser;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleLinesToSubtitleUnitDataParser;
 import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitleLinesToSubtitleUnitDataParser;
 import com.subtitlescorrector.core.util.FileUtil;
-import com.subtitlescorrector.core.util.Util;
+import com.subtitlescorrector.core.util.JsonSerializationUtil;
 
 @Service
 public class SubtitleFileProviderForUserServiceImpl implements SubtitleFileProviderForUser {
@@ -63,15 +62,15 @@ public class SubtitleFileProviderForUserServiceImpl implements SubtitleFileProvi
 		
 		switch(metadata.getFormat()) {
 		case SRT:
-			lines = srtParser.convertToListOfStrings(Util.jsonToSrtSubtitleFileData(subtitleFileJson), 
+			lines = srtParser.convertToListOfStrings(JsonSerializationUtil.jsonToSrtSubtitleFileData(subtitleFileJson), 
 					metadata.getBomData().getHasBom() && metadata.getBomData().getKeepBom());
 			break;
 		case VTT:
-			lines = vttParser.convertToListOfStrings(Util.jsonToVttSubtitleFileData(subtitleFileJson), 
+			lines = vttParser.convertToListOfStrings(JsonSerializationUtil.jsonToVttSubtitleFileData(subtitleFileJson), 
 					metadata.getBomData().getHasBom() && metadata.getBomData().getKeepBom());
 			break;
 		case ASS:
-			lines = assParser.convertToListOfStrings(Util.jsonToAssSubtitleFileData(subtitleFileJson), 
+			lines = assParser.convertToListOfStrings(JsonSerializationUtil.jsonToAssSubtitleFileData(subtitleFileJson), 
 					metadata.getBomData().getHasBom() && metadata.getBomData().getKeepBom());
 		}
 				

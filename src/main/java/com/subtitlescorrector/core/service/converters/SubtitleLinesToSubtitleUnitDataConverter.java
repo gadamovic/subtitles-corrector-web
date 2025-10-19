@@ -3,7 +3,7 @@ package com.subtitlescorrector.core.service.converters;
 import java.util.List;
 
 import com.subtitlescorrector.core.domain.AdditionalData;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleUnitData;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
 
 public interface SubtitleLinesToSubtitleUnitDataConverter {
 

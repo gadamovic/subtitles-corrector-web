@@ -20,6 +20,8 @@ import com.subtitlescorrector.core.domain.EditOperation;
 import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
 import com.subtitlescorrector.core.domain.UserData;
 import com.subtitlescorrector.core.domain.ai.LineForAiCorrection;
+import com.subtitlescorrector.core.domain.ass.AssSubtitleFileData;
+import com.subtitlescorrector.core.domain.ass.AssSubtitleUnitData;
 import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
 import com.subtitlescorrector.core.service.EditDistanceService;
 import com.subtitlescorrector.core.service.corrections.AbstractCorrector;

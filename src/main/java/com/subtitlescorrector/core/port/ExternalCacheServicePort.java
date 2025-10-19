@@ -5,11 +5,11 @@ import java.util.List;
 
 import com.subtitlescorrector.core.domain.UserSubtitleConversionCurrentVersionMetadata;
 import com.subtitlescorrector.core.domain.UserSubtitleCorrectionCurrentVersionMetadata;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
 import com.subtitlescorrector.core.service.conversion.AssSubtitleConversionFileData;
 import com.subtitlescorrector.core.service.conversion.SrtSubtitleConversionFileData;
 import com.subtitlescorrector.core.service.conversion.VttSubtitleConversionFileData;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleUnitData;
 
 public interface ExternalCacheServicePort {
 

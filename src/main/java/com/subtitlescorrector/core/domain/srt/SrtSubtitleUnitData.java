@@ -1,4 +1,4 @@
-package com.subtitlescorrector.core.service.corrections.srt;
+package com.subtitlescorrector.core.domain.srt;
 
 import java.util.List;
 

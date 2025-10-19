@@ -1,7 +1,6 @@
 package com.subtitlescorrector.adapters.out;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,9 +11,7 @@ import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.service.conversion.AssSubtitleConversionFileData;
 import com.subtitlescorrector.core.service.conversion.SrtSubtitleConversionFileData;
 import com.subtitlescorrector.core.service.conversion.VttSubtitleConversionFileData;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleUnitData;
-import com.subtitlescorrector.core.util.Util;
+import com.subtitlescorrector.core.util.JsonSerializationUtil;
 
 import io.micrometer.common.util.StringUtils;
 import redis.clients.jedis.Jedis;
@@ -135,7 +132,7 @@ public class RedisServiceAdapter implements ExternalCacheServicePort {
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
 			
 			String jsonResult = jedis.get(RedisSchema.createUserSubtitleCurrentVersionKey(userId));
-			return Util.jsonToVttSubtitleConversionFileData(jsonResult);
+			return JsonSerializationUtil.jsonToVttSubtitleConversionFileData(jsonResult);
 		}
 	}
 	
@@ -143,7 +140,7 @@ public class RedisServiceAdapter implements ExternalCacheServicePort {
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
 			
 			String jsonResult = jedis.get(RedisSchema.createUserSubtitleCurrentVersionKey(userId));
-			return Util.jsonToAssSubtitleConversionFileData(jsonResult);
+			return JsonSerializationUtil.jsonToAssSubtitleConversionFileData(jsonResult);
 		}
 	}
 	
@@ -151,7 +148,7 @@ public class RedisServiceAdapter implements ExternalCacheServicePort {
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
 			
 			String jsonResult = jedis.get(RedisSchema.createUserSubtitleCurrentVersionKey(userId));
-			return Util.jsonToSrtSubtitleConversionFileData(jsonResult);
+			return JsonSerializationUtil.jsonToSrtSubtitleConversionFileData(jsonResult);
 		}
 	}
 
@@ -160,14 +157,14 @@ public class RedisServiceAdapter implements ExternalCacheServicePort {
 		
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
 			String jsonResult = jedis.get(RedisSchema.createUserSubtitleCurrentVersionFileMetadataKey(userId));
-			return Util.jsonToSubtitleCurrentVersionMetadata(jsonResult);
+			return JsonSerializationUtil.jsonToSubtitleCurrentVersionMetadata(jsonResult);
 		}
 	}
 
 	@Override
 	public void addUsersLastUpdatedSubtitleFileMetadata(UserSubtitleCorrectionCurrentVersionMetadata metadata, String userId) {
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
-			jedis.setex(RedisSchema.createUserSubtitleCurrentVersionFileMetadataKey(userId), USER_SUBTITLE_CURRENT_VERSION_CACHE_TTL, Util.userSubtitleCurrentVersionMetadataToJson(metadata));
+			jedis.setex(RedisSchema.createUserSubtitleCurrentVersionFileMetadataKey(userId), USER_SUBTITLE_CURRENT_VERSION_CACHE_TTL, JsonSerializationUtil.userSubtitleCurrentVersionMetadataToJson(metadata));
 		}
 	}
 
@@ -175,7 +172,7 @@ public class RedisServiceAdapter implements ExternalCacheServicePort {
 	public void addUsersLastUpdatedSubtitleConversionFileMetadata(UserSubtitleConversionCurrentVersionMetadata metadata,
 			String userId) {
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
-			jedis.setex(RedisSchema.createUserSubtitleCurrentVersionFileMetadataKey(userId), USER_SUBTITLE_CURRENT_VERSION_CACHE_TTL, Util.userSubtitleConversionCurrentVersionMetadataToJson(metadata));
+			jedis.setex(RedisSchema.createUserSubtitleCurrentVersionFileMetadataKey(userId), USER_SUBTITLE_CURRENT_VERSION_CACHE_TTL, JsonSerializationUtil.userSubtitleConversionCurrentVersionMetadataToJson(metadata));
 		}
 	}
 	
@@ -184,7 +181,7 @@ public class RedisServiceAdapter implements ExternalCacheServicePort {
 		
 		try (Jedis jedis = redisConnection.getJedisPool().getResource()) {
 			String jsonResult = jedis.get(RedisSchema.createUserSubtitleCurrentVersionFileMetadataKey(userId));
-			return Util.jsonToUserSubtitleConversionCurrentVersionMetadata(jsonResult);
+			return JsonSerializationUtil.jsonToUserSubtitleConversionCurrentVersionMetadata(jsonResult);
 		}
 	}
 	

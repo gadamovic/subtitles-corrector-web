@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.core.domain.AdditionalData;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleUnitData;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
 
 @Service
 public class InvalidCharactersCorrector extends AbstractCorrector{

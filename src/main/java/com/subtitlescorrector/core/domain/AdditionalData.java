@@ -20,7 +20,6 @@ public class AdditionalData {
 	private int numberOfCorrectors;
 	int processedLines = 0;
 	int totalNumberOfLines = 0;
-	private BusinessOperation businessOperation;
 	private SubtitleFormat targetConversionFormat;
 	private String originalFilename;
 	
@@ -134,23 +133,6 @@ public class AdditionalData {
 
 	public void setAiEnabled(Boolean aiEnabled) {
 		this.aiEnabled = aiEnabled;
-	}
-
-	public BusinessOperation getBusinessOperation() {
-		return businessOperation;
-	}
-
-	public void setBusinessOperation(BusinessOperation businessOperation) {
-		this.businessOperation = businessOperation;
-	}
-	public void setBusinessOperation(String businessOperationStr) {
-		
-		for(BusinessOperation operation : BusinessOperation.values()) {
-			if(businessOperationStr.equalsIgnoreCase(operation.name())) {
-				this.businessOperation = operation;
-				break;
-			}
-		}
 	}
 	
 	public SubtitleFormat getTargetConversionFormat() {

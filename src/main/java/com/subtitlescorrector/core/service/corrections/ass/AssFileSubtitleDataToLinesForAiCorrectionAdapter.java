@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.core.domain.ai.LineForAiCorrection;
+import com.subtitlescorrector.core.domain.ass.AssSubtitleFileData;
+import com.subtitlescorrector.core.domain.ass.AssSubtitleUnitData;
 
 @Service
 public class AssFileSubtitleDataToLinesForAiCorrectionAdapter {

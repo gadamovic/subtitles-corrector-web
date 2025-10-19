@@ -1,4 +1,4 @@
-package com.subtitlescorrector.core.service.corrections.vtt.domain;
+package com.subtitlescorrector.core.domain.srt;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;
@@ -7,17 +7,18 @@ import java.util.List;
 
 import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
+import com.subtitlescorrector.core.service.conversion.SrtSubtitleConversionFileData;
 import com.subtitlescorrector.core.service.conversion.VttSubtitleConversionFileData;
 import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileDataWebDto;
 import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileLineDataWebDto;
 
-public class VttSubtitleFileData implements Serializable{
+public class SrtSubtitleFileData implements Serializable{
 
 	private static final long serialVersionUID = -2406499811554095114L;
 
 	String filename;
 	
-	List<VttSubtitleUnitData> lines;
+	List<SrtSubtitleUnitData> lines;
 	
 	String httpResponseMessage;
 	
@@ -26,11 +27,6 @@ public class VttSubtitleFileData implements Serializable{
 	SubtitleFormat format;
 	
 	BomData bomData;
-	
-	/**
-	 * Everything that goes above the start of subtitle lines
-	 */
-	List<String> header;
 	
 	public SubtitleFormat getFormat() {
 		return format;
@@ -48,11 +44,11 @@ public class VttSubtitleFileData implements Serializable{
 		this.filename = filename;
 	}
 
-	public List<VttSubtitleUnitData> getLines() {
+	public List<SrtSubtitleUnitData> getLines() {
 		return lines;
 	}
 
-	public void setLines(List<VttSubtitleUnitData> lines) {
+	public void setLines(List<SrtSubtitleUnitData> lines) {
 		this.lines = lines;
 	}
 
@@ -80,27 +76,11 @@ public class VttSubtitleFileData implements Serializable{
 		this.bomData = bomData;
 	}
 	
-	public List<String> getHeader() {
-		return header;
-	}
-
-	public void setHeader(List<String> header) {
-		this.header = header;
-	}
-	
-	public void addLineToHeader(String line) {
-		if(this.header == null) {
-			this.header = new ArrayList<>();
-		}
-		
-		this.header.add(line);
-	}
-
 	public List<SubtitleCorrectionFileLineDataWebDto> linesToResponseLines(){
 		
 		List<SubtitleCorrectionFileLineDataWebDto> response = new ArrayList<>();
 		
-		for(VttSubtitleUnitData line : lines) {
+		for(SrtSubtitleUnitData line : lines) {
 			
 			SubtitleCorrectionFileLineDataWebDto responseLine = new SubtitleCorrectionFileLineDataWebDto();
 			responseLine.setCompEditOperations(line.getCompEditOperations());
@@ -117,7 +97,7 @@ public class VttSubtitleFileData implements Serializable{
 		return response;
 		
 	}
-	
+
 	public void merge(SubtitleCorrectionFileDataWebDto subtitleData) {
 		
 		List<SubtitleCorrectionFileLineDataWebDto> dtoLines = subtitleData.getLines();
@@ -135,20 +115,18 @@ public class VttSubtitleFileData implements Serializable{
 		}
 		
 	}
-
-	public VttSubtitleConversionFileData toSubtitleFileConversionData() {
-		
-		VttSubtitleConversionFileData vttConversionData = new VttSubtitleConversionFileData();
-		
-		vttConversionData.setBomData(bomData);
-		vttConversionData.setDetectedEncoding(detectedCharset.displayName());
-		vttConversionData.setFilename(filename);
-		vttConversionData.setLines(lines);
-		vttConversionData.setSourceFormat(format);
-		vttConversionData.setHeader(header);
-		
-		return vttConversionData;
-	}
 	
+	public SrtSubtitleConversionFileData toSubtitleFileConversionData() {
+		
+		SrtSubtitleConversionFileData srtConversionData = new SrtSubtitleConversionFileData();
+		
+		srtConversionData.setBomData(bomData);
+		srtConversionData.setDetectedEncoding(detectedCharset.displayName());
+		srtConversionData.setFilename(filename);
+		srtConversionData.setLines(lines);
+		srtConversionData.setSourceFormat(format);
+		
+		return srtConversionData;
+	}
 
 }

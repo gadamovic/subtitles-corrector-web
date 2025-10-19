@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.core.domain.SubtitleFormat;
+import com.subtitlescorrector.core.domain.ass.AssSubtitleUnitData;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
+import com.subtitlescorrector.core.domain.vtt.VttSubtitleUnitData;
 import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleLinesToSubtitleUnitDataParser;
-import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleUnitData;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleLinesToSubtitleUnitDataParser;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleUnitData;
 import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitleLinesToSubtitleUnitDataParser;
-import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleUnitData;
 
 @Service
 public class SubtitlesFileConverter {

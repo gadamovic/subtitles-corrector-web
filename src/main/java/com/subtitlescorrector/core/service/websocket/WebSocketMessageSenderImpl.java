@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
 import com.subtitlescorrector.core.domain.UserData;
 import com.subtitlescorrector.core.port.WebSocketOutboundPort;
-import com.subtitlescorrector.core.util.Util;
+import com.subtitlescorrector.core.util.JsonSerializationUtil;
 
 
 @Service
@@ -20,7 +20,7 @@ public class WebSocketMessageSenderImpl implements WebSocketMessageSender {
 	
 	@Override
 	public void sendMessage(SubtitleCorrectionEvent event) {
-		webSocketPort.sendMessage(Util.subtitleCorrectionEventToJson(event), user.getWebSocketSessionId());
+		webSocketPort.sendMessage(JsonSerializationUtil.subtitleCorrectionEventToJson(event), user.getWebSocketSessionId());
 	}
 
 }

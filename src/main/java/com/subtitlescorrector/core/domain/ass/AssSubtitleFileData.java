@@ -1,24 +1,21 @@
-package com.subtitlescorrector.core.service.corrections.srt;
+package com.subtitlescorrector.core.domain.ass;
 
-import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
+import com.subtitlescorrector.core.service.conversion.AssSubtitleConversionFileData;
 import com.subtitlescorrector.core.service.conversion.SrtSubtitleConversionFileData;
-import com.subtitlescorrector.core.service.conversion.VttSubtitleConversionFileData;
 import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileDataWebDto;
 import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileLineDataWebDto;
 
-public class SrtSubtitleFileData implements Serializable{
-
-	private static final long serialVersionUID = -2406499811554095114L;
+public class AssSubtitleFileData {
 
 	String filename;
 	
-	List<SrtSubtitleUnitData> lines;
+	List<AssSubtitleUnitData> lines;
 	
 	String httpResponseMessage;
 	
@@ -44,11 +41,11 @@ public class SrtSubtitleFileData implements Serializable{
 		this.filename = filename;
 	}
 
-	public List<SrtSubtitleUnitData> getLines() {
+	public List<AssSubtitleUnitData> getLines() {
 		return lines;
 	}
 
-	public void setLines(List<SrtSubtitleUnitData> lines) {
+	public void setLines(List<AssSubtitleUnitData> lines) {
 		this.lines = lines;
 	}
 
@@ -80,7 +77,7 @@ public class SrtSubtitleFileData implements Serializable{
 		
 		List<SubtitleCorrectionFileLineDataWebDto> response = new ArrayList<>();
 		
-		for(SrtSubtitleUnitData line : lines) {
+		for(AssSubtitleUnitData line : lines) {
 			
 			SubtitleCorrectionFileLineDataWebDto responseLine = new SubtitleCorrectionFileLineDataWebDto();
 			responseLine.setCompEditOperations(line.getCompEditOperations());
@@ -97,7 +94,7 @@ public class SrtSubtitleFileData implements Serializable{
 		return response;
 		
 	}
-
+	
 	public void merge(SubtitleCorrectionFileDataWebDto subtitleData) {
 		
 		List<SubtitleCorrectionFileLineDataWebDto> dtoLines = subtitleData.getLines();
@@ -116,17 +113,18 @@ public class SrtSubtitleFileData implements Serializable{
 		
 	}
 	
-	public SrtSubtitleConversionFileData toSubtitleFileConversionData() {
+	public AssSubtitleConversionFileData toSubtitleFileConversionData() {
 		
-		SrtSubtitleConversionFileData srtConversionData = new SrtSubtitleConversionFileData();
+		AssSubtitleConversionFileData assConversionData = new AssSubtitleConversionFileData();
 		
-		srtConversionData.setBomData(bomData);
-		srtConversionData.setDetectedEncoding(detectedCharset.displayName());
-		srtConversionData.setFilename(filename);
-		srtConversionData.setLines(lines);
-		srtConversionData.setSourceFormat(format);
+		assConversionData.setBomData(bomData);
+		assConversionData.setDetectedEncoding(detectedCharset.displayName());
+		assConversionData.setFilename(filename);
+		assConversionData.setLines(lines);
+		assConversionData.setSourceFormat(format);
 		
-		return srtConversionData;
+		return assConversionData;
 	}
 
+	
 }

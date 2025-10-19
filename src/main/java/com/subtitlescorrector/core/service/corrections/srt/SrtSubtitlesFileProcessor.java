@@ -21,6 +21,10 @@ import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.UserData;
 import com.subtitlescorrector.core.domain.ai.LineForAiCorrection;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
+import com.subtitlescorrector.core.domain.vtt.VttSubtitleFileData;
+import com.subtitlescorrector.core.domain.vtt.VttSubtitleUnitData;
 import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
 import com.subtitlescorrector.core.service.EditDistanceService;
 import com.subtitlescorrector.core.service.converters.SubtitlesConverterFactory;
@@ -32,8 +36,6 @@ import com.subtitlescorrector.core.service.corrections.SubtitlesFileProcessor;
 import com.subtitlescorrector.core.service.corrections.vtt.VttFileSubtitleDataToLinesForAiCorrectionAdapter;
 import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitleLinesToSubtitleUnitDataParser;
 import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitlesFileProcessor;
-import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleFileData;
-import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleUnitData;
 import com.subtitlescorrector.core.service.preprocessing.PreProcessor;
 import com.subtitlescorrector.core.service.preprocessing.PreProcessorsManager;
 import com.subtitlescorrector.core.service.websocket.WebSocketMessageSender;
@@ -69,7 +71,7 @@ public class SrtSubtitlesFileProcessor {
 	AiCustomCorrector aiCorrector;
 
 	@Autowired
-	SrtSubtitleLinesToSubtitleUnitDataParser converter;
+	SrtSubtitleLinesToSubtitleUnitDataParser parser;
 	
 	@Autowired
 	UserData user;
@@ -159,7 +161,7 @@ public class SrtSubtitlesFileProcessor {
 			Charset detectedEncoding, List<String> lines, BomData bomData) {
 		data.setDetectedCharset(detectedEncoding);
 		data.setFilename(subtitleFile.getName());
-		data.setLines(converter.convertToSubtitleUnits(lines).getLines());
+		data.setLines(parser.convertToSubtitleUnits(lines).getLines());
 		data.setBomData(bomData);
 	}
 

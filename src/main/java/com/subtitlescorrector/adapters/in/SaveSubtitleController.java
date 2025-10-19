@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.subtitlescorrector.core.domain.UserSubtitleCorrectionCurrentVersionMetadata;
+import com.subtitlescorrector.core.domain.ass.AssSubtitleFileData;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
+import com.subtitlescorrector.core.domain.vtt.VttSubtitleFileData;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.service.DownloadSubtitlesFileService;
 import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileDataWebDto;
-import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleFileData;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
-import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleFileData;
+import com.subtitlescorrector.core.util.JsonSerializationUtil;
 import com.subtitlescorrector.core.util.Util;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,19 +42,19 @@ public class SaveSubtitleController {
 		
 		switch(metadata.getFormat()) {
 		case SRT:
-			SrtSubtitleFileData srtData = Util.jsonToSrtSubtitleFileData(currentJson);
+			SrtSubtitleFileData srtData = JsonSerializationUtil.jsonToSrtSubtitleFileData(currentJson);
 			srtData.merge(subtitleData);
-			updatedJson = Util.srtSubtitleFileDataToJson(srtData);
+			updatedJson = JsonSerializationUtil.srtSubtitleFileDataToJson(srtData);
 			break;
 		case VTT:
-			VttSubtitleFileData vttData = Util.jsonToVttSubtitleFileData(currentJson);
+			VttSubtitleFileData vttData = JsonSerializationUtil.jsonToVttSubtitleFileData(currentJson);
 			vttData.merge(subtitleData);
-			updatedJson = Util.vttSubtitleFileDataToJson(vttData);
+			updatedJson = JsonSerializationUtil.vttSubtitleFileDataToJson(vttData);
 			break;
 		case ASS:
-			AssSubtitleFileData assData = Util.jsonToAssSubtitleFileData(currentJson);
+			AssSubtitleFileData assData = JsonSerializationUtil.jsonToAssSubtitleFileData(currentJson);
 			assData.merge(subtitleData);
-			updatedJson = Util.assSubtitleFileDataToJson(assData);
+			updatedJson = JsonSerializationUtil.assSubtitleFileDataToJson(assData);
 			break;
 		}
 		

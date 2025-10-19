@@ -14,7 +14,10 @@ import com.subtitlescorrector.core.domain.SecondMillisecondDelimiterRegex;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.SubtitleTimestamp;
 import com.subtitlescorrector.core.domain.TimeUnit;
+import com.subtitlescorrector.core.domain.ass.AssSubtitleFileData;
+import com.subtitlescorrector.core.domain.ass.AssSubtitleUnitData;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleLinesToSubtitleUnitDataParser;
+import com.subtitlescorrector.core.util.SubtitleTimestampUtils;
 import com.subtitlescorrector.core.util.Util;
 
 @Service
@@ -29,7 +32,7 @@ public class AssSubtitleLinesToSubtitleUnitDataParser {
     private static final Pattern STYLE_PATTERN = Pattern.compile("\\{.*?\\}");
 	
 	@Autowired
-	Util util;
+	SubtitleTimestampUtils util;
 		
 	public AssSubtitleFileData convertToSubtitleUnits(List<String> lines) {
 
@@ -100,8 +103,8 @@ public class AssSubtitleLinesToSubtitleUnitDataParser {
 		for(AssSubtitleUnitData subtitle : lines) {
 
 			String line = "Dialogue: " + DEFAULT_DIALOGUE_FORMAT_PLACEHOLDER;
-			String from = Util.formatTimestamp(subtitle.getTimestampFrom(), ".", TimeUnit.CENTISECOND);
-			String to = Util.formatTimestamp(subtitle.getTimestampTo(), ".", TimeUnit.CENTISECOND);
+			String from = SubtitleTimestampUtils.formatTimestamp(subtitle.getTimestampFrom(), ".", TimeUnit.CENTISECOND);
+			String to = SubtitleTimestampUtils.formatTimestamp(subtitle.getTimestampTo(), ".", TimeUnit.CENTISECOND);
 			
 			line = line.replace("Layer", "0");
 			line = line.replace("Start", from);

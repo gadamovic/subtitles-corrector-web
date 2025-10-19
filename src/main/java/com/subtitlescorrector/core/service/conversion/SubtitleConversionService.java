@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.subtitlescorrector.core.domain.ConversionParameters;
 import com.subtitlescorrector.core.domain.SubtitleConversionFileDataResponse;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.BomData;
 

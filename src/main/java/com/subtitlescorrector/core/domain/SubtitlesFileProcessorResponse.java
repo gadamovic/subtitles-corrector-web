@@ -3,7 +3,7 @@ package com.subtitlescorrector.core.domain;
 import java.io.File;
 import java.util.List;
 
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
 
 public class SubtitlesFileProcessorResponse {
 

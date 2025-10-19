@@ -9,33 +9,27 @@ import org.springframework.stereotype.Service;
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.BomData;
-import com.subtitlescorrector.core.domain.BusinessOperation;
 import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.UserData;
 import com.subtitlescorrector.core.domain.UserSubtitleCorrectionCurrentVersionMetadata;
+import com.subtitlescorrector.core.domain.ass.AssSubtitleFileData;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
+import com.subtitlescorrector.core.domain.vtt.VttSubtitleFileData;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
-import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleFileData;
 import com.subtitlescorrector.core.service.corrections.ass.AssSubtitlesFileProcessor;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitlesFileProcessor;
 import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitlesFileProcessor;
-import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleFileData;
 import com.subtitlescorrector.core.service.websocket.WebSocketMessageSender;
 import com.subtitlescorrector.core.util.FileUtil;
+import com.subtitlescorrector.core.util.JsonSerializationUtil;
 import com.subtitlescorrector.core.util.Util;
 
 @Service
 public class SubtitlesCorrectionServiceImpl implements SubtitlesCorrectionService {
 
 	@Autowired
-	SrtSubtitlesFileProcessor srtProcessor;
-	
-	@Autowired
-	VttSubtitlesFileProcessor vttProcessor;
-	
-	@Autowired
-	AssSubtitlesFileProcessor assProcessor;
+	SubtitlesProcessorFactory processorFactory;
 	
 	@Autowired
 	ExternalCacheServicePort redisService;
@@ -63,27 +57,29 @@ public class SubtitlesCorrectionServiceImpl implements SubtitlesCorrectionServic
 		
 		SubtitleCorrectionFileDataWebDto response = new SubtitleCorrectionFileDataWebDto();
 		
+		Object subtitlesProcessor = processorFactory.getProcessor(format);
+		
 		switch (format) {
 		case SRT:
-			SrtSubtitleFileData srtData = srtProcessor.process(uploadedFile, lines, clientParameters, bomData);
+			SrtSubtitleFileData srtData = ((SrtSubtitlesFileProcessor) subtitlesProcessor).process(uploadedFile, lines, clientParameters, bomData);
 			response.setFilename(srtData.getFilename());
 			response.setHttpResponseMessage(srtData.getHttpResponseMessage());
 			response.setLines(srtData.linesToResponseLines());
-			jsonData = Util.srtSubtitleFileDataToJson(srtData);
+			jsonData = JsonSerializationUtil.srtSubtitleFileDataToJson(srtData);
 			break;
 		case VTT:
-			VttSubtitleFileData vttData = vttProcessor.process(uploadedFile, lines, clientParameters, bomData);
+			VttSubtitleFileData vttData = ((VttSubtitlesFileProcessor) subtitlesProcessor).process(uploadedFile, lines, clientParameters, bomData);
 			response.setFilename(vttData.getFilename());
 			response.setHttpResponseMessage(vttData.getHttpResponseMessage());
 			response.setLines(vttData.linesToResponseLines());
-			jsonData = Util.vttSubtitleFileDataToJson(vttData);
+			jsonData = JsonSerializationUtil.vttSubtitleFileDataToJson(vttData);
 			break;
 		case ASS:
-			AssSubtitleFileData assData = assProcessor.process(uploadedFile, lines, clientParameters, bomData);
+			AssSubtitleFileData assData = ((AssSubtitlesFileProcessor) subtitlesProcessor).process(uploadedFile, lines, clientParameters, bomData);
 			response.setFilename(assData.getFilename());
 			response.setHttpResponseMessage(assData.getHttpResponseMessage());
 			response.setLines(assData.linesToResponseLines());
-			jsonData = Util.assSubtitleFileDataToJson(assData);
+			jsonData = JsonSerializationUtil.assSubtitleFileDataToJson(assData);
 			break;
 		}
 		
@@ -115,9 +111,7 @@ public class SubtitlesCorrectionServiceImpl implements SubtitlesCorrectionServic
 				data.setKeepBom(true);
 			}else {
 				data.setKeepBom(false);
-				if(params.getBusinessOperation() == BusinessOperation.CORRECTION) {
-					sendBOMRemovedMessage();
-				}
+				sendBOMRemovedMessage();
 			}
 		} else {
 			data.setHasBom(false);

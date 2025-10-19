@@ -1,4 +1,4 @@
-package com.subtitlescorrector.core.service.corrections.ass;
+package com.subtitlescorrector.core.domain.vtt;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import com.subtitlescorrector.core.domain.EditOperation;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.SubtitleTimestamp;
 
-public class AssSubtitleUnitData {
+public class VttSubtitleUnitData {
 
 	SubtitleFormat format; 
 	Integer number;
@@ -17,6 +17,7 @@ public class AssSubtitleUnitData {
 	SubtitleTimestamp timestampToShifted;
 	String text;
 	String textBeforeCorrection;
+	String cues;
 	
 	List<List<EditOperation>> editOperations;
 	List<CompositeEditOperation> compEditOperations;
@@ -85,13 +86,19 @@ public class AssSubtitleUnitData {
 	public void setTimestampToShifted(SubtitleTimestamp timestampToShifted) {
 		this.timestampToShifted = timestampToShifted;
 	}
+	public String getCues() {
+		return cues;
+	}
+	public void setCues(String cues) {
+		this.cues = cues;
+	}
 	@Override
 	public String toString() {
-		return "AssSubtitleUnitData [format=" + format + ", number=" + number + ", timestampFrom=" + timestampFrom
+		return "VttSubtitleUnitData [format=" + format + ", number=" + number + ", timestampFrom=" + timestampFrom
 				+ ", timestampTo=" + timestampTo + ", timestampFromShifted=" + timestampFromShifted
 				+ ", timestampToShifted=" + timestampToShifted + ", text=" + text + ", textBeforeCorrection="
-				+ textBeforeCorrection + ", editOperations=" + editOperations + ", compEditOperations="
-				+ compEditOperations + "]";
+				+ textBeforeCorrection + ", cues=" + cues + ", editOperations=" + editOperations
+				+ ", compEditOperations=" + compEditOperations + "]";
 	}
 
 	

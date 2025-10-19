@@ -16,7 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 
 import com.subtitlescorrector.core.domain.AdditionalData;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitlesFileProcessor;
 import com.subtitlescorrector.core.util.FileUtil;
 import com.subtitlescorrector.core.util.Util;

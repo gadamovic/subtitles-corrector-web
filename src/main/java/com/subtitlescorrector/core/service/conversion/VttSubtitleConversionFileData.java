@@ -6,9 +6,9 @@ import java.util.List;
 
 import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
-import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleFileData;
-import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleFileData;
-import com.subtitlescorrector.core.service.corrections.vtt.domain.VttSubtitleUnitData;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
+import com.subtitlescorrector.core.domain.vtt.VttSubtitleFileData;
+import com.subtitlescorrector.core.domain.vtt.VttSubtitleUnitData;
 
 public class VttSubtitleConversionFileData implements Serializable{
 
