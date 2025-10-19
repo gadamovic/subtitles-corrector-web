@@ -10,7 +10,7 @@ public class AdditionalData {
 	/**
 	 * Flag to indicate not to remove BOM from files if it is present
 	 */
-	private Boolean keepBOM;
+	private Boolean keepBOM = false;
 	private Boolean aeToTj;
 	private Boolean AEToTJ;
 	private Boolean eToch;

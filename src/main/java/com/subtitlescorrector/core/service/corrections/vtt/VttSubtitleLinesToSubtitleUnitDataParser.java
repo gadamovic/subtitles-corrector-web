@@ -33,9 +33,9 @@ public class VttSubtitleLinesToSubtitleUnitDataParser {
 		
 		VttSubtitleFileData fileData = new VttSubtitleFileData();
 		
-		lines = trimLines(lines);
-		
 		Util.removeBomIfExists(lines);
+		
+		lines = trimLines(lines);
 		
 		List<VttSubtitleUnitData> dataList = new ArrayList<>();
 		VttSubtitleUnitData data = null;

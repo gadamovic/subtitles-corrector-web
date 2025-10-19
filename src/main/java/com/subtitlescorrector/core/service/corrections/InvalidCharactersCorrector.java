@@ -37,22 +37,22 @@ public class InvalidCharactersCorrector extends AbstractCorrector{
 		tmp = beforeCorrection.replace("", "");
 		beforeCorrection = checkForChanges(tmp, beforeCorrection, "Removed \"\"", processedPercentage);
 		
-		if(params.getConvertAeToTj()) {
+		if(params.getConvertAeToTj() != null && params.getConvertAeToTj()) {
 			tmp = beforeCorrection.replace("æ", "ć");
 			beforeCorrection = checkForChanges(tmp, beforeCorrection, "æ -> ć", processedPercentage);
 		}
 		
-		if(params.getConvertAEToTJ()) {			
+		if(params.getConvertAEToTJ() != null &&params.getConvertAEToTJ()) {			
 			tmp = beforeCorrection.replace("Æ", "Ć");
 			beforeCorrection = checkForChanges(tmp, beforeCorrection, "Æ -> Ć", processedPercentage);
 		}
 		
-		if(params.getConvertEToch()) {
+		if(params.getConvertEToch() != null && params.getConvertEToch()) {
 			tmp = beforeCorrection.replace("è", "č");
 			beforeCorrection = checkForChanges(tmp, beforeCorrection, "è -> č", processedPercentage);
 		}
 		
-		if(params.getConvertEToCH()) {
+		if(params.getConvertEToCH() != null && params.getConvertEToCH()) {
 			tmp = beforeCorrection.replace("È", "Č");
 			beforeCorrection = checkForChanges(tmp, beforeCorrection, "È -> Č", processedPercentage);
 		}

@@ -18,24 +18,16 @@ import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.EditOperation;
 import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
-import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.UserData;
 import com.subtitlescorrector.core.domain.ai.LineForAiCorrection;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
-import com.subtitlescorrector.core.domain.vtt.VttSubtitleFileData;
-import com.subtitlescorrector.core.domain.vtt.VttSubtitleUnitData;
 import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
 import com.subtitlescorrector.core.service.EditDistanceService;
-import com.subtitlescorrector.core.service.converters.SubtitlesConverterFactory;
 import com.subtitlescorrector.core.service.corrections.AbstractCorrector;
 import com.subtitlescorrector.core.service.corrections.AdditionalDataToCorrectorParametersAdapter;
 import com.subtitlescorrector.core.service.corrections.AiCustomCorrector;
 import com.subtitlescorrector.core.service.corrections.CorrectorsManager;
-import com.subtitlescorrector.core.service.corrections.SubtitlesFileProcessor;
-import com.subtitlescorrector.core.service.corrections.vtt.VttFileSubtitleDataToLinesForAiCorrectionAdapter;
-import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitleLinesToSubtitleUnitDataParser;
-import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitlesFileProcessor;
 import com.subtitlescorrector.core.service.preprocessing.PreProcessor;
 import com.subtitlescorrector.core.service.preprocessing.PreProcessorsManager;
 import com.subtitlescorrector.core.service.websocket.WebSocketMessageSender;
@@ -87,7 +79,7 @@ public class SrtSubtitlesFileProcessor {
 		this.s3Service = s3Service;
 	}
 
-	private static final Logger log = LoggerFactory.getLogger(VttSubtitlesFileProcessor.class);
+	private static final Logger log = LoggerFactory.getLogger(SrtSubtitlesFileProcessor.class);
 	
 	public SrtSubtitleFileData process(File storedFile, List<String> lines, AdditionalData params, BomData bomData) {
 
@@ -109,8 +101,8 @@ public class SrtSubtitlesFileProcessor {
 			for (PreProcessor preProcessor : preProcessorsManager.getPreProcessors()) {
 				List<String> tmp = preProcessor.process(data.getLines().stream().map(SrtSubtitleUnitData::getText).collect(Collectors.toList()));
 				for(int i = 0; i < tmp.size(); i++) {
-					SrtSubtitleUnitData vttData = data.getLines().get(i);
-					vttData.setText(tmp.get(i));
+					SrtSubtitleUnitData srtData = data.getLines().get(i);
+					srtData.setText(tmp.get(i));
 				}
 			}
 			
@@ -136,7 +128,7 @@ public class SrtSubtitlesFileProcessor {
 			if (params.getAiEnabled()) {
 				List<LineForAiCorrection> corrected = aiCorrector.correct(aiAdapter.adapt(data), adapter.adapt(params));
 				
-				// Put back corrected lines to VttSubtitleUnitData
+				// Put back corrected lines to SrtSubtitleUnitData
 				List<SrtSubtitleUnitData> uncorrected = data.getLines();
 				for(int i = 0; i < uncorrected.size(); i++) {
 					uncorrected.get(i).setText(corrected.get(i).getText());

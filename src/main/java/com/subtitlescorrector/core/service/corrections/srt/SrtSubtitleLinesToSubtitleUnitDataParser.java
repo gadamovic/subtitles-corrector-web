@@ -32,9 +32,9 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 		
 		SrtSubtitleFileData fileData = new SrtSubtitleFileData();
 		
-		lines = trimLines(lines);
-		
 		Util.removeBomIfExists(lines);
+		
+		lines = trimLines(lines);
 		
 		List<SrtSubtitleUnitData> dataList = new ArrayList<>();
 		SrtSubtitleUnitData data = null;

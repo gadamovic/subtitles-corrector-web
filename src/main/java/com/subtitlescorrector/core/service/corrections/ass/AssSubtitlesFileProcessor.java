@@ -28,7 +28,6 @@ import com.subtitlescorrector.core.service.corrections.AbstractCorrector;
 import com.subtitlescorrector.core.service.corrections.AdditionalDataToCorrectorParametersAdapter;
 import com.subtitlescorrector.core.service.corrections.AiCustomCorrector;
 import com.subtitlescorrector.core.service.corrections.CorrectorsManager;
-import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitlesFileProcessor;
 import com.subtitlescorrector.core.service.preprocessing.PreProcessor;
 import com.subtitlescorrector.core.service.preprocessing.PreProcessorsManager;
 import com.subtitlescorrector.core.service.websocket.WebSocketMessageSender;
@@ -79,7 +78,7 @@ public class AssSubtitlesFileProcessor{
 		this.s3Service = s3Service;
 	}
 
-	private static final Logger log = LoggerFactory.getLogger(VttSubtitlesFileProcessor.class);
+	private static final Logger log = LoggerFactory.getLogger(AssSubtitlesFileProcessor.class);
 	
 	public AssSubtitleFileData process(File storedFile, List<String> lines, AdditionalData params, BomData bomData) {
 
@@ -101,8 +100,8 @@ public class AssSubtitlesFileProcessor{
 			for (PreProcessor preProcessor : preProcessorsManager.getPreProcessors()) {
 				List<String> tmp = preProcessor.process(data.getLines().stream().map(AssSubtitleUnitData::getText).collect(Collectors.toList()));
 				for(int i = 0; i < tmp.size(); i++) {
-					AssSubtitleUnitData vttData = data.getLines().get(i);
-					vttData.setText(tmp.get(i));
+					AssSubtitleUnitData assData = data.getLines().get(i);
+					assData.setText(tmp.get(i));
 				}
 			}
 			
@@ -128,7 +127,7 @@ public class AssSubtitlesFileProcessor{
 			if (params.getAiEnabled()) {
 				List<LineForAiCorrection> corrected = aiCorrector.correct(aiAdapter.adapt(data), adapter.adapt(params));
 				
-				// Put back corrected lines to VttSubtitleUnitData
+				// Put back corrected lines to AssSubtitleUnitData
 				List<AssSubtitleUnitData> uncorrected = data.getLines();
 				for(int i = 0; i < uncorrected.size(); i++) {
 					uncorrected.get(i).setText(corrected.get(i).getText());
