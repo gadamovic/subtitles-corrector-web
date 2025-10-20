@@ -427,7 +427,7 @@ public class SubtitleTextCorrectionsItTest {
 		
 	}
 	
-	//@Test
+	@Test
 	void givenSubtitleFileWithBOM_whenProcessingWithKeepBOMFlagFalse_thenRemoveBOM() {
 
 		File testFile = null;
