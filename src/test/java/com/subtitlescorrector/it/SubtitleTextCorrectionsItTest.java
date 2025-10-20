@@ -1,38 +1,53 @@
 package com.subtitlescorrector.it;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.Collections;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.mockito.MockedStatic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.subtitlescorrector.adapters.out.RedisServiceAdapter;
 import com.subtitlescorrector.adapters.out.WebSocketOutboundAdapter;
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
+import com.subtitlescorrector.core.domain.SubtitleTimestamp;
 import com.subtitlescorrector.core.domain.UserSubtitleCorrectionCurrentVersionMetadata;
 import com.subtitlescorrector.core.domain.UserSubtitleData;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
 import com.subtitlescorrector.core.service.SubtitleFileProviderForUserServiceImpl;
 import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileDataWebDto;
+import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileLineDataWebDto;
 import com.subtitlescorrector.core.service.corrections.SubtitlesCorrectionService;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitlesFileProcessor;
 import com.subtitlescorrector.core.util.FileUtil;
@@ -42,6 +57,7 @@ import com.subtitlescorrector.core.util.Util;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@AutoConfigureMockMvc
 public class SubtitleTextCorrectionsItTest {
 
 	private static final Logger log = LoggerFactory.getLogger(SubtitleTextCorrectionsItTest.class);
@@ -60,8 +76,9 @@ public class SubtitleTextCorrectionsItTest {
 	
 	@Autowired
 	SubtitleFileProviderForUserServiceImpl fileProvider;
-
-	private File testFile;
+	
+	@Autowired
+	MockMvc mockMvc;
 
 	/**
 	 * 1. Correction
@@ -75,6 +92,7 @@ public class SubtitleTextCorrectionsItTest {
 	 * 1.5 File with multiple BOMs, when remove BOM, validate if all BOMs are removed
 	 * 1.6 File with multiple BOMs, when keep BOM, validate that only 1 BOM is kept
 	 * 1.7 File when uploaded and subtitles shifted, validate if shifted correctly
+	 * 
 	 * 1.8 File when uploaded and edited in editor, check if saves file with edits
 	 * 1.9 AI corrections for all formats
 	 * 1.10 Srt file with invalid timestamp delimiters should be fixed
@@ -116,11 +134,29 @@ public class SubtitleTextCorrectionsItTest {
             return null;
         }).when(webSocketAdapter).sendMessage(anyString(), nullable(String.class));
 
+		
+        try (MockedStatic<FileUtil> mocked = mockStatic(FileUtil.class)) {
+            // Do nothing when writing to a file
+            mocked.when(() -> FileUtil.writeLinesToFile(any(), any(), any())).thenAnswer(invocation -> null);
+        }
+		
+	}
+	
+	@AfterAll
+	public void cleanUp() {
+		File fileCreatedByFileProvider = new File("filename");
+		if(fileCreatedByFileProvider.exists()) {
+			try {
+				Files.delete(fileCreatedByFileProvider.toPath());
+			} catch (IOException e) {
+				log.error(e.getMessage(), e);
+			}
+		}
 	}
 	
 	@Test
 	void givenSubtitleFileWithoutBOMWithCyrilicInvalidLatinCharactersAndHtmlTags_whenProcessingWithStripHtmlAndFixCharactersOptions_thenFixCyrilicCharactersAndStripHtml() {
-
+		File testFile = null;
 		InputStream is;
 		try {
 			is = new ClassPathResource("test_resources/subtitle_files/srt/subtitle_withoutBOM_withHtmlTags_withInvalidLatinCyrilicCharacters.srt").getInputStream();
@@ -144,7 +180,7 @@ public class SubtitleTextCorrectionsItTest {
 		data.setAiEnabled(false);
 		
 		SrtSubtitleFileData fileData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
-		
+
 		assertEquals(fileData.getDetectedCharset(), StandardCharsets.UTF_8);
 		assertEquals(fileData.getLines().size(), 8);
 		
@@ -204,6 +240,7 @@ public class SubtitleTextCorrectionsItTest {
 	@Test
 	void givenSubtitleFileWithoutBOMWithCyrilicInvalidLatinCharactersAndHtmlTags_whenProcessingWithoutStripHtmlTagsOption_thenStripForbiddenAndLeavePermittedTags() {
 
+		File testFile = null;
 		InputStream is;
 		try {
 			is = new ClassPathResource("test_resources/subtitle_files/srt/subtitle_withoutBOM_withHtmlTags_withInvalidLatinCyrilicCharacters.srt").getInputStream();
@@ -218,7 +255,7 @@ public class SubtitleTextCorrectionsItTest {
 		data.setAiEnabled(false);
 		
 		SrtSubtitleFileData fileData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
-		
+
 		assertEquals(fileData.getDetectedCharset(), StandardCharsets.UTF_8);
 		assertEquals(fileData.getLines().size(), 8);
 		
@@ -232,7 +269,8 @@ public class SubtitleTextCorrectionsItTest {
 	
 	@Test
 	void givenSubtitleFileWithBOMWithCyrilicInvalidLatinCharactersAndHtmlTags_whenProcessingWithStripHtmlAndFixCharactersOptions_thenFixCyrilicCharactersAndStripHtml() {
-
+		
+		File testFile = null;
 		InputStream is;
 		try {
 			is = new ClassPathResource("test_resources/subtitle_files/srt/subtitle_withBOM_withHtmlTags_withInvalidLatinCyrilicCharacters.srt").getInputStream();
@@ -256,7 +294,7 @@ public class SubtitleTextCorrectionsItTest {
 		data.setAiEnabled(false);
 		
 		SubtitleCorrectionFileDataWebDto fileDtoData = correctionService.applyCorrectionOperations(data, testFile);
-		
+
 		assertEquals(fileDtoData.getLines().size(), 8);
 		
 		assertEquals(fileDtoData.getLines().get(0).getText(), "aaaaaaaaaaaa not permited tag<br>aaaaaaaaaaaa permited tag");
@@ -307,6 +345,7 @@ public class SubtitleTextCorrectionsItTest {
 	@Test
 	void givenSubtitleFileWithBOMWithCyrilicInvalidLatinCharactersAndHtmlTags_whenProcessingWithoutStripHtmlTagsOption_thenStripForbiddenAndLeavePermittedTags() {
 
+		File testFile = null;
 		InputStream is;
 		try {
 			is = new ClassPathResource("test_resources/subtitle_files/srt/subtitle_withBOM_withHtmlTags_withInvalidLatinCyrilicCharacters.srt").getInputStream();
@@ -321,7 +360,7 @@ public class SubtitleTextCorrectionsItTest {
 		data.setAiEnabled(false);
 		
 		SubtitleCorrectionFileDataWebDto fileDtoData = correctionService.applyCorrectionOperations(data, testFile);
-		
+
 		assertEquals(fileDtoData.getLines().size(), 8);
 		
 		assertEquals(fileDtoData.getLines().get(0).getText(), "aaaaaaaaaaaa not permited tag<br>aaaaaaaaaaaa <font color=\"red\">permited tag</font>");
@@ -331,8 +370,9 @@ public class SubtitleTextCorrectionsItTest {
 	}
 	
 	@Test
-	void givenSubtitleFileWithBOM_whenProcessingWithKeepBOMFlagFalse_thenRemoveBOM() {
+	void givenSubtitleFileWithBOM_whenProcessing_thenRemoveBOM() {
 
+		File testFile = null;
 		InputStream is;
 		try {
 			is = new ClassPathResource("test_resources/subtitle_files/srt/subtitle_withBOM_withHtmlTags_withInvalidLatinCyrilicCharacters.srt").getInputStream();
@@ -345,16 +385,16 @@ public class SubtitleTextCorrectionsItTest {
 		data = new AdditionalData();
 		
 		data.setAiEnabled(false);
-		data.setKeepBOM(false);
 		
 		SubtitleCorrectionFileDataWebDto fileDtoData = correctionService.applyCorrectionOperations(data, testFile);
-		
+
 		assertEquals(false,fileDtoData.getLines().get(0).getText().startsWith("\uFEFF"));
 	}
 	
 	@Test
 	void givenSubtitleFileWithBOM_whenProcessingWithKeepBOMFlagTrue_thenKeepBOM() {
 
+		File testFile = null;
 		InputStream is;
 		try {
 			is = new ClassPathResource("test_resources/subtitle_files/srt/subtitle_withBOM_withHtmlTags_withInvalidLatinCyrilicCharacters.srt").getInputStream();
@@ -377,12 +417,199 @@ public class SubtitleTextCorrectionsItTest {
 		metadata.setFormat(SubtitleFormat.SRT);
 		
 		SrtSubtitleFileData fileData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+
 		when(redis.getUserSubtitleCurrentVersionJson(anyString())).thenReturn(JsonSerializationUtil.srtSubtitleFileDataToJson(fileData));
 		when(redis.getUsersLastUpdatedSubtitleFileMetadata(anyString())).thenReturn(metadata);
 		
 		UserSubtitleData userData = fileProvider.provideFileForUser("foo");
 		boolean hasBom = FileUtil.loadTextFile(userData.getFile()).get(0).startsWith("\uFEFF");
 		assertTrue(hasBom);
+		
+	}
+	
+	//@Test
+	void givenSubtitleFileWithBOM_whenProcessingWithKeepBOMFlagFalse_thenRemoveBOM() {
+
+		File testFile = null;
+		InputStream is;
+		try {
+			is = new ClassPathResource("test_resources/subtitle_files/srt/subtitle_withBOM_withHtmlTags_withInvalidLatinCyrilicCharacters.srt").getInputStream();
+			testFile = Util.inputStreamToFile(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		AdditionalData data;
+		data = new AdditionalData();
+		
+		data.setAiEnabled(false);
+		
+		UserSubtitleCorrectionCurrentVersionMetadata metadata = new UserSubtitleCorrectionCurrentVersionMetadata();
+		BomData bom = new BomData();
+		bom.setHasBom(true);
+		bom.setKeepBom(false);
+		metadata.setBomData(bom);
+		metadata.setFilename("filename");
+		metadata.setFormat(SubtitleFormat.SRT);
+		
+		SrtSubtitleFileData fileData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+
+		when(redis.getUserSubtitleCurrentVersionJson(anyString())).thenReturn(JsonSerializationUtil.srtSubtitleFileDataToJson(fileData));
+		when(redis.getUsersLastUpdatedSubtitleFileMetadata(anyString())).thenReturn(metadata);
+		
+		UserSubtitleData userData = fileProvider.provideFileForUser("foo");
+		boolean hasBom = FileUtil.loadTextFile(userData.getFile()).get(0).startsWith("\uFEFF");
+		assertFalse(hasBom);
+	}
+	
+	
+	@Test
+	void givenSubtitleFileWithTwoBOMs_whenProcessingWithKeepBOMFlagTrue_thenKeepOneBOM() {
+
+		File testFile = null;
+		InputStream is;
+		try {
+			is = new ClassPathResource("test_resources/subtitle_files/srt/subtitle_withTwoBOMs.srt").getInputStream();
+			testFile = Util.inputStreamToFile(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		// Make sure file has two BOMs to start with
+		String firstLineBeforeProcessing = FileUtil.loadTextFile(testFile).get(0);
+		boolean hasTwoBoms = firstLineBeforeProcessing.startsWith("\uFEFF\uFEFF");
+		assertTrue(hasTwoBoms);
+		
+		AdditionalData data;
+		data = new AdditionalData();
+		
+		data.setAiEnabled(false);
+		
+		UserSubtitleCorrectionCurrentVersionMetadata metadata = new UserSubtitleCorrectionCurrentVersionMetadata();
+		BomData bom = new BomData();
+		bom.setHasBom(true);
+		bom.setKeepBom(true);
+		metadata.setBomData(bom);
+		metadata.setFilename("filename");
+		metadata.setFormat(SubtitleFormat.SRT);
+		
+		SrtSubtitleFileData fileData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+
+		when(redis.getUserSubtitleCurrentVersionJson(anyString())).thenReturn(JsonSerializationUtil.srtSubtitleFileDataToJson(fileData));
+		when(redis.getUsersLastUpdatedSubtitleFileMetadata(anyString())).thenReturn(metadata);
+		
+		UserSubtitleData userData = fileProvider.provideFileForUser("foo");
+		String firstLine = FileUtil.loadTextFile(userData.getFile()).get(0);
+		boolean hasBom = firstLine.startsWith("\uFEFF");
+		hasTwoBoms = firstLine.startsWith("\uFEFF\uFEFF");
+		
+		assertTrue(hasBom);
+		assertFalse(hasTwoBoms);
+	}
+	
+	@Test
+	void givenSubtitleFileWithTwoBOMs_whenProcessing_thenRemoveBothBOMs() {
+
+		File testFile = null;
+		InputStream is;
+		try {
+			is = new ClassPathResource("test_resources/subtitle_files/srt/subtitle_withTwoBOMs.srt").getInputStream();
+			testFile = Util.inputStreamToFile(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		AdditionalData data;
+		data = new AdditionalData();
+		
+		data.setAiEnabled(false);
+		
+		SubtitleCorrectionFileDataWebDto fileDtoData = correctionService.applyCorrectionOperations(data, testFile);
+		
+		assertEquals(false,fileDtoData.getLines().get(0).getText().startsWith("\uFEFF"));
 	}
 
+	@Test
+	void givenSubtitleEditedOnFeAndSaveSubtitleEndpointCalled_whenPersisting_thenMergeFeEditsWithCurrentSubtitleVersion() throws Exception {
+
+		
+		AdditionalData data;
+		data = new AdditionalData();
+		
+		data.setAiEnabled(false);
+		
+		SubtitleCorrectionFileLineDataWebDto dtoLine = new SubtitleCorrectionFileLineDataWebDto();
+		dtoLine.setNumber(1);
+		dtoLine.setText("edited one line");
+		dtoLine.setTextBeforeCorrection("one line");
+		
+		SubtitleTimestamp from = new SubtitleTimestamp();
+		from.setHour((short) 0);
+		from.setMinute((short) 1);
+		from.setSecond((short) 1);
+		from.setMillisecond((short) 100);
+		
+		SubtitleTimestamp to = new SubtitleTimestamp();
+		to.setHour((short) 0);
+		to.setMinute((short) 1);
+		to.setSecond((short) 2);
+		to.setMillisecond((short) 200);
+		
+		SubtitleTimestamp fromShifted = new SubtitleTimestamp();
+		fromShifted.setHour((short) 0);
+		fromShifted.setMinute((short) 1);
+		fromShifted.setSecond((short) 1);
+		fromShifted.setMillisecond((short) 400);
+		
+		SubtitleTimestamp toShifted = new SubtitleTimestamp();
+		toShifted.setHour((short) 0);
+		toShifted.setMinute((short) 1);
+		toShifted.setSecond((short) 2);
+		toShifted.setMillisecond((short) 500);
+		
+		dtoLine.setTimestampFrom(from);
+		dtoLine.setTimestampTo(to);
+		dtoLine.setTimestampFromShifted(fromShifted);
+		dtoLine.setTimestampToShifted(toShifted);
+		
+		
+		SrtSubtitleFileData fileData = new SrtSubtitleFileData();
+		SrtSubtitleUnitData subtitleUnitData = new SrtSubtitleUnitData();
+		subtitleUnitData.setText("one line");
+		subtitleUnitData.setTimestampFrom(from);
+		subtitleUnitData.setTimestampTo(to);
+		fileData.setLines(Collections.singletonList(subtitleUnitData));
+		
+		
+		SubtitleCorrectionFileDataWebDto fileDto = new SubtitleCorrectionFileDataWebDto();
+		fileDto.setFilename("filename");
+		fileDto.setLines(Collections.singletonList(dtoLine));
+		
+		UserSubtitleCorrectionCurrentVersionMetadata metadata = new UserSubtitleCorrectionCurrentVersionMetadata();
+		metadata.setFormat(SubtitleFormat.SRT);
+		
+		when(redis.getUserSubtitleCurrentVersionJson(anyString())).thenReturn(JsonSerializationUtil.srtSubtitleFileDataToJson(fileData));
+		when(redis.getUsersLastUpdatedSubtitleFileMetadata(anyString())).thenReturn(metadata);
+		
+		doAnswer(invocation -> {
+            String mergedSubtitleFileData = invocation.getArgument(0);
+            
+            SrtSubtitleFileData merged = JsonSerializationUtil.jsonToSrtSubtitleFileData(mergedSubtitleFileData);
+            assertEquals("edited one line", merged.getLines().get(0).getText());
+            assertEquals("one line", merged.getLines().get(0).getTextBeforeCorrection());
+            //TODO: add missing fields
+            
+            return null;
+        }).when(redis).addUserSubtitleCurrentVersion(anyString(), nullable(String.class));
+		
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/rest/1.0/save")
+				.param("userId", "123")
+		        .contentType(MediaType.APPLICATION_JSON)
+		        .content(new ObjectMapper().writeValueAsString(fileDto))
+				)
+        .andExpect(MockMvcResultMatchers.status().isOk());
+		
+	}
+
+	
 }
