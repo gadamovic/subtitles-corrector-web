@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.RequestValidatorStatus;
+import com.subtitlescorrector.core.domain.exception.SubtitleFileParseException;
 import com.subtitlescorrector.core.port.EmailServicePort;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.port.StorageSystemPort;
@@ -76,9 +77,12 @@ public class CorrectionsController {
 		AdditionalData clientParameters = Util.extractOptions(request);
 		clientParameters.setOriginalFilename(file.getOriginalFilename());
 		
-		SubtitleCorrectionFileDataWebDto response = correctionService.applyCorrectionOperations(clientParameters, storedFile);
-		return ResponseEntity.ok(response);
-
+		try {
+			SubtitleCorrectionFileDataWebDto response = correctionService.applyCorrectionOperations(clientParameters, storedFile);
+			return ResponseEntity.ok(response);
+		}catch(SubtitleFileParseException parseException) {
+			return getInvalidResponseEntity(HttpStatus.BAD_REQUEST, parseException.getMessage());
+		}
 		
 	}
 

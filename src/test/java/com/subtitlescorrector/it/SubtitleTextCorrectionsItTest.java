@@ -2,17 +2,21 @@ package com.subtitlescorrector.it;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Collections;
@@ -46,6 +50,7 @@ import com.subtitlescorrector.core.domain.UserSubtitleData;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
 import com.subtitlescorrector.core.service.SubtitleFileProviderForUserServiceImpl;
+import com.subtitlescorrector.core.service.corrections.AiCustomCorrector;
 import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileDataWebDto;
 import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileLineDataWebDto;
 import com.subtitlescorrector.core.service.corrections.SubtitlesCorrectionService;
@@ -77,6 +82,9 @@ public class SubtitleTextCorrectionsItTest {
 	@Autowired
 	SubtitleFileProviderForUserServiceImpl fileProvider;
 	
+	@MockBean
+	AiCustomCorrector aiCorrector;
+	
 	@Autowired
 	MockMvc mockMvc;
 
@@ -92,13 +100,13 @@ public class SubtitleTextCorrectionsItTest {
 	 * 1.5 File with multiple BOMs, when remove BOM, validate if all BOMs are removed
 	 * 1.6 File with multiple BOMs, when keep BOM, validate that only 1 BOM is kept
 	 * 1.7 File when uploaded and subtitles shifted, validate if shifted correctly
-	 * 
 	 * 1.8 File when uploaded and edited in editor, check if saves file with edits
 	 * 1.9 AI corrections for all formats
 	 * 1.10 Srt file with invalid timestamp delimiters should be fixed
 	 * 1.11 Srt file with multiple consecutive blank lines at the beginning
 	 * 1.12 Srt file with multiple consecutive blank lines in the middle (TBA)
 	 * 1.13 File with other then UTF-8 encoding should be converted to UTF-8
+	 * 
 	 * 1.14 Vtt file with header, confirm it stays valid and contains header after correction
 	 * 1.15 Vtt file without header, confirm valid after correction
 	 * 1.16 Validate big file gets rejected
@@ -597,7 +605,26 @@ public class SubtitleTextCorrectionsItTest {
             SrtSubtitleFileData merged = JsonSerializationUtil.jsonToSrtSubtitleFileData(mergedSubtitleFileData);
             assertEquals("edited one line", merged.getLines().get(0).getText());
             assertEquals("one line", merged.getLines().get(0).getTextBeforeCorrection());
-            //TODO: add missing fields
+            
+            assertEquals(from.getHour(), merged.getLines().get(0).getTimestampFrom().getHour());
+            assertEquals(from.getSecond(), merged.getLines().get(0).getTimestampFrom().getSecond());
+            assertEquals(from.getMinute(), merged.getLines().get(0).getTimestampFrom().getMinute());
+            assertEquals(from.getMillisecond(), merged.getLines().get(0).getTimestampFrom().getMillisecond());
+            
+            assertEquals(fromShifted.getHour(), merged.getLines().get(0).getTimestampFromShifted().getHour());
+            assertEquals(fromShifted.getSecond(), merged.getLines().get(0).getTimestampFromShifted().getSecond());
+            assertEquals(fromShifted.getMinute(), merged.getLines().get(0).getTimestampFromShifted().getMinute());
+            assertEquals(fromShifted.getMillisecond(), merged.getLines().get(0).getTimestampFromShifted().getMillisecond());
+            
+            assertEquals(to.getHour(), merged.getLines().get(0).getTimestampTo().getHour());
+            assertEquals(to.getSecond(), merged.getLines().get(0).getTimestampTo().getSecond());
+            assertEquals(to.getMinute(), merged.getLines().get(0).getTimestampTo().getMinute());
+            assertEquals(to.getMillisecond(), merged.getLines().get(0).getTimestampTo().getMillisecond());
+            
+            assertEquals(toShifted.getHour(), merged.getLines().get(0).getTimestampToShifted().getHour());
+            assertEquals(toShifted.getSecond(), merged.getLines().get(0).getTimestampToShifted().getSecond());
+            assertEquals(toShifted.getMinute(), merged.getLines().get(0).getTimestampToShifted().getMinute());
+            assertEquals(toShifted.getMillisecond(), merged.getLines().get(0).getTimestampToShifted().getMillisecond());
             
             return null;
         }).when(redis).addUserSubtitleCurrentVersion(anyString(), nullable(String.class));
@@ -610,6 +637,136 @@ public class SubtitleTextCorrectionsItTest {
         .andExpect(MockMvcResultMatchers.status().isOk());
 		
 	}
+	
+	@Test
+	public void givenAdditionalParameters_whenAiProcessingIsTrue_thenAiProcessorShouldStart() {
+		
+		File testFile = null;
+		InputStream is;
+		try {
+			is = new ClassPathResource("test_resources/subtitle_files/srt/subtitle_withTwoBOMs.srt").getInputStream();
+			testFile = Util.inputStreamToFile(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+				
+		when(aiCorrector.correct(any(), any())).thenReturn(null);
 
+		AdditionalData data = new AdditionalData();
+		data.setAiEnabled(true);
+		
+		try {
+			processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+		}catch(Exception e) {}
+		
+		verify(aiCorrector).correct(any(), any());
+	}
+	
+	
+	@Test
+	public void givenSubtitleFileWithInvalidTimestampDelimiters_whenProcessing_thenCorrectInvalidTimestampDelimiters() {
+		
+		File testFile = null;
+		InputStream is;
+		try {
+			is = new ClassPathResource("test_resources/subtitle_files/srt/subtitle_withInvalidTimestampDelimiters.srt").getInputStream();
+			testFile = Util.inputStreamToFile(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		AdditionalData data = new AdditionalData();
+		data.setAiEnabled(false);
+		
+		SrtSubtitleFileData srtData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+
+		assertEquals("Ћирилица", srtData.getLines().get(2).getText());
+		
+	}
+	
+	@Test
+	public void givenSubtitleFileWithEmptyTextLines_whenProcessing_thenParseCorrectly() {
+		
+		File testFile = null;
+		InputStream is;
+		try {
+			is = new ClassPathResource("test_resources/subtitle_files/srt/subtitle_withEmptyTextLines.srt").getInputStream();
+			testFile = Util.inputStreamToFile(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		AdditionalData data = new AdditionalData();
+		data.setAiEnabled(false);
+		
+		try {
+			SrtSubtitleFileData srtData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+		}catch(Exception e) {
+			fail("Processing subtitle with empty text failed!");
+		}
+		
+	}
+	
+	@Test
+	public void givenSubtitleFileWithNonUtf8Encoding_whenProcessing_thenConvertToUtf8() {
+		
+		File testFile = null;
+		InputStream is;
+		try {
+			is = new ClassPathResource("test_resources/subtitle_files/srt/subtitle_withNonUTF8Encoding.srt").getInputStream();
+			testFile = Util.inputStreamToFile(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		AdditionalData data;
+		data = new AdditionalData();
+		
+		data.setAiEnabled(false);
+		
+		UserSubtitleCorrectionCurrentVersionMetadata metadata = new UserSubtitleCorrectionCurrentVersionMetadata();
+		BomData bom = new BomData();
+		bom.setHasBom(true);
+		bom.setKeepBom(true);
+		metadata.setBomData(bom);
+		metadata.setFilename("filename");
+		metadata.setFormat(SubtitleFormat.SRT);
+		
+		Charset unProcessedFileCharset = FileUtil.detectEncodingOfFile(testFile);
+		assertNotEquals(Charset.forName("UTF-8"), unProcessedFileCharset);
+		
+		SrtSubtitleFileData fileData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+
+		when(redis.getUserSubtitleCurrentVersionJson(anyString())).thenReturn(JsonSerializationUtil.srtSubtitleFileDataToJson(fileData));
+		when(redis.getUsersLastUpdatedSubtitleFileMetadata(anyString())).thenReturn(metadata);
+		
+		UserSubtitleData userData = fileProvider.provideFileForUser("foo");
+		Charset processedFileCharset = FileUtil.detectEncodingOfFile(userData.getFile());
+		assertEquals(Charset.forName("UTF-8"), processedFileCharset);
+		
+	}
+	
+	@Test
+	public void givenSubtitleFileWithMissingLineNumbers_whenProcessing_thenParseCorrectly() {
+		
+		File testFile = null;
+		InputStream is;
+		try {
+			is = new ClassPathResource("test_resources/subtitle_files/srt/subtitle_withMissingLineNumbers.srt").getInputStream();
+			testFile = Util.inputStreamToFile(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		AdditionalData data = new AdditionalData();
+		data.setAiEnabled(false);
+		
+		try {
+			SrtSubtitleFileData srtData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+		}catch(Exception e) {
+			fail("Processing subtitle with missing line numbers failed!");
+		}
+		
+	}
 	
 }

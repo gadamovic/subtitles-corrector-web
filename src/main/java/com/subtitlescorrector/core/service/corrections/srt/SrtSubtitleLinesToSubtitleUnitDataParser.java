@@ -10,11 +10,15 @@ import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.SecondMillisecondDelimiterRegex;
+import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.SubtitleTimestamp;
+import com.subtitlescorrector.core.domain.exception.SubtitleFileParseException;
+import com.subtitlescorrector.core.domain.srt.SrtFileErrorsFlags;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
 import com.subtitlescorrector.core.service.converters.SubtitleLinesToSubtitleUnitDataConverter;
+import com.subtitlescorrector.core.service.websocket.WebSocketMessageSender;
 import com.subtitlescorrector.core.util.SubtitleTimestampUtils;
 import com.subtitlescorrector.core.util.Util;
 
@@ -28,7 +32,10 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 	@Autowired
 	SubtitleTimestampUtils util;
 	
-	public SrtSubtitleFileData convertToSubtitleUnits(List<String> lines){
+	@Autowired
+	WebSocketMessageSender webSocketMessageSender;
+	
+	public SrtSubtitleFileData convertToSubtitleUnits(List<String> lines) {
 		
 		SrtSubtitleFileData fileData = new SrtSubtitleFileData();
 		
@@ -38,64 +45,100 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 		
 		List<SrtSubtitleUnitData> dataList = new ArrayList<>();
 		SrtSubtitleUnitData data = null;
+		
+		SrtFileErrorsFlags errorFlags = new SrtFileErrorsFlags();
+		
 		int i = -1;
 		
-		for(String line : lines) {
-			
-			//ignore multiple consecutive blank lines
-			//TODO: should also handle the case with random blank lines across the file
-			i++;
-			if(StringUtils.isBlank(line) && (i < lines.size()) && StringUtils.isBlank(lines.get(i + 1))) {
-				continue;
-			}
-			
-			Integer number = toInteger(line);
-			if(number != null && data == null) {
-				data = new SrtSubtitleUnitData();
-				data.setNumber(number);
-				data.setFormat(SubtitleFormat.SRT);
-				continue;
-			}
-			
-			if(line.contains("-->")) {
-				String from = (line.substring(0, line.indexOf("-->") - 1));
-				String to = line.substring((line.lastIndexOf(" ") + 1), line.length());
+		try {
+			for(String line : lines) {
 				
-				SubtitleTimestamp tsFrom = util.parseSubtitleTimestampString(from, SecondMillisecondDelimiterRegex.COMMA);
-				SubtitleTimestamp tsTo = util.parseSubtitleTimestampString(to, SecondMillisecondDelimiterRegex.COMMA);
-				
-				tsFrom.setFormattedTimestamp(SubtitleTimestampUtils.formatTimestamp(tsFrom, ","));
-				tsTo.setFormattedTimestamp(SubtitleTimestampUtils.formatTimestamp(tsTo, ","));
-				
-				data.setTimestampFrom(tsFrom);
-				data.setTimestampTo(tsTo);
-				
-				continue;
-			}
-			
-			if(StringUtils.isNotBlank(line)) {
-				if(StringUtils.isNotBlank(data.getText())) {
-					data.setText(data.getText() + "\n" + line);
-				}else {
-					data.setText(line);
+				//ignore multiple consecutive blank lines
+				i++;
+				if(StringUtils.isBlank(line) && (i < lines.size()) && StringUtils.isBlank(lines.get(i + 1))) {
+					continue;
 				}
 				
-				if(i == lines.size()-1) {
-					//last line of the file
+				Integer number = toInteger(line);
+				if(number != null && data == null) {
+					data = new SrtSubtitleUnitData();
+					data.setNumber(number);
+					data.setFormat(SubtitleFormat.SRT);
+					continue;
+				}
+				
+				if(line.contains("-->")) {
+					String from = (line.substring(0, line.indexOf("-->") - 1));
+					String to = line.substring((line.lastIndexOf(" ") + 1), line.length());
+					
+					SubtitleTimestamp tsFrom = util.parseSubtitleTimestampString(from, SecondMillisecondDelimiterRegex.COMMA);
+					SubtitleTimestamp tsTo = util.parseSubtitleTimestampString(to, SecondMillisecondDelimiterRegex.COMMA);
+					
+					tsFrom.setFormattedTimestamp(SubtitleTimestampUtils.formatTimestamp(tsFrom, ","));
+					tsTo.setFormattedTimestamp(SubtitleTimestampUtils.formatTimestamp(tsTo, ","));
+					
+					if(data == null) {
+						data = new SrtSubtitleUnitData();
+						log.warn("Subtitle unit was null when --> was found in text!");
+						errorFlags.setInvalidNumbers(true); // If we found --> in text but data is still null, it might mean that line numbers are missing or invalid
+						webSocketMessageSender.sendMessage(createInvalidNumbersCorrectionEvent());
+					}
+					
+					data.setTimestampFrom(tsFrom);
+					data.setTimestampTo(tsTo);
+					
+					continue;
+				}
+				
+				if(StringUtils.isNotBlank(line)) {
+					if(StringUtils.isNotBlank(data.getText())) {
+						data.setText(data.getText() + "\n" + line);
+					}else {
+						data.setText(line);
+					}
+					
+					if(i == lines.size()-1) {
+						//last line of the file
+						dataList.add(data);
+						data = null;
+					}
+					
+				}else {
+					//end of subtitle
 					dataList.add(data);
 					data = null;
 				}
 				
-			}else {
-				//end of subtitle
-				dataList.add(data);
-				data = null;
+				
 			}
 			
+			postProcess(dataList, errorFlags);
+			
+			fileData.setLines(dataList);
+				return fileData;
+		}catch(Exception e) {
+			log.error("Error parsing lines!", e);
+			throw new SubtitleFileParseException("Error parsing srt file!");
+		}
+	}
+
+	private SubtitleCorrectionEvent createInvalidNumbersCorrectionEvent() {
+		SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
+		event.setCorrection("Invalid line numbers detected, new valid ones will be generated");
+		return event;
+	}
+
+	private void postProcess(List<SrtSubtitleUnitData> dataList, SrtFileErrorsFlags errorFlags) {
+		
+		int lineNumber = 1;
+		for(SrtSubtitleUnitData data : dataList) {
+			
+			if(errorFlags.isInvalidNumbers()) {
+				data.setNumber(lineNumber++);
+			}
 			
 		}
-		fileData.setLines(dataList);
-		return fileData;
+		
 	}
 
 	private List<String> trimLines(List<String> lines) {

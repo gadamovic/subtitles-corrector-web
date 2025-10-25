@@ -3,6 +3,7 @@ package com.subtitlescorrector.core.service.preprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,7 +16,10 @@ public class BrTagPreProcessor implements PreProcessor{
 		
 		for(String line : data) {
 			
-			String text = line.replace("\n", "<br>");
+			String text = "";
+			if(StringUtils.isNotBlank(line)) {
+				text = line.replace("\n", "<br>");
+			}
 			processed.add(text);
 			
 		}

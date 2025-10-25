@@ -20,6 +20,7 @@ import com.subtitlescorrector.core.domain.EditOperation;
 import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
 import com.subtitlescorrector.core.domain.UserData;
 import com.subtitlescorrector.core.domain.ai.LineForAiCorrection;
+import com.subtitlescorrector.core.domain.exception.SubtitleFileParseException;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
 import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
@@ -140,8 +141,14 @@ public class SrtSubtitlesFileProcessor {
 
 			sendProcessingFinishedMessage();
 			
-		}catch (Exception e) {
+		}
+		catch(SubtitleFileParseException parseException) {
+			log.error("Error parsing file!", parseException);
+			throw parseException;
+		}
+		catch (Exception e) {
 			log.error("Error processing file!", e);
+			throw new RuntimeException("Error processing file!", e);
 		} finally {
 			deleteFiles(storedFile, correctedFile);
 		}

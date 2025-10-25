@@ -1,0 +1,48 @@
+
+
+
+1
+00:01:06,450 --> 00:01:10,450
+aaaaaaaaaaaa <a href="http://www.google.com" onclick="console.log('test')">not permited tag</a>
+aaaaaaaaaaaa <font color="red">permited tag</font>
+
+2
+00:01:13,450 --> 00:01:18,633
+multi
+line
+
+3
+00:01:18,825 --> 00:01:25,763
+????????
+
+4
+00:01:25,908 --> 00:01:28,669
+Cirilica
+
+5
+00:01:28,950 --> 00:01:32,621
+asdasdasd<i>i tag</i> <u>u tag</u> <b>b tag</b>
+
+6
+00:01:32,867 --> 00:01:38,717
+Nemilosrdna je prema svemu
+laûnom. Ali zato je i predivna.
+
+
+
+7
+00:01:38,950 --> 00:01:46,224
+test
+
+
+
+
+
+8
+00:01:44,950 --> 00:01:46,264
+Ê∆Ë»
+
+
+
+
+

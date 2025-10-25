@@ -16,6 +16,7 @@ import com.subtitlescorrector.core.domain.SubtitleTimestamp;
 import com.subtitlescorrector.core.domain.TimeUnit;
 import com.subtitlescorrector.core.domain.ass.AssSubtitleFileData;
 import com.subtitlescorrector.core.domain.ass.AssSubtitleUnitData;
+import com.subtitlescorrector.core.domain.exception.SubtitleFileParseException;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleLinesToSubtitleUnitDataParser;
 import com.subtitlescorrector.core.util.SubtitleTimestampUtils;
 import com.subtitlescorrector.core.util.Util;
@@ -47,46 +48,51 @@ public class AssSubtitleLinesToSubtitleUnitDataParser {
 		
 		List<AssSubtitleUnitData> subsList = new ArrayList<>();
 		
-		for(String line : lines) {
-		
-			if(!foundEventsSection && !line.equals(EVENTS_SECTION_START)) {
-				continue;
-			}else {
-				foundEventsSection = true;
-			}
+		try {
+			for(String line : lines) {
 			
-			if(!foundFormat && !line.startsWith(FORMAT)) {
-				continue;
-			}else if(!foundFormat){
-				foundFormat = true;
-				format = Arrays.asList(line.substring(FORMAT.length()).split(","));
-				format.replaceAll(String::trim);
-			}
-		
+				if(!foundEventsSection && !line.equals(EVENTS_SECTION_START)) {
+					continue;
+				}else {
+					foundEventsSection = true;
+				}
+				
+				if(!foundFormat && !line.startsWith(FORMAT)) {
+					continue;
+				}else if(!foundFormat){
+					foundFormat = true;
+					format = Arrays.asList(line.substring(FORMAT.length()).split(","));
+					format.replaceAll(String::trim);
+				}
 			
-			if(line.contains("Dialogue: ")) {
-				String tmp = line.substring("Dialogue: ".length());
-				String parts[] = tmp.split(",", format.size());
 				
-				String start = parts[format.indexOf("Start")];
-				String end = parts[format.indexOf("End")];
-				String text = parts[format.indexOf("Text")];
-				text = STYLE_PATTERN.matcher(text).replaceAll("");
+				if(line.contains("Dialogue: ")) {
+					String tmp = line.substring("Dialogue: ".length());
+					String parts[] = tmp.split(",", format.size());
+					
+					String start = parts[format.indexOf("Start")];
+					String end = parts[format.indexOf("End")];
+					String text = parts[format.indexOf("Text")];
+					text = STYLE_PATTERN.matcher(text).replaceAll("");
+					
+					AssSubtitleUnitData subUnit = new AssSubtitleUnitData();
+					subUnit.setFormat(SubtitleFormat.ASS);
+					subUnit.setNumber(i++);
+					subUnit.setText(text);
+					
+					SubtitleTimestamp tsFrom = util.parseSubtitleTimestampString(start, SecondMillisecondDelimiterRegex.DOT, 10);
+					subUnit.setTimestampFrom(tsFrom);
+					
+					SubtitleTimestamp tsTo = util.parseSubtitleTimestampString(end, SecondMillisecondDelimiterRegex.DOT, 10);
+					subUnit.setTimestampTo(tsTo);
+					
+					subsList.add(subUnit);
+				}
 				
-				AssSubtitleUnitData subUnit = new AssSubtitleUnitData();
-				subUnit.setFormat(SubtitleFormat.ASS);
-				subUnit.setNumber(i++);
-				subUnit.setText(text);
-				
-				SubtitleTimestamp tsFrom = util.parseSubtitleTimestampString(start, SecondMillisecondDelimiterRegex.DOT, 10);
-				subUnit.setTimestampFrom(tsFrom);
-				
-				SubtitleTimestamp tsTo = util.parseSubtitleTimestampString(end, SecondMillisecondDelimiterRegex.DOT, 10);
-				subUnit.setTimestampTo(tsTo);
-				
-				subsList.add(subUnit);
 			}
-			
+		}catch(Exception e) {
+			log.error("Error parsing ass file!", e);
+			throw new SubtitleFileParseException("Error parsing ass file!");
 		}
 		fileData.setLines(subsList);
 		return fileData;

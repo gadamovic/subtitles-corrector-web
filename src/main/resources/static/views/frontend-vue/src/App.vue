@@ -12,7 +12,9 @@ import BaseTemplate from './components/BaseTemplate.vue'
 
 <style>
 body {
-  background-image: url('assets/poly-background-3.png')
+  background-image: url('assets/poly-background-3.png');
+  min-height: 100vh;
+  background-size: cover;
 }
 
 body:after {

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.subtitlescorrector.core.domain.SecondMillisecondDelimiterRegex;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.SubtitleTimestamp;
+import com.subtitlescorrector.core.domain.exception.SubtitleFileParseException;
 import com.subtitlescorrector.core.domain.vtt.VttSubtitleFileData;
 import com.subtitlescorrector.core.domain.vtt.VttSubtitleUnitData;
 import com.subtitlescorrector.core.util.SubtitleTimestampUtils;
@@ -43,77 +44,82 @@ public class VttSubtitleLinesToSubtitleUnitDataParser {
 		int subtitleLineNumber = 1;
 		boolean foundFirstSubtitleLine = false;
 		
-		for(String line : lines) {
-			
-			i++;
-			
-			if(line.contains("-->")) {
+		try {
+			for(String line : lines) {
 				
-				foundFirstSubtitleLine = true;
-				data = new VttSubtitleUnitData();
-				data.setNumber(subtitleLineNumber++);
-				data.setFormat(SubtitleFormat.VTT);
+				i++;
 				
-				String from = (line.substring(0, line.indexOf("-->") - 1));
-				String to = line.substring(line.indexOf(" --> ") + " --> ".length());
-				
-				if(to.contains(" ")) {
-					String toSplit[] = to.split(" ");
+				if(line.contains("-->")) {
 					
-					to = toSplit[0];
-					String cues = "";
+					foundFirstSubtitleLine = true;
+					data = new VttSubtitleUnitData();
+					data.setNumber(subtitleLineNumber++);
+					data.setFormat(SubtitleFormat.VTT);
 					
-					for(int j = 1; j < toSplit.length; j++) {
-						cues += (" " + toSplit[j]);
+					String from = (line.substring(0, line.indexOf("-->") - 1));
+					String to = line.substring(line.indexOf(" --> ") + " --> ".length());
+					
+					if(to.contains(" ")) {
+						String toSplit[] = to.split(" ");
+						
+						to = toSplit[0];
+						String cues = "";
+						
+						for(int j = 1; j < toSplit.length; j++) {
+							cues += (" " + toSplit[j]);
+						}
+						
+						cues = cues.substring(1);
+						data.setCues(cues);
+						
 					}
 					
-					cues = cues.substring(1);
-					data.setCues(cues);
+					SubtitleTimestamp tsFrom = util.parseSubtitleTimestampString(from, SecondMillisecondDelimiterRegex.DOT);
+					SubtitleTimestamp tsTo = util.parseSubtitleTimestampString(to, SecondMillisecondDelimiterRegex.DOT);
 					
+					tsFrom.setFormattedTimestamp(SubtitleTimestampUtils.formatTimestamp(tsFrom, "."));
+					tsTo.setFormattedTimestamp(SubtitleTimestampUtils.formatTimestamp(tsTo, "."));
+					
+					data.setTimestampFrom(tsFrom);
+					data.setTimestampTo(tsTo);
+	
+					continue;
 				}
 				
-				SubtitleTimestamp tsFrom = util.parseSubtitleTimestampString(from, SecondMillisecondDelimiterRegex.DOT);
-				SubtitleTimestamp tsTo = util.parseSubtitleTimestampString(to, SecondMillisecondDelimiterRegex.DOT);
+				if(!line.equals(WEBVTT_MARK) && !foundFirstSubtitleLine) {
+					fileData.addLineToHeader(line);
+				}
 				
-				tsFrom.setFormattedTimestamp(SubtitleTimestampUtils.formatTimestamp(tsFrom, "."));
-				tsTo.setFormattedTimestamp(SubtitleTimestampUtils.formatTimestamp(tsTo, "."));
+				//ignore multiple consecutive blank lines or any blank lines before the first subtitle line is found
+				if((!foundFirstSubtitleLine) ||
+						(StringUtils.isBlank(line) && (i < lines.size()) && StringUtils.isBlank(lines.get(i + 1)))) {
+					continue;
+				}
 				
-				data.setTimestampFrom(tsFrom);
-				data.setTimestampTo(tsTo);
-
-				continue;
-			}
-			
-			if(!line.equals(WEBVTT_MARK) && !foundFirstSubtitleLine) {
-				fileData.addLineToHeader(line);
-			}
-			
-			//ignore multiple consecutive blank lines or any blank lines before the first subtitle line is found
-			if((!foundFirstSubtitleLine) ||
-					(StringUtils.isBlank(line) && (i < lines.size()) && StringUtils.isBlank(lines.get(i + 1)))) {
-				continue;
-			}
-			
-			if(StringUtils.isNotBlank(line)) {
-				if(StringUtils.isNotBlank(data.getText())) {
-					data.setText(data.getText() + "\n" + line);
+				if(StringUtils.isNotBlank(line)) {
+					if(StringUtils.isNotBlank(data.getText())) {
+						data.setText(data.getText() + "\n" + line);
+					}else {
+						data.setText(line);
+					}
+					
+					if(i == lines.size()-1) {
+						//last line of the file
+						dataList.add(data);
+						data = null;
+					}
+					
 				}else {
-					data.setText(line);
-				}
-				
-				if(i == lines.size()-1) {
-					//last line of the file
+					//end of subtitle
 					dataList.add(data);
 					data = null;
 				}
 				
-			}else {
-				//end of subtitle
-				dataList.add(data);
-				data = null;
+				
 			}
-			
-			
+		}catch(Exception e) {
+			log.error("Error parsing vtt lines!", e);
+			throw new SubtitleFileParseException("Error parsing vtt file!");
 		}
 		
 		fileData.setHeader(trimHeader(fileData.getHeader()));
