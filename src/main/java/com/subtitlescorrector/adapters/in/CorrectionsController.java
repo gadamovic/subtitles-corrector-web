@@ -68,7 +68,7 @@ public class CorrectionsController {
 		}
 		
 		if(properties.isProdEnvironment() && uploadRateCheck == RequestValidatorStatus.SUBTITLES_PROCESSED_LIMIT_EXCEEDED_FOR_IP) {
-			return getInvalidResponseEntity(HttpStatus.TOO_MANY_REQUESTS, "The limit for processed subtitle files has been reached for user: " + clientIp + ". Please try again later");
+			return getInvalidResponseEntity(HttpStatus.TOO_MANY_REQUESTS, "The limit for processed subtitle files has been reached. Please try again later");
 		}else {
 			redisService.updateLastS3UploadTimestamp(clientIp);
 		}

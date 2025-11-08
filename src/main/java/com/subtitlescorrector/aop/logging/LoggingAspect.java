@@ -15,13 +15,11 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.subtitlescorrector.adapters.out.EmailServiceAdapter;
-
 @Aspect
 @Component
 public class LoggingAspect {
 
-	Logger log = LoggerFactory.getLogger(EmailServiceAdapter.class);
+	Logger log = LoggerFactory.getLogger(LoggingAspect.class);
 	
 	@Pointcut("within(@org.springframework.web.bind.annotation.RestController *)")
 	public void loggingPointcut() {
