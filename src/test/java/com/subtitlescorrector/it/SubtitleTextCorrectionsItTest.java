@@ -32,15 +32,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.subtitlescorrector.adapters.out.EmailServiceAdapter;
 import com.subtitlescorrector.adapters.out.RedisServiceAdapter;
 import com.subtitlescorrector.adapters.out.WebSocketOutboundAdapter;
+import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
@@ -49,12 +53,14 @@ import com.subtitlescorrector.core.domain.UserSubtitleCorrectionCurrentVersionMe
 import com.subtitlescorrector.core.domain.UserSubtitleData;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
+import com.subtitlescorrector.core.domain.vtt.VttSubtitleFileData;
 import com.subtitlescorrector.core.service.SubtitleFileProviderForUserServiceImpl;
 import com.subtitlescorrector.core.service.corrections.AiCustomCorrector;
 import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileDataWebDto;
 import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileLineDataWebDto;
 import com.subtitlescorrector.core.service.corrections.SubtitlesCorrectionService;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitlesFileProcessor;
+import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitlesFileProcessor;
 import com.subtitlescorrector.core.util.FileUtil;
 import com.subtitlescorrector.core.util.JsonSerializationUtil;
 import com.subtitlescorrector.core.util.Util;
@@ -68,7 +74,10 @@ public class SubtitleTextCorrectionsItTest {
 	private static final Logger log = LoggerFactory.getLogger(SubtitleTextCorrectionsItTest.class);
 	
 	@Autowired
-	SrtSubtitlesFileProcessor processor;
+	SrtSubtitlesFileProcessor srtProcessor;
+	
+	@Autowired
+	VttSubtitlesFileProcessor vttProcessor;
 	
 	@Autowired
 	SubtitlesCorrectionService correctionService;
@@ -85,9 +94,16 @@ public class SubtitleTextCorrectionsItTest {
 	@MockBean
 	AiCustomCorrector aiCorrector;
 	
+	@SpyBean
+	ApplicationProperties properties;
+
+	@MockBean
+	EmailServiceAdapter emailService;
+	
 	@Autowired
 	MockMvc mockMvc;
 
+	
 	/**
 	 * 1. Correction
 	 * 1.0 For ALL subtitle formats
@@ -106,11 +122,11 @@ public class SubtitleTextCorrectionsItTest {
 	 * 1.11 Srt file with multiple consecutive blank lines at the beginning
 	 * 1.12 Srt file with multiple consecutive blank lines in the middle (TBA)
 	 * 1.13 File with other then UTF-8 encoding should be converted to UTF-8
-	 * 
 	 * 1.14 Vtt file with header, confirm it stays valid and contains header after correction
 	 * 1.15 Vtt file without header, confirm valid after correction
 	 * 1.16 Validate big file gets rejected
 	 * 1.17 Validate number of requests exceeded rejects upload
+	 * 
 	 * 1.18 Validate contact form on homepage works correctly
 	 * 1.19 Validate feedback form after download works correctly
 	 * 
@@ -187,7 +203,7 @@ public class SubtitleTextCorrectionsItTest {
 		
 		data.setAiEnabled(false);
 		
-		SrtSubtitleFileData fileData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+		SrtSubtitleFileData fileData = srtProcessor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
 
 		assertEquals(fileData.getDetectedCharset(), StandardCharsets.UTF_8);
 		assertEquals(fileData.getLines().size(), 8);
@@ -262,7 +278,7 @@ public class SubtitleTextCorrectionsItTest {
 		
 		data.setAiEnabled(false);
 		
-		SrtSubtitleFileData fileData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+		SrtSubtitleFileData fileData = srtProcessor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
 
 		assertEquals(fileData.getDetectedCharset(), StandardCharsets.UTF_8);
 		assertEquals(fileData.getLines().size(), 8);
@@ -424,7 +440,7 @@ public class SubtitleTextCorrectionsItTest {
 		metadata.setFilename("filename");
 		metadata.setFormat(SubtitleFormat.SRT);
 		
-		SrtSubtitleFileData fileData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+		SrtSubtitleFileData fileData = srtProcessor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
 
 		when(redis.getUserSubtitleCurrentVersionJson(anyString())).thenReturn(JsonSerializationUtil.srtSubtitleFileDataToJson(fileData));
 		when(redis.getUsersLastUpdatedSubtitleFileMetadata(anyString())).thenReturn(metadata);
@@ -460,7 +476,7 @@ public class SubtitleTextCorrectionsItTest {
 		metadata.setFilename("filename");
 		metadata.setFormat(SubtitleFormat.SRT);
 		
-		SrtSubtitleFileData fileData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+		SrtSubtitleFileData fileData = srtProcessor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
 
 		when(redis.getUserSubtitleCurrentVersionJson(anyString())).thenReturn(JsonSerializationUtil.srtSubtitleFileDataToJson(fileData));
 		when(redis.getUsersLastUpdatedSubtitleFileMetadata(anyString())).thenReturn(metadata);
@@ -501,7 +517,7 @@ public class SubtitleTextCorrectionsItTest {
 		metadata.setFilename("filename");
 		metadata.setFormat(SubtitleFormat.SRT);
 		
-		SrtSubtitleFileData fileData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+		SrtSubtitleFileData fileData = srtProcessor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
 
 		when(redis.getUserSubtitleCurrentVersionJson(anyString())).thenReturn(JsonSerializationUtil.srtSubtitleFileDataToJson(fileData));
 		when(redis.getUsersLastUpdatedSubtitleFileMetadata(anyString())).thenReturn(metadata);
@@ -656,7 +672,7 @@ public class SubtitleTextCorrectionsItTest {
 		data.setAiEnabled(true);
 		
 		try {
-			processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+			srtProcessor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
 		}catch(Exception e) {}
 		
 		verify(aiCorrector).correct(any(), any());
@@ -678,7 +694,7 @@ public class SubtitleTextCorrectionsItTest {
 		AdditionalData data = new AdditionalData();
 		data.setAiEnabled(false);
 		
-		SrtSubtitleFileData srtData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+		SrtSubtitleFileData srtData = srtProcessor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
 
 		assertEquals("Ћирилица", srtData.getLines().get(2).getText());
 		
@@ -700,7 +716,7 @@ public class SubtitleTextCorrectionsItTest {
 		data.setAiEnabled(false);
 		
 		try {
-			SrtSubtitleFileData srtData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+			srtProcessor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
 		}catch(Exception e) {
 			fail("Processing subtitle with empty text failed!");
 		}
@@ -735,7 +751,7 @@ public class SubtitleTextCorrectionsItTest {
 		Charset unProcessedFileCharset = FileUtil.detectEncodingOfFile(testFile);
 		assertNotEquals(Charset.forName("UTF-8"), unProcessedFileCharset);
 		
-		SrtSubtitleFileData fileData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+		SrtSubtitleFileData fileData = srtProcessor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
 
 		when(redis.getUserSubtitleCurrentVersionJson(anyString())).thenReturn(JsonSerializationUtil.srtSubtitleFileDataToJson(fileData));
 		when(redis.getUsersLastUpdatedSubtitleFileMetadata(anyString())).thenReturn(metadata);
@@ -762,11 +778,113 @@ public class SubtitleTextCorrectionsItTest {
 		data.setAiEnabled(false);
 		
 		try {
-			SrtSubtitleFileData srtData = processor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+			srtProcessor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
 		}catch(Exception e) {
 			fail("Processing subtitle with missing line numbers failed!");
 		}
 		
+	}
+	
+	@Test
+	public void givenVttFileWithHeader_whenProcessing_thenRemainValidAndKeepHeader() {
+		
+		File testFile = null;
+		InputStream is;
+		try {
+			is = new ClassPathResource("test_resources/subtitle_files/vtt/subtitle_withHeader.vtt").getInputStream();
+			testFile = Util.inputStreamToFile(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		AdditionalData data = new AdditionalData();
+		data.setAiEnabled(false);
+		
+		VttSubtitleFileData fileData = vttProcessor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+		
+		assertTrue(!fileData.getHeader().isEmpty());
+		assertTrue(!fileData.getLines().isEmpty());
+		assertEquals("Avec ton regard bleu<br>et ton rêve envolé.", fileData.getLines().get(49).getText());
+		assertEquals(680, fileData.getLines().get(49).getTimestampFrom().getMillisecond());
+		assertEquals(13, fileData.getLines().get(49).getTimestampFrom().getSecond());
+		assertEquals(8, fileData.getLines().get(49).getTimestampFrom().getMinute());
+		
+		assertEquals(80, fileData.getLines().get(49).getTimestampTo().getMillisecond());
+		
+	}
+	
+	@Test
+	public void givenVttFileWithoutHeader_whenProcessing_thenRemainValidAndKeepHeader() {
+		
+		File testFile = null;
+		InputStream is;
+		try {
+			is = new ClassPathResource("test_resources/subtitle_files/vtt/subtitle_withoutHeader.vtt").getInputStream();
+			testFile = Util.inputStreamToFile(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		AdditionalData data = new AdditionalData();
+		data.setAiEnabled(false);
+		
+		VttSubtitleFileData fileData = vttProcessor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
+		
+		assertTrue(fileData.getHeader().isEmpty());
+		assertTrue(!fileData.getLines().isEmpty());
+		assertEquals("Avec ton regard bleu<br>et ton rêve envolé.", fileData.getLines().get(49).getText());
+		assertEquals(680, fileData.getLines().get(49).getTimestampFrom().getMillisecond());
+		assertEquals(13, fileData.getLines().get(49).getTimestampFrom().getSecond());
+		assertEquals(8, fileData.getLines().get(49).getTimestampFrom().getMinute());
+		
+		assertEquals(80, fileData.getLines().get(49).getTimestampTo().getMillisecond());
+		
+	}
+	
+	@Test
+	public void givenTooBigVttFile_whenProcessing_thenReturnPayloadTooLargeHttpStatus() throws Exception {
+		
+		InputStream is;
+		MockMultipartFile testMultipartFile = null;
+		try {
+			is = new ClassPathResource("test_resources/subtitle_files/vtt/subtitle_withoutHeader_withSizeTooBig.vtt").getInputStream();
+			testMultipartFile = new MockMultipartFile("file", is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	    mockMvc.perform(MockMvcRequestBuilders
+                .multipart("/api/rest/1.0/corrections/upload") // replace with your actual endpoint path
+                .file(testMultipartFile)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(MockMvcResultMatchers.status().isPayloadTooLarge());		
+	}
+	
+	@Test
+	public void givenSubtitleFile_whenUserExceededUploadRateLimit_thenReturnTooManyRequests() throws Exception {
+		
+		
+		InputStream is;
+		MockMultipartFile testMultipartFile = null;
+		try {
+			is = new ClassPathResource("test_resources/subtitle_files/srt/subtitle_withMissingLineNumbers.srt").getInputStream();
+			testMultipartFile = new MockMultipartFile("file", is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		when(emailService.sendEmailOnlyIfProduction(anyString(), anyString(), anyString())).thenReturn(null);
+		when(properties.isProdEnvironment()).thenReturn(true);
+		int stubedNumberOfUserUploads = properties.getSubtitlesPerUserPerTimeIntervalLimit() + 1;
+		when(redis.incrementAndGetNumberOfSubtitlesProcessedByUserInCurrentTimeInterval(anyString()))
+			.thenReturn(stubedNumberOfUserUploads);
+		
+	    mockMvc.perform(MockMvcRequestBuilders
+                .multipart("/api/rest/1.0/corrections/upload")
+                .file(testMultipartFile)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(MockMvcResultMatchers.status().isTooManyRequests());
+	    
 	}
 	
 }

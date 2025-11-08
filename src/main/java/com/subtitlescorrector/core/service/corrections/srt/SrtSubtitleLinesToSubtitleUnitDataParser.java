@@ -124,7 +124,9 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 
 	private SubtitleCorrectionEvent createInvalidNumbersCorrectionEvent() {
 		SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
-		event.setCorrection("Invalid line numbers detected, new valid ones will be generated");
+		String message = "Invalid line numbers detected, new valid ones will be generated";
+		log.info(message);
+		event.setCorrection(message);
 		return event;
 	}
 
