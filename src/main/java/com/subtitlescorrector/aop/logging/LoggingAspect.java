@@ -37,6 +37,7 @@ public class LoggingAspect {
 		long start = System.currentTimeMillis();
 		Object returnObject = joinPoint.proceed();
 		long elapsedTimeMs = System.currentTimeMillis() - start;
+		
 		mdcParameters.put("execution_time", String.valueOf(elapsedTimeMs));
 		
 		ServletRequestAttributes attrs = 

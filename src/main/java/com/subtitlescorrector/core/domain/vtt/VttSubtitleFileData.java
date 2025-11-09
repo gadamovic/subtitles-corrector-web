@@ -141,7 +141,9 @@ public class VttSubtitleFileData implements Serializable{
 		VttSubtitleConversionFileData vttConversionData = new VttSubtitleConversionFileData();
 		
 		vttConversionData.setBomData(bomData);
-		vttConversionData.setDetectedEncoding(detectedCharset.displayName());
+		if(detectedCharset != null) {
+			vttConversionData.setDetectedEncoding(detectedCharset.displayName());
+		}
 		vttConversionData.setFilename(filename);
 		vttConversionData.setLines(lines);
 		vttConversionData.setSourceFormat(format);

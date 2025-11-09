@@ -121,7 +121,9 @@ public class SrtSubtitleFileData implements Serializable{
 		SrtSubtitleConversionFileData srtConversionData = new SrtSubtitleConversionFileData();
 		
 		srtConversionData.setBomData(bomData);
-		srtConversionData.setDetectedEncoding(detectedCharset.displayName());
+		if(detectedCharset != null) {
+			srtConversionData.setDetectedEncoding(detectedCharset.displayName());
+		}
 		srtConversionData.setFilename(filename);
 		srtConversionData.setLines(lines);
 		srtConversionData.setSourceFormat(format);

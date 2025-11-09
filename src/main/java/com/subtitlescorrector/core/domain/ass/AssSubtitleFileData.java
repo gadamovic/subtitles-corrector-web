@@ -118,7 +118,9 @@ public class AssSubtitleFileData {
 		AssSubtitleConversionFileData assConversionData = new AssSubtitleConversionFileData();
 		
 		assConversionData.setBomData(bomData);
-		assConversionData.setDetectedEncoding(detectedCharset.displayName());
+		if(detectedCharset != null) {
+			assConversionData.setDetectedEncoding(detectedCharset.displayName());
+		}
 		assConversionData.setFilename(filename);
 		assConversionData.setLines(lines);
 		assConversionData.setSourceFormat(format);
