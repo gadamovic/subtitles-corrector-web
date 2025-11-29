@@ -11,6 +11,7 @@ public class UserData {
 
 	private String userId;
 	private String webSocketSessionId;
+	private String userIp;
 	
 	public String getUserId() {
 		return userId;
@@ -24,5 +25,12 @@ public class UserData {
 	public void setWebSocketSessionId(String webSocketSessionId) {
 		this.webSocketSessionId = webSocketSessionId;
 	}
+	public void setUserIp(String userIp) {
+		this.userIp = userIp;
+	}
+	public String getUserUp() {
+		return this.userIp;
+	}
+	
 	
 }

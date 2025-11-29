@@ -29,6 +29,11 @@ public class UserDataAdvice {
     		user.setUserId(userId);
     		user.setWebSocketSessionId(webSocketSessionId);    		
     	}
+    	
+    	String userIp = request.getRemoteAddr();
+    	if(StringUtils.isNotBlank(userIp)) {
+    		user.setUserIp(userIp);
+    	}
     }
 	
 }
