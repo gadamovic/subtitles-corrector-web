@@ -6,5 +6,6 @@ public interface DownloadSubtitlesFileService {
 
 	void downloadSubtitlesFileForUser(String userId, HttpServletResponse response);
 	void downloadSubtitlesConvertedFileForUser(String userId, String targetFormat, HttpServletResponse response);
+	void downloadSubtitlesTranslatedFileForUser(String userId, HttpServletResponse response);
 
 }

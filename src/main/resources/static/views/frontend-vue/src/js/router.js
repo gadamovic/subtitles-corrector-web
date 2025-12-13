@@ -7,6 +7,7 @@ import SubtitleConverters from '../components/SubtitleConverters.vue'
 import ToSrtConverter from '@/components/ToSrtConverter.vue'
 import ToVttConverter from '@/components/ToVttConverter.vue'
 import ToAssConverter from '@/components/ToAssConverter.vue'
+import SubtitleTranslations from '@/components/SubtitleTranslations.vue'
 
 const routes = [
     {
@@ -64,6 +65,14 @@ const routes = [
         meta: {
             title: 'Ass converter',
             description: 'Convert any subtitle format to ass. srt to ass converter, ass to ass converter.'
+        }
+    },
+        {
+        path: '/translate-subtitles',
+        component: SubtitleTranslations,
+        meta: {
+            title: 'Subtitles Translator',
+            description: 'Translate subtitle file to another language.'
         }
     },
 ]

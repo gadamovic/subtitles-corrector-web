@@ -65,5 +65,11 @@ public class DownloadSubtitlesFileServiceImpl implements DownloadSubtitlesFileSe
 		responseWriter.writeFileToResponse(userData, response);
 		
 	}
+
+	@Override
+	public void downloadSubtitlesTranslatedFileForUser(String userId, HttpServletResponse response) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

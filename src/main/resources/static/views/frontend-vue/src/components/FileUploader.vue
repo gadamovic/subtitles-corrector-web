@@ -138,7 +138,7 @@ import { useLineVisibleFlagsStore } from '@/stores/subtitleLineVisibleFlagsStore
 import GenericButton from './GenericButton.vue';
 import ModalComponent from './ModalComponent.vue';
 import { useSubtitleDataStore } from '@/stores/subtitleDataStore';
-import { useSupportedFileFormatsInEditorStore } from '@/stores/supportedFileFormatsStore';
+import { useSupportedFileFormats } from '@/stores/supportedFileFormatsStore';
 import DownloadFileModalComponent from './DownloadFileModalComponent.vue';
 
 export default {
@@ -164,7 +164,7 @@ export default {
       showDownloadLink: false,
       loaderStore: useLoaderStore(),
       lineVisibleFlagsStore: useLineVisibleFlagsStore(),
-      supportedFileFormatsStore: useSupportedFileFormatsInEditorStore(),
+      supportedFileFormatsStore: useSupportedFileFormats(),
       socket: WebSocket,
       stripBTags: false,
       stripITags: false,

@@ -14,49 +14,49 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
-import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.RequestValidatorStatus;
-import com.subtitlescorrector.core.domain.SubtitleConversionFileDataResponse;
+import com.subtitlescorrector.core.domain.translation.SubtitleTranslationDataResponse;
+import com.subtitlescorrector.core.domain.translation.TranslationLanguage;
 import com.subtitlescorrector.core.port.EmailServicePort;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.port.StorageSystemPort;
 import com.subtitlescorrector.core.service.RequestValidator;
-import com.subtitlescorrector.core.service.conversion.SubtitleConversionService;
-import com.subtitlescorrector.core.util.Util;
+import com.subtitlescorrector.core.service.translation.TranslationService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping(path = "/api/rest/1.0/conversions")
-public class ConversionsController {
+@RequestMapping(path = "/api/rest/1.0/translations")
+public class TranslationsController {
 
-	Logger log = LoggerFactory.getLogger(ConversionsController.class);
-
-	@Autowired
-	StorageSystemPort fileSystemStorageService;
-		
-	@Autowired
-	ExternalCacheServicePort redisService;
+	Logger log = LoggerFactory.getLogger(TranslationsController.class);
 	
 	@Autowired
 	RequestValidator validator;
 	
 	@Autowired
+	EmailServicePort emailService;
+	
+	@Autowired
 	ApplicationProperties properties;
 	
 	@Autowired
-	SubtitleConversionService conversionService;
+	ExternalCacheServicePort redisService;
 	
 	@Autowired
-	EmailServicePort emailService;
+	StorageSystemPort fileSystemStorageService;
 	
-	@RequestMapping(path = "/upload", method = RequestMethod.POST)
-	public ResponseEntity<SubtitleConversionFileDataResponse> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+	@Autowired
+	TranslationService translationService;
+	
+	@RequestMapping(path="/upload", method = RequestMethod.POST)
+	public ResponseEntity<SubtitleTranslationDataResponse> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("language") String language, HttpServletRequest request) {
 		
 		String clientIp = request.getRemoteAddr();
 		
+		//TODO: this things are on the start of many controllers - they can be moved to aspect
 		emailService.sendEmailOnlyIfProduction("Ip: " + clientIp + "\nFilename: " + file.getOriginalFilename(), properties.getAdminEmailAddress(),
-				"Somebody is uploading a subtitle for CONVERSION");
+				"Somebody is uploading a subtitle for TRANSLATION");
 		
 		RequestValidatorStatus uploadRateCheck = validator.validateSubtitlesUploadRateLimit(clientIp);
 		RequestValidatorStatus fileSizeCheck = validator.validateFileSize(file);
@@ -71,21 +71,18 @@ public class ConversionsController {
 			redisService.updateLastS3UploadTimestamp(clientIp);
 		}
 		
-		File storedFile = fileSystemStorageService.store(file);
-		AdditionalData clientParameters = Util.extractOptions(request);
-		clientParameters.setOriginalFilename(file.getOriginalFilename());
-
-		SubtitleConversionFileDataResponse response = conversionService.applyConversionOperations(clientParameters.getConversionParameters(), storedFile);
-
+		File storedFile = fileSystemStorageService.store(file);		
+		
+		SubtitleTranslationDataResponse response = translationService.translate(storedFile, TranslationLanguage.findByDisplayName(language));
+		
 		return ResponseEntity.ok(response);
 	}
-
-	private ResponseEntity<SubtitleConversionFileDataResponse> getInvalidResponseEntity(HttpStatus httpStatus, String message) {
-		SubtitleConversionFileDataResponse data = new SubtitleConversionFileDataResponse();
+	
+	private ResponseEntity<SubtitleTranslationDataResponse> getInvalidResponseEntity(HttpStatus httpStatus, String message) {
+		SubtitleTranslationDataResponse data = new SubtitleTranslationDataResponse();
 		data.setHttpResponseMessage(message);
 		log.error(message);
 		return ResponseEntity.status(httpStatus).body(data);
 	}
-
+	
 }
-

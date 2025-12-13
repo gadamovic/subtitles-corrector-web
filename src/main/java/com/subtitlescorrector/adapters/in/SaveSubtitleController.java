@@ -28,9 +28,6 @@ public class SaveSubtitleController {
 
 	@Autowired
 	ExternalCacheServicePort redisService;
-	
-	@Autowired
-	DownloadSubtitlesFileService downloadService;
 
 	@RequestMapping(path = "/save")
 	public void save(@RequestBody SubtitleCorrectionFileDataWebDto subtitleData, @RequestParam("userId") String userId) {
@@ -59,16 +56,6 @@ public class SaveSubtitleController {
 		}
 		
 		redisService.addUserSubtitleCurrentVersion(updatedJson, userId);
-	}
-
-	@RequestMapping(path = "/downloadFile")
-	public void download(@RequestParam("userId") String userId, HttpServletResponse response) {
-		downloadService.downloadSubtitlesFileForUser(userId, response);
-	}
-	
-	@RequestMapping(path = "/downloadConvertedFile")
-	public void downloadConvertedFile(@RequestParam("userId") String userId, @RequestParam("targetFormat") String targetFormat, HttpServletResponse response) {
-		downloadService.downloadSubtitlesConvertedFileForUser(userId, targetFormat, response);	
 	}
 
 }
