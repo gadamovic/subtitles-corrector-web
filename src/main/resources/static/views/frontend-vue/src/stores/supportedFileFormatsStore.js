@@ -5,7 +5,7 @@ export const useSupportedFileFormats = defineStore('supportedFileFormatsInEditor
   state: () => {
     return {
       supportedFileFormatsInEditor: ['.srt', '.vtt'],
-      supportedFileFormatsInTranslator: ['.srt', '.vtt', 'ass']
+      supportedFileFormatsInTranslator: ['.srt', '.vtt', '.ass']
     }
   }
 })
