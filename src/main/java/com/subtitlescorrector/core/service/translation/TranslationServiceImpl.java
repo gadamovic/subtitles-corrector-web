@@ -107,7 +107,7 @@ public class TranslationServiceImpl implements TranslationService{
 				}
 				subtitleFileDataJson = JsonSerializationUtil.srtSubtitleFileDataToJson(srtFileData);
 			}else {
-				String message = "Number of translated lines doesn't match the source lines!";
+				String message = "Translation error!";
 				log.error(message);
 				throw new RuntimeException(message);
 			}
@@ -131,7 +131,7 @@ public class TranslationServiceImpl implements TranslationService{
 				}
 				subtitleFileDataJson = JsonSerializationUtil.vttSubtitleFileDataToJson(vttFileData);
 			}else {
-				String message = "Number of translated lines doesn't match the source lines!";
+				String message = "Translation error!";
 				log.error(message);
 				throw new RuntimeException(message);
 			}
@@ -154,7 +154,7 @@ public class TranslationServiceImpl implements TranslationService{
 				}
 				subtitleFileDataJson = JsonSerializationUtil.assSubtitleFileDataToJson(assFileData);
 			}else {
-				String message = "Number of translated lines doesn't match the source lines!";
+				String message = "Translation error!";
 				log.error(message);
 				throw new RuntimeException(message);
 			}
@@ -189,6 +189,7 @@ public class TranslationServiceImpl implements TranslationService{
 		
 	}
 
+	//TODO: Move to util
 	private void handleBOM(BomData data, List<String> lines) {
 
 		if (lines.get(0).startsWith("\uFEFF")) {
