@@ -22,7 +22,7 @@ public class DeepLUsageMetricsAdapter implements DeepLUsageMetricsPort {
             .register(registry);
         
         Gauge.builder("deepl_characters_used_percent", usedCharactersPercent, AtomicDouble::get)
-	        .description("Percents of used DeepL translation characters out of characters available")
+	        .description("Percentage of used DeepL translation characters out of characters available")
 	        .register(registry);
     }
 
