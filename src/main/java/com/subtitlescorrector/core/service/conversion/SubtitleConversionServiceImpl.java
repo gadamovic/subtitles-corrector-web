@@ -61,7 +61,7 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 		
 		BomData bomData = new BomData();
 		
-		handleBOM(bomData, lines);
+		Util.populateBomData(bomData, lines);
 		
 		log.info("Converting a file");
 		
@@ -129,22 +129,6 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 		response.setFilename(conversionParameters.getOriginalFilename());
 		
 		return response;
-	}
-	
-	/**
-	 * BOM is actually added and removed in converters. Here we just set BOM related parameters to SubtitleFileData object
-	 * and send message about correction to the client if needed
-	 * @param data
-	 * @param lines
-	 */
-	private void handleBOM(BomData data, List<String> lines) {
-		//TODO: Move to util
-		if (lines.get(0).startsWith("\uFEFF")) {
-			data.setHasBom(true);
-			data.setKeepBom(false);
-		}else {
-			data.setHasBom(false);
-		}
 	}
 
 }

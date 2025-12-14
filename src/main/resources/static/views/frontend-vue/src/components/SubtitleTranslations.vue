@@ -41,7 +41,7 @@
 
 
 
-                        <div class="field">
+                        <div class="field" v-if="!showUploadedFileData">
                             <div class="control">
                                 <div class="select is-fullwidth is-dark">
                                     <select v-model="this.language">
@@ -89,7 +89,7 @@
 
 
                     <div v-if="showUploadedFileData">
-                        <label class="label has-text-white has-text-centered title is-5 mb-5">Step 2: Download!</label>
+                        <label class="label has-text-white has-text-centered title is-5 mb-5">Download!</label>
                         <div class="notification is-link is-light has-text-centered mb-5">
                             <a class="button is-link is-medium is-flex is-align-items-center is-justify-content-center"
                                 @click="downloadFile" style="max-width: 100%; overflow: hidden;"
@@ -131,7 +131,7 @@ import GenericButton from './GenericButton.vue';
 import { useSupportedFileFormats } from '@/stores/supportedFileFormatsStore';
 
 export default {
-    name: "ToSrtConverter",
+    name: "SubtitleTranslations",
     components: { GenericButton },
     data: function () {
         return {
@@ -179,6 +179,11 @@ export default {
                 return;
             }
 
+            if(this.language == null || this.language == 'Choose language'){
+                this.error = "Please choose a language"
+                return;
+            }
+
             this.loading = true;
 
             if (this.showUploadedFileData) {
@@ -223,11 +228,13 @@ export default {
                 this.error = "An error occurred!";
                 this.loading = false;
             } finally {
-                this.showUploadedFileData = true;
+                if(this.error == null){
+                    this.showUploadedFileData = true;
+                }
             }
         },
         init() {
-
+            this.error = null;
             this.sourceFormat = null;
             this.showUploadedFileData = false;
             this.encoding = null;
@@ -251,7 +258,10 @@ export default {
 
                 a.href = url;
 
-                a.download = '[subtitles-corrector.com]-' + this.subtitlesFilename.substr(this.subtitlesFilename.indexOf("_") + 1, this.subtitlesFilename.length);
+                a.download = '[subtitles-corrector.com]-' 
+                    + this.subtitlesFilename.slice(this.subtitlesFilename.indexOf("_") + 1, this.subtitlesFilename.lastIndexOf("."))
+                     + '-' + this.language
+                     + '.' + this.sourceFormat.toLowerCase();
                 document.body.appendChild(a);
                 a.click();
 

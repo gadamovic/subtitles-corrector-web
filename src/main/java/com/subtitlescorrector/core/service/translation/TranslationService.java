@@ -7,6 +7,6 @@ import com.subtitlescorrector.core.domain.translation.TranslationLanguage;
 
 public interface TranslationService {
 
-	public SubtitleTranslationDataResponse translate(File file, TranslationLanguage language);
+	public SubtitleTranslationDataResponse translate(File file, String originalFileName, TranslationLanguage language);
 	
 }

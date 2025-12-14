@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
+import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.CompositeEditOperation;
 import com.subtitlescorrector.core.domain.EditOperation;
 import com.subtitlescorrector.core.domain.SubtitleConversionFileDataResponse;
@@ -327,6 +328,16 @@ public class Util {
 		params.setAiEnabled(Boolean.parseBoolean(request.getParameter("aiEnabled")));
 		
 		return params;
+	}
+	
+	public static void populateBomData(BomData data, List<String> lines) {
+
+		if (lines.get(0).startsWith("\uFEFF")) {
+			data.setHasBom(true);
+			data.setKeepBom(false);
+		}else {
+			data.setHasBom(false);
+		}
 	}
 	
 }

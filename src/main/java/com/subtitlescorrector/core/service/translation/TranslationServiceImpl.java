@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.core.domain.BomData;
@@ -67,24 +66,31 @@ public class TranslationServiceImpl implements TranslationService{
 	
 	
 	@Override
-	public SubtitleTranslationDataResponse translate(File file, TranslationLanguage language) {
+	public SubtitleTranslationDataResponse translate(File file, String originalFileName, TranslationLanguage language) {
+		
+		SubtitleTranslationDataResponse response = new SubtitleTranslationDataResponse();
+		
+		if(language == null) {
+			response.setHttpResponseMessage("Language must be provided!");
+			return response;
+		}
 		
 		List<String> lines = FileUtil.loadTextFile(file);
 		
 		BomData bomData = new BomData();
-		handleBOM(bomData, lines);
+		Util.populateBomData(bomData, lines);
 		
-		MDC.put("subtitle_name", file.getName());
+		MDC.put("subtitle_name", originalFileName);
 		log.info("Uploading file for translation...");
 		MDC.remove("subtitle_name");
 		
-		String s3Key = user.getUserId() + "_" + file.getName();
+		String s3Key = user.getUserId() + "_" + originalFileName;
 		s3Service.storeIfProd("translation_" + language.getDisplayName() + "_" + s3Key, file);
 		
 		Charset detectedEncoding = FileUtil.detectEncodingOfFile(file);
 		SubtitleFormat sourceFormat = Util.detectSubtitleFormat(lines);
 		
-		SubtitleTranslationDataResponse response = new SubtitleTranslationDataResponse();
+		
 		String subtitleFileDataJson = null;
 
 		
@@ -166,38 +172,20 @@ public class TranslationServiceImpl implements TranslationService{
 		
 		UserSubtitleCorrectionCurrentVersionMetadata metadata = new UserSubtitleCorrectionCurrentVersionMetadata();
 		metadata.setBomData(bomData);
-		metadata.setFilename(file.getName());
+		metadata.setFilename(originalFileName);
 		metadata.setFormat(sourceFormat);
 		
 		redisService.addUsersLastUpdatedSubtitleFileMetadata(metadata, user.getUserId());
 		
-		
-		
-		
-		
-		
-		
-		
 		response.setDetectedEncoding(detectedEncoding.displayName());
 		response.setDetectedSourceFormat(sourceFormat);
-		response.setFilename(file.getName());
+		response.setFilename(originalFileName);
 		
 		//Refresh usage metrics after using DeepL Api
 		usageMetricsExposer.reportUsage();
 		
 		return response;
 		
-	}
-
-	//TODO: Move to util
-	private void handleBOM(BomData data, List<String> lines) {
-
-		if (lines.get(0).startsWith("\uFEFF")) {
-			data.setHasBom(true);
-			data.setKeepBom(false);
-		}else {
-			data.setHasBom(false);
-		}
 	}
 	
 }
