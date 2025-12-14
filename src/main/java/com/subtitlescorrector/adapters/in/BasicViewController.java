@@ -64,6 +64,11 @@ public class BasicViewController {
 		
 	}
 	
+	@RequestMapping(path="translate-subtitles")
+	public String translateSubtitles(HttpServletRequest request) {
+		log.info("translate-subtitles");
+		return "index";	
+	}
 	
 }
 
