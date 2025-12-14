@@ -10,11 +10,12 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.UserData;
+import com.subtitlescorrector.core.domain.deepl.DeepLUsageData;
 import com.subtitlescorrector.core.domain.translation.SubtitleTranslationDataResponse;
 import com.subtitlescorrector.core.domain.translation.TranslationLanguage;
+import com.subtitlescorrector.core.port.DeepLUsageMetricsPort;
 import com.subtitlescorrector.core.port.DeeplClientPort;
 import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
 import com.subtitlescorrector.core.util.FileUtil;
@@ -33,6 +34,9 @@ public class TranslationServiceImpl implements TranslationService{
 	
 	@Autowired
 	DeeplClientPort deepLClient;
+	
+	@Autowired
+	DeepLUsageMetricsPort usageMetrics;
 	
 	@Override
 	public SubtitleTranslationDataResponse translate(File file, TranslationLanguage language) {
@@ -55,8 +59,14 @@ public class TranslationServiceImpl implements TranslationService{
 		response.setFilename(file.getName());
 		response.setNumberOfLines(lines.size());
 		
-		List<String> translated = deepLClient.translate(lines);
+		//List<String> translated = deepLClient.translate(lines);
+		DeepLUsageData data = deepLClient.getUsageInfo();
 		
+		long current = data.getCharacterCount();
+		long limit = data.getCharacterLimit();
+		
+		usageMetrics.updateRemainingCount(limit - current);
+		usageMetrics.updatePercentUsed((double) current / (double) limit * 100.0);
 		return response;
 		
 	}
