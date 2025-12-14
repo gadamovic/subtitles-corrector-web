@@ -21,6 +21,7 @@ import com.subtitlescorrector.core.port.EmailServicePort;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.port.StorageSystemPort;
 import com.subtitlescorrector.core.service.RequestValidator;
+import com.subtitlescorrector.core.service.corrections.SubtitleCorrectionFileDataWebDto;
 import com.subtitlescorrector.core.service.translation.TranslationService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -73,9 +74,12 @@ public class TranslationsController {
 		
 		File storedFile = fileSystemStorageService.store(file);		
 		
-		SubtitleTranslationDataResponse response = translationService.translate(storedFile, TranslationLanguage.findByDisplayName(language));
-		
-		return ResponseEntity.ok(response);
+		try {
+			SubtitleTranslationDataResponse response = translationService.translate(storedFile, TranslationLanguage.findByDisplayName(language));
+			return ResponseEntity.ok(response);
+		}catch(Exception exception) {
+			return getInvalidResponseEntity(HttpStatus.BAD_REQUEST, exception.getMessage());
+		}
 	}
 	
 	private ResponseEntity<SubtitleTranslationDataResponse> getInvalidResponseEntity(HttpStatus httpStatus, String message) {

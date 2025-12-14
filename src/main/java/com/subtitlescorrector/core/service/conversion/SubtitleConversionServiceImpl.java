@@ -18,6 +18,7 @@ import com.subtitlescorrector.core.domain.UserData;
 import com.subtitlescorrector.core.domain.UserSubtitleConversionCurrentVersionMetadata;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
+import com.subtitlescorrector.core.service.DeepLUsageMetricsExposerService;
 import com.subtitlescorrector.core.service.converters.SubtitlesConverterFactory;
 import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleLinesToSubtitleUnitDataParser;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleLinesToSubtitleUnitDataParser;
@@ -60,7 +61,7 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 		
 		BomData bomData = new BomData();
 		
-		handleBOM(conversionParameters, bomData, lines);
+		handleBOM(bomData, lines);
 		
 		log.info("Converting a file");
 		
@@ -133,12 +134,11 @@ public class SubtitleConversionServiceImpl implements SubtitleConversionService 
 	/**
 	 * BOM is actually added and removed in converters. Here we just set BOM related parameters to SubtitleFileData object
 	 * and send message about correction to the client if needed
-	 * @param params
 	 * @param data
 	 * @param lines
 	 */
-	private void handleBOM(ConversionParameters params, BomData data, List<String> lines) {
-
+	private void handleBOM(BomData data, List<String> lines) {
+		//TODO: Move to util
 		if (lines.get(0).startsWith("\uFEFF")) {
 			data.setHasBom(true);
 			data.setKeepBom(false);

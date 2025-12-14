@@ -8,17 +8,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean;
 import org.springframework.stereotype.Service;
 
+import com.subtitlescorrector.core.domain.BomData;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.UserData;
-import com.subtitlescorrector.core.domain.deepl.DeepLUsageData;
+import com.subtitlescorrector.core.domain.UserSubtitleCorrectionCurrentVersionMetadata;
+import com.subtitlescorrector.core.domain.ass.AssSubtitleFileData;
+import com.subtitlescorrector.core.domain.ass.AssSubtitleUnitData;
+import com.subtitlescorrector.core.domain.deepl.DeepLResponse;
+import com.subtitlescorrector.core.domain.deepl.DeepLTranslation;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
+import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
 import com.subtitlescorrector.core.domain.translation.SubtitleTranslationDataResponse;
 import com.subtitlescorrector.core.domain.translation.TranslationLanguage;
-import com.subtitlescorrector.core.port.DeepLUsageMetricsPort;
+import com.subtitlescorrector.core.domain.vtt.VttSubtitleFileData;
+import com.subtitlescorrector.core.domain.vtt.VttSubtitleUnitData;
 import com.subtitlescorrector.core.port.DeeplClientPort;
+import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
+import com.subtitlescorrector.core.service.DeepLUsageMetricsExposerService;
+import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleLinesToSubtitleUnitDataParser;
+import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleLinesToSubtitleUnitDataParser;
+import com.subtitlescorrector.core.service.corrections.vtt.VttSubtitleLinesToSubtitleUnitDataParser;
 import com.subtitlescorrector.core.util.FileUtil;
+import com.subtitlescorrector.core.util.JsonSerializationUtil;
 import com.subtitlescorrector.core.util.Util;
 
 @Service
@@ -36,12 +51,28 @@ public class TranslationServiceImpl implements TranslationService{
 	DeeplClientPort deepLClient;
 	
 	@Autowired
-	DeepLUsageMetricsPort usageMetrics;
+	ExternalCacheServicePort redisService;
+	
+	@Autowired
+	SrtSubtitleLinesToSubtitleUnitDataParser srtParser;
+	
+	@Autowired
+	VttSubtitleLinesToSubtitleUnitDataParser vttParser;
+	
+	@Autowired
+	AssSubtitleLinesToSubtitleUnitDataParser assParser;
+	
+	@Autowired
+	DeepLUsageMetricsExposerService usageMetricsExposer;
+	
 	
 	@Override
 	public SubtitleTranslationDataResponse translate(File file, TranslationLanguage language) {
 		
 		List<String> lines = FileUtil.loadTextFile(file);
+		
+		BomData bomData = new BomData();
+		handleBOM(bomData, lines);
 		
 		MDC.put("subtitle_name", file.getName());
 		log.info("Uploading file for translation...");
@@ -54,21 +85,118 @@ public class TranslationServiceImpl implements TranslationService{
 		SubtitleFormat sourceFormat = Util.detectSubtitleFormat(lines);
 		
 		SubtitleTranslationDataResponse response = new SubtitleTranslationDataResponse();
+		String subtitleFileDataJson = null;
+
+		
+		switch (sourceFormat) {
+		case SRT:
+			SrtSubtitleFileData srtFileData = srtParser.convertToSubtitleUnits(lines);
+
+			response.setNumberOfLines(srtFileData.getLines().size());
+			DeepLResponse translatedSrt = deepLClient.translate(srtFileData.getLines().stream()
+				.map(SrtSubtitleUnitData::getText)
+				.toList(), language.getIsoCode());
+			
+			List<String> translatedLinesSrt = translatedSrt.getTranslations().stream()
+				.map(DeepLTranslation::getText)
+				.toList();
+	
+			if(translatedLinesSrt.size() == srtFileData.getLines().size()) {
+				for(int i=0; i<translatedLinesSrt.size(); i++) {
+					srtFileData.getLines().get(i).setText(translatedLinesSrt.get(i));
+				}
+				subtitleFileDataJson = JsonSerializationUtil.srtSubtitleFileDataToJson(srtFileData);
+			}else {
+				String message = "Number of translated lines doesn't match the source lines!";
+				log.error(message);
+				throw new RuntimeException(message);
+			}
+
+			break;
+		case VTT:
+			VttSubtitleFileData vttFileData = vttParser.convertToSubtitleUnits(lines);
+
+			response.setNumberOfLines(vttFileData.getLines().size());
+			DeepLResponse translated = deepLClient.translate(vttFileData.getLines().stream()
+					.map(VttSubtitleUnitData::getText)
+					.toList(), language.getIsoCode());
+			
+			List<String> translatedLinesVtt = translated.getTranslations().stream()
+			.map(DeepLTranslation::getText)
+			.toList();
+	
+			if(translatedLinesVtt.size() == vttFileData.getLines().size()) {
+				for(int i=0; i<translatedLinesVtt.size(); i++) {
+					vttFileData.getLines().get(i).setText(translatedLinesVtt.get(i));
+				}
+				subtitleFileDataJson = JsonSerializationUtil.vttSubtitleFileDataToJson(vttFileData);
+			}else {
+				String message = "Number of translated lines doesn't match the source lines!";
+				log.error(message);
+				throw new RuntimeException(message);
+			}
+			break;
+		case ASS:
+			AssSubtitleFileData assFileData = assParser.convertToSubtitleUnits(lines);
+
+			response.setNumberOfLines(assFileData.getLines().size());
+			DeepLResponse translatedAss = deepLClient.translate(assFileData.getLines().stream()
+					.map(AssSubtitleUnitData::getText)
+					.toList(), language.getIsoCode());
+			
+			List<String> translatedLinesAss = translatedAss.getTranslations().stream()
+			.map(DeepLTranslation::getText)
+			.toList();
+	
+			if(translatedLinesAss.size() == assFileData.getLines().size()) {
+				for(int i=0; i<translatedLinesAss.size(); i++) {
+					assFileData.getLines().get(i).setText(translatedLinesAss.get(i));
+				}
+				subtitleFileDataJson = JsonSerializationUtil.assSubtitleFileDataToJson(assFileData);
+			}else {
+				String message = "Number of translated lines doesn't match the source lines!";
+				log.error(message);
+				throw new RuntimeException(message);
+			}
+			break;
+		}
+		
+		
+		redisService.addUserSubtitleCurrentVersion(subtitleFileDataJson, user.getUserId());
+		
+		UserSubtitleCorrectionCurrentVersionMetadata metadata = new UserSubtitleCorrectionCurrentVersionMetadata();
+		metadata.setBomData(bomData);
+		metadata.setFilename(file.getName());
+		metadata.setFormat(sourceFormat);
+		
+		redisService.addUsersLastUpdatedSubtitleFileMetadata(metadata, user.getUserId());
+		
+		
+		
+		
+		
+		
+		
+		
 		response.setDetectedEncoding(detectedEncoding.displayName());
 		response.setDetectedSourceFormat(sourceFormat);
 		response.setFilename(file.getName());
-		response.setNumberOfLines(lines.size());
 		
-		//List<String> translated = deepLClient.translate(lines);
-		DeepLUsageData data = deepLClient.getUsageInfo();
+		//Refresh usage metrics after using DeepL Api
+		usageMetricsExposer.reportUsage();
 		
-		long current = data.getCharacterCount();
-		long limit = data.getCharacterLimit();
-		
-		usageMetrics.updateRemainingCount(limit - current);
-		usageMetrics.updatePercentUsed((double) current / (double) limit * 100.0);
 		return response;
 		
 	}
 
+	private void handleBOM(BomData data, List<String> lines) {
+
+		if (lines.get(0).startsWith("\uFEFF")) {
+			data.setHasBom(true);
+			data.setKeepBom(false);
+		}else {
+			data.setHasBom(false);
+		}
+	}
+	
 }

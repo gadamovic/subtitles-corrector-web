@@ -93,7 +93,7 @@
                         <div class="notification is-link is-light has-text-centered mb-5">
                             <a class="button is-link is-medium is-flex is-align-items-center is-justify-content-center"
                                 @click="downloadFile" style="max-width: 100%; overflow: hidden;"
-                                :title="createSubtitleFileName(subtitlesFilename, targetFormat, sourceFormat)">
+                                :title="subtitlesFilename">
                                 📥 Download&nbsp;
                                 <span style="
                                 display: inline-block;
@@ -102,7 +102,7 @@
                                 white-space: nowrap;
                                 vertical-align: bottom;
                             ">
-                                    {{ createSubtitleFileName(subtitlesFilename, targetFormat, sourceFormat) }}
+                                    {{ subtitlesFilename }}
                                 </span>
                             </a>
                         </div>
@@ -128,7 +128,6 @@
 
 <script>
 import GenericButton from './GenericButton.vue';
-import { createSubtitleFileName, createDownloadedFileName } from '@/js/util.js'
 import { useSupportedFileFormats } from '@/stores/supportedFileFormatsStore';
 
 export default {
@@ -147,7 +146,6 @@ export default {
             encoding: null,
             subtitlesFilename: null,
             numberOfSubtitleLines: null,
-            createSubtitleFileName,
             supportedFileFormats: useSupportedFileFormats().supportedFileFormatsInTranslator,
             language: "Choose language"
         }
@@ -241,7 +239,7 @@ export default {
             }
         },
         async downloadFile() {
-            const response = await fetch("api/rest/1.0/downloadConvertedFile?userId=" + this.userId + "&targetFormat=" + this.targetFormat, {
+            const response = await fetch("api/rest/1.0/downloadTranslatedFile?userId=" + this.userId + "&targetFormat=" + this.targetFormat, {
                 method: "GET"
             });
 
@@ -253,7 +251,7 @@ export default {
 
                 a.href = url;
 
-                a.download = createDownloadedFileName(this.subtitlesFilename, this.targetFormat, this.sourceFormat);
+                a.download = '[subtitles-corrector.com]-' + this.subtitlesFilename.substr(this.subtitlesFilename.indexOf("_") + 1, this.subtitlesFilename.length);
                 document.body.appendChild(a);
                 a.click();
 
