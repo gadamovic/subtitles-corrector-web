@@ -3,6 +3,7 @@ package com.subtitlescorrector.aop.infrastructure.logging;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -45,6 +46,10 @@ public class LoggingAspect {
 		
 		String url = attrs.getRequest().getRequestURI().toString();
 		mdcParameters.put("uri", url);
+		// For translations
+		if(StringUtils.isNotBlank(attrs.getRequest().getParameter("language"))) {
+			mdcParameters.put("translation_target_language", attrs.getRequest().getParameter("language"));			
+		}
 		
 		mdcParameters.put("userIp", attrs.getRequest().getRemoteAddr());
 		
