@@ -24,7 +24,7 @@
 	</developers>
 	<scm>
 		<connection />
-		<developerConnection />
+		<developerConnection>scm:git:https://github.com/gadamovic/subtitles-corrector-web.git</developerConnection>
 		<tag />
 		<url />
 	</scm>
@@ -161,6 +161,11 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>3.3.1</version>
 			</plugin>
 		</plugins>
 	</build>
