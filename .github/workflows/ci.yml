@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       APP_ENVIRONMENT: dev
-      DEEPL_API_KEY: ${{ DEEPL_API_KEY }}
+      DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
     steps:
       - uses: actions/checkout@v4
 
