@@ -32,9 +32,7 @@ jobs:
         run: |
           mvn release:prepare -DskipTests
 
-      - name: Deploy with Ansible
+      - name: Deployment
         if: success()
         run: |
           echo "Ansible deployment would start here"
-          ls
-          ../ls
