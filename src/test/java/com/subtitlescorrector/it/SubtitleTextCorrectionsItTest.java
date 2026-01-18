@@ -672,6 +672,7 @@ public class SubtitleTextCorrectionsItTest {
 		data.setAiEnabled(true);
 		
 		try {
+			// Should break, we just verify that ai corrector is called
 			srtProcessor.process(testFile, FileUtil.loadTextFile(testFile), data, null);
 		}catch(Exception e) {}
 		
