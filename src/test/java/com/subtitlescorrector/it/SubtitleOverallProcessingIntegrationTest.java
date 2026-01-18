@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 
 import com.subtitlescorrector.core.domain.AdditionalData;
+import com.subtitlescorrector.core.domain.SubtitleFormat;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitlesFileProcessor;
 import com.subtitlescorrector.core.util.FileUtil;
@@ -86,49 +87,49 @@ public class SubtitleOverallProcessingIntegrationTest {
 		
 		assertEquals(fileData.getLines().get(0).getText(), "aaaaaaaaaaaa not permited tag<br>aaaaaaaaaaaa <font color=\"red\">permited tag</font>");
 		assertEquals(fileData.getLines().get(0).getNumber(), 1);
-		assertEquals(fileData.getLines().get(0).getFormat(), "srt");
+		assertEquals(fileData.getLines().get(0).getFormat(), SubtitleFormat.SRT);
 		assertTrue(fileData.getLines().get(0).getTimestampFrom() != null);
 		assertTrue(fileData.getLines().get(0).getTimestampTo() != null);
 		
 		assertEquals(fileData.getLines().get(1).getText(), "multi<br>line");
 		assertEquals(fileData.getLines().get(1).getNumber(), 2);
-		assertEquals(fileData.getLines().get(1).getFormat(), "srt");
+		assertEquals(fileData.getLines().get(1).getFormat(), SubtitleFormat.SRT);
 		assertTrue(fileData.getLines().get(1).getTimestampFrom() != null);
 		assertTrue(fileData.getLines().get(1).getTimestampTo() != null);
 		
 		assertEquals(fileData.getLines().get(2).getText(), "Ћирилица");
 		assertEquals(fileData.getLines().get(2).getNumber(), 3);
-		assertEquals(fileData.getLines().get(2).getFormat(), "srt");
+		assertEquals(fileData.getLines().get(2).getFormat(), SubtitleFormat.SRT);
 		assertTrue(fileData.getLines().get(2).getTimestampFrom() != null);
 		assertTrue(fileData.getLines().get(2).getTimestampTo() != null);
 		
 		assertEquals(fileData.getLines().get(3).getText(), "Ćirilica");
 		assertEquals(fileData.getLines().get(3).getNumber(), 4);
-		assertEquals(fileData.getLines().get(3).getFormat(), "srt");
+		assertEquals(fileData.getLines().get(3).getFormat(), SubtitleFormat.SRT);
 		assertTrue(fileData.getLines().get(3).getTimestampFrom() != null);
 		assertTrue(fileData.getLines().get(3).getTimestampTo() != null);
 		
 		assertEquals(fileData.getLines().get(4).getText(), "asdasdasd");
 		assertEquals(fileData.getLines().get(4).getNumber(), 5);
-		assertEquals(fileData.getLines().get(4).getFormat(), "srt");
+		assertEquals(fileData.getLines().get(4).getFormat(), SubtitleFormat.SRT);
 		assertTrue(fileData.getLines().get(4).getTimestampFrom() != null);
 		assertTrue(fileData.getLines().get(4).getTimestampTo() != null);
 		
 		assertEquals(fileData.getLines().get(5).getText(), "Nemilosrdna je prema svemu<br>lažnom. Ali zato je i predivna.");
 		assertEquals(fileData.getLines().get(5).getNumber(), 6);
-		assertEquals(fileData.getLines().get(5).getFormat(), "srt");
+		assertEquals(fileData.getLines().get(5).getFormat(), SubtitleFormat.SRT);
 		assertTrue(fileData.getLines().get(5).getTimestampFrom() != null);
 		assertTrue(fileData.getLines().get(5).getTimestampTo() != null);
 		
 		assertEquals(fileData.getLines().get(6).getText(), "test");
 		assertEquals(fileData.getLines().get(6).getNumber(), 7);
-		assertEquals(fileData.getLines().get(6).getFormat(), "srt");
+		assertEquals(fileData.getLines().get(6).getFormat(), SubtitleFormat.SRT);
 		assertTrue(fileData.getLines().get(6).getTimestampFrom() != null);
 		assertTrue(fileData.getLines().get(6).getTimestampTo() != null);
 		
 		assertEquals(fileData.getLines().get(7).getText(), "ćĆčČ");
 		assertEquals(fileData.getLines().get(7).getNumber(), 8);
-		assertEquals(fileData.getLines().get(7).getFormat(), "srt");
+		assertEquals(fileData.getLines().get(7).getFormat(), SubtitleFormat.SRT);
 		assertTrue(fileData.getLines().get(7).getTimestampFrom() != null);
 		assertTrue(fileData.getLines().get(7).getTimestampTo() != null);
 
@@ -143,6 +144,7 @@ public class SubtitleOverallProcessingIntegrationTest {
 		data.setConvertAEToTJ(true);
 		data.setConverteToch(true);
 		data.setConvertEToCH(true);
+		data.setAiEnabled(false);
 
 		InputStream is;
 		try {
