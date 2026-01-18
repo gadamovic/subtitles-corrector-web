@@ -31,7 +31,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mvn release:prepare -DskipTests
-          mvn release:perform -DskipTests
 
       - name: Deploy with Ansible
         if: success()
