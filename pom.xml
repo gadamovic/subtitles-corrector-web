@@ -166,8 +166,7 @@
 				<version>3.3.1</version>
 					<configuration>
 						<arguments>-DskipTests</arguments>
-						<releaseCommitMessageFormat>[skip ci] prepare release @{{project.version}}</releaseCommitMessageFormat>
-          				<developmentCommitMessageFormat>[skip ci] prepare next development iteration @{{project.version}}</developmentCommitMessageFormat>
+						<scmCommentPrefix>[skip ci] </scmCommentPrefix>
 					</configuration>
 			</plugin>
 		</plugins>

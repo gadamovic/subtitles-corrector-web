@@ -3,9 +3,12 @@ name: Release
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   release:
-    name: Maven Release & Deploy
+    name: Build & Deploy
     runs-on: ubuntu-latest
 
     steps:
