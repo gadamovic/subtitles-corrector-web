@@ -1,0 +1,30 @@
+name: CI & Release
+
+on:
+  push:
+    branches: [ "**" ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    env:
+      APP_ENVIRONMENT: dev
+      DEEPL_API_KEY: fake
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+
+      - name: Create log directories
+        run: sudo mkdir -p /home/logs/application
+  
+      - name: Run tests
+        run: mvn clean verify
+
