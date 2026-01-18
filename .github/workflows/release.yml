@@ -30,7 +30,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mvn release:prepare -DskipTests
+          mvn release:prepare -DskipTests -Dresume=false
 
       - name: Deployment
         if: success()
