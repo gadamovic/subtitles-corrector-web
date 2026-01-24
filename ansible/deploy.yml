@@ -1,0 +1,5 @@
+- hosts: webservers-prod
+  vars_files:
+  - vars/ssh.yml
+  tasks:
+    - ping:

@@ -1,4 +1,4 @@
-name: Release
+name: Prepare minor release
 
 on:
   workflow_dispatch:
@@ -7,8 +7,8 @@ permissions:
   contents: write
 
 jobs:
-  release:
-    name: Build & Deploy
+  build:
+    name: Build & Bump minor version
     runs-on: ubuntu-latest
 
     steps:
@@ -29,13 +29,13 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-      - name: Maven release
+      - name: Maven prepare minor release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mvn release:prepare -DprojectVersionPolicyId=SemVerMinorDevelopment -DskipTests -Dresume=false
+          mvn release:prepare \
+            -DprojectVersionPolicyId=SemVerMinorDevelopment \
+            -DpreparationGoals=validate \
+            -DskipTests \
+            -Dresume=false
 
-      - name: Deployment
-        if: success()
-        run: |
-          echo "Ansible deployment would start here"

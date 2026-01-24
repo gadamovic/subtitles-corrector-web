@@ -1,0 +1,49 @@
+name: Deploy release
+
+on:
+  workflow_dispatch:    
+    inputs:
+      tag:
+        description: 'Tag to run this workflow for'
+        required: true
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # REQUIRED for tags + release plugin
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_PROD_SSH_PRIV_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Setup Ansible Vault
+        run: |
+          mkdir -p ~/ansible-vault/
+          echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > ~/ansible-vault/password
+          chmod 600 ~/ansible-vault/password
+
+      - name: Deployment
+        if: success()
+        run: |
+          echo "Ansible deployment start..."
+          ansible-playbook -i $GITHUB_WORKSPACE/ansible/hosts \
+          $GITHUB_WORKSPACE/ansible/deploy.yml --vault-password-file ~/ansible-vault/password
