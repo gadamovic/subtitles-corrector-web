@@ -33,7 +33,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mvn release:prepare -DskipTests -Dresume=false -DprojectVersionPolicyId=SemVerMinorDevelopment
+          mvn release:prepare -DprojectVersionPolicyId=SemVerMinorDevelopment -DskipTests -Dresume=false
 
       - name: Deployment
         if: success()

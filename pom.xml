@@ -167,7 +167,6 @@
 					<configuration>
 						<arguments>-DskipTests</arguments>
 						<scmCommentPrefix>[skip ci] </scmCommentPrefix>
-						<projectVersionPolicyId>SemVerMinorDevelopment</projectVersionPolicyId>
 					</configuration>
 			</plugin>
 		</plugins>
