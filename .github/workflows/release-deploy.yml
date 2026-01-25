@@ -43,6 +43,8 @@ jobs:
 
       - name: Deployment
         if: success()
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "false"
         run: |
           echo "Ansible deployment start..."
           ansible-playbook -i $GITHUB_WORKSPACE/ansible/hosts \
