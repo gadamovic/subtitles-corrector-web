@@ -32,7 +32,7 @@ jobs:
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_PROD_SSH_PRIV_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.EC2_PROD_SSH_PRIV_KEY }}" > ~/.ssh/id_rsa.pem
           chmod 600 ~/.ssh/id_rsa
 
       - name: Setup Ansible Vault
