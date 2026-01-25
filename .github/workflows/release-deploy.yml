@@ -2,11 +2,11 @@ name: Deploy release
 
 on:
   workflow_dispatch:    
-    inputs:
-      tag:
-        description: 'Tag to run this workflow for'
-        required: true
-        default: ''
+#    inputs:
+#      tag:
+#        description: 'Tag to run this workflow for'
+#        required: true
+#        default: ''
 
 permissions:
   contents: write
