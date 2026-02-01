@@ -57,4 +57,4 @@ jobs:
         run: |
           echo "Ansible deployment start..."
           ansible-playbook -i $GITHUB_WORKSPACE/ansible/hosts \
-          $GITHUB_WORKSPACE/ansible/deploy.yml --vault-password-file ~/ansible-vault/password -e ansible_python_interpreter=/usr/bin/python3.8 -vvvv
+          $GITHUB_WORKSPACE/ansible/deploy.yml --vault-password-file ~/ansible-vault/password -vvvv
