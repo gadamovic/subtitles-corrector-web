@@ -47,7 +47,7 @@
         creates: /usr/bin/docker
 
     - name: Check docker compose version
-      ansible.builtin.command: /usr/local/bin/docker-compose -version
+      ansible.builtin.command: /usr/local/bin/docker-compose -v
       register: docker_compose_version
       ignore_errors: yes
 
