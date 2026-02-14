@@ -18,14 +18,14 @@
 
     - name: Print aws version
       ansible.builtin.debug:
-        var: aws_version
+        msg: "Aws version check output: {{ aws_version }}"
 
     - name: Download AWS CLI v2 if not exists
-      when: aws_version.rc != 0 #only when aws is not installed
+      when: aws_version.rc != 0 #only when aws is not installed - rc = return code, 0 = success
       get_url:
         url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
         dest: /tmp/awscliv2.zip
-        mode: '0644' 
+        mode: '0644'
 
     - name: Unzip AWS CLI
       when: aws_version.rc != 0
