@@ -12,7 +12,7 @@
         state: present
 
     - name: Check AWS CLI version
-      ansible.builtin.command: aws --version
+      ansible.builtin.command: /usr/local/bin/aws --version
       register: aws_version
       ignore_errors: yes
 
