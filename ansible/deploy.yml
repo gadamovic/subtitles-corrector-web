@@ -46,10 +46,18 @@
       args:
         creates: /usr/bin/docker
 
-    - name: Install Docker Compose v2 plugin
-      ansible.builtin.package:
-        name: docker-compose-plugin
-        state: present
+    - name: Check docker compose version
+      ansible.builtin.command: docker-compose -version
+      register: docker-compose-version
+      ignore_errors: yes
+
+    - name: Install docker compose if not installed
+      when: docker-compose-version.rc != 0
+      ansible.builtin.command: curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+       
+    - name: Set permissions for docker compose
+      when: docker-compose-version.rc != 0
+      ansible.builtin.command: chmod +x /usr/local/bin/docker-compose
 
     - name: Ensure Docker service is started and enabled
       ansible.builtin.service:
