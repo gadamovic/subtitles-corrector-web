@@ -12,9 +12,13 @@
         state: present
 
     - name: Check AWS CLI version
-      command: aws --version
+      ansible.builtin.command: aws --version
       register: aws_version
       ignore_errors: yes
+
+    - name: Print aws version
+      ansible.builtin.debug:
+        var: aws_version
 
     - name: Download AWS CLI v2 if not exists
       when: aws_version.rc != 0 #only when aws is not installed
