@@ -48,7 +48,7 @@
 
     - name: Check docker compose version
       ansible.builtin.command: docker-compose -version
-      register: docker-compose-version
+      register: docker_compose_version
       ignore_errors: yes
 
     - name: Install docker compose if not installed
