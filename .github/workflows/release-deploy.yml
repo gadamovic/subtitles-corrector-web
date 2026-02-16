@@ -2,11 +2,10 @@ name: Deploy release
 
 on:
   workflow_dispatch:    
-#    inputs:
-#      tag:
-#        description: 'Tag to run this workflow for'
-#        required: true
-#        default: ''
+    inputs:
+      tag:
+        description: 'Tag to run this workflow for'
+        required: true
 
 permissions:
   contents: write
@@ -22,6 +21,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0   # REQUIRED for tags + release plugin
+          ref: ${{ github.event.inputs.tag }}
+
+      - name: Extract version
+        id: version # Id to reference version from other steps
+        run: |
+          VERSION=${{ github.event.inputs.tag }} # Set version from workflow manual input to a variable
+          VERSION=${VERSION#v} # Remove v prefix
+          echo "version=$VERSION" >> $GITHUB_OUTPUT # Write variable to GITHOUB_OUTPUT so other steps can access it
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -71,16 +78,16 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t subtitles/subtitles-corrector .
+          docker build -t subtitles-corrector-image . # Will use Dockerfile located at project root
 
       - name: Tag image
         run: |
-          docker tag subtitles/subtitles-corrector:latest \
-          841162706718.dkr.ecr.eu-north-1.amazonaws.com/subtitles/subtitles-corrector:latest
+          docker tag subtitles-corrector-image:${{ steps.version.outputs.version }} \
+          841162706718.dkr.ecr.eu-north-1.amazonaws.com/subtitles/subtitles-corrector:${{ steps.version.outputs.version }}
 
       - name: Push image
         run: |
-          docker push 841162706718.dkr.ecr.eu-north-1.amazonaws.com/subtitles/subtitles-corrector
+          docker push 841162706718.dkr.ecr.eu-north-1.amazonaws.com/subtitles/subtitles-corrector:${{ steps.version.outputs.version }}
 
 
 
