@@ -16,8 +16,7 @@ FROM amazoncorretto:25.0.1
 WORKDIR /app
 
 # Copy the application JAR file
-RUN pwd && ls -la
-COPY ./target/subtitlescorrector-*.jar app.jar
+COPY --from=build /app/target/subtitlescorrector-*.jar app.jar
 
 # Run the application
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
