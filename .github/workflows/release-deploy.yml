@@ -78,7 +78,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t subtitles-corrector-image . # Will use Dockerfile located at project root
+          docker build -t subtitles-corrector-image:${{ steps.version.outputs.version }} . # Will use Dockerfile located at project root
 
       - name: Tag image
         run: |
