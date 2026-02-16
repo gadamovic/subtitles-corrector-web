@@ -52,15 +52,39 @@ jobs:
           # Python 3.7/3.8 environments
           pip install "ansible-core==2.14.11" ansible
 
-      - name: Build java with Maven
-        run: |
-          cd $GITHUB_WORKSPACE
-          mvn clean package -DskipTests
 
-      - name: Build java with Maven
+
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::841162706718:role/subtitles-corrector-ecr-role
+          aws-region: eu-north-1
+
+      - name: Login to ECR
         run: |
-          cd $GITHUB_WORKSPACE
-          ls -la
+          aws ecr get-login-password --region eu-north-1 \
+          | docker login \
+            --username AWS \
+            --password-stdin 841162706718.dkr.ecr.eu-north-1.amazonaws.com
+
+      - name: Build Docker image
+        run: |
+          docker build -t subtitles/subtitles-corrector .
+
+      - name: Tag image
+        run: |
+          docker tag subtitles/subtitles-corrector:latest \
+          841162706718.dkr.ecr.eu-north-1.amazonaws.com/subtitles/subtitles-corrector:latest
+
+      - name: Push image
+        run: |
+          docker push 841162706718.dkr.ecr.eu-north-1.amazonaws.com/subtitles/subtitles-corrector
+
+
+
+
+          
 
       - name: Deployment
         if: success()
