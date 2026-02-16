@@ -48,9 +48,19 @@ jobs:
       - name: Install Compatible Ansible
         run: |
           python -m pip install --upgrade pip
-          # 2.14.x is the last version that fully supports the older 
+          # 2.14.x is the last version that fully supports the older
           # Python 3.7/3.8 environments
           pip install "ansible-core==2.14.11" ansible
+
+      - name: Build java with Maven
+        run: |
+          cd $GITHUB_WORKSPACE
+          mvn clean package -DskipTests
+
+      - name: Build java with Maven
+        run: |
+          cd $GITHUB_WORKSPACE
+          ls -la
 
       - name: Deployment
         if: success()
