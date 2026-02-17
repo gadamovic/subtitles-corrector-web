@@ -76,3 +76,17 @@
         name: git
         state: present
 
+    - name: Install nvm
+      ansible.builtin.package:
+        name: nvm
+        state: present
+
+    - name: Install bulma
+      ansible.builtin.package:
+        name: bulma
+        state: present
+
+
+
+
+
