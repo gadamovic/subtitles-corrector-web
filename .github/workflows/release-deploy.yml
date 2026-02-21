@@ -113,6 +113,6 @@ jobs:
         if: success()
         run: |
           echo "Ansible deployment start..."
-          cd $GITHUB_WORKSPACE
+          cd $GITHUB_WORKSPACE/ansible
           ansible-playbook -i $GITHUB_WORKSPACE/ansible/inventory/hosts \
           $GITHUB_WORKSPACE/ansible/playbooks/deploy.yml --vault-password-file ~/ansible-vault/password
