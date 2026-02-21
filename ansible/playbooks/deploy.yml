@@ -3,15 +3,7 @@
   become: yes
   vars_files:
   - ../vars/ssh.yml
-  tasks:
-    - name: Install dependencies
-      import-role:
-        name: common
-
-    - name: Setup AWS
-      import-role:
-        name: aws
-     
-    - name: Setup Docker
-      import-role:
-        name: aws    
+  roles:
+    - common
+    - aws
+    - docker
