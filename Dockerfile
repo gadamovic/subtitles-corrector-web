@@ -9,14 +9,7 @@ RUN mvn clean package -DskipTests
 
 
 # ---- Runtime stage ----
-# Use an official Java runtime as a parent image
-FROM amazoncorretto:25.0.1
-
-# Set the working directory
-WORKDIR /app
-
-# Copy the application JAR file
-COPY --from=build /app/target/subtitlescorrector-*.jar app.jar
-
-# Run the application
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+FROM amazoncorretto:25.0.1 # Use an official Java runtime as a parent image
+WORKDIR /app # Set the working directory
+COPY --from=build /app/target/subtitlescorrector-*.jar app.jar # Copy the application JAR file
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"] # Run the application

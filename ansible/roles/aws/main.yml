@@ -1,0 +1,29 @@
+
+- name: Extract AWS CLI version
+  ansible.builtin.command: /usr/local/bin/aws --version
+  register: aws_version
+  ignore_errors: yes
+
+- name: Print aws version
+  ansible.builtin.debug:
+    msg: "Aws version check output: {{ aws_version }}"
+
+- name: Download AWS CLI v2 if not exists
+  when: aws_version.rc != 0 # only when aws is not installed - rc = return code, 0 = success
+  get_url:
+    url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+    dest: /tmp/awscliv2.zip
+    mode: '0644'
+
+- name: Unzip AWS CLI
+  when: aws_version.rc != 0
+  ansible.builtin.unarchive:
+    src: /tmp/awscliv2.zip
+    dest: /tmp
+    remote_src: yes # file is located on remote - ec2
+
+- name: Install AWS CLI v2
+  when: aws_version.rc != 0
+  ansible.builtin.command: /tmp/aws/install
+
+# setup aws credentials manually using aws configure

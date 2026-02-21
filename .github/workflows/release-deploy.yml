@@ -66,6 +66,29 @@ jobs:
           role-to-assume: arn:aws:iam::841162706718:role/subtitles-corrector-ecr-role
           aws-region: eu-north-1
 
+
+
+      - name: Setup frontend env variables
+        run: |
+          # Overwrite the .env file and add environment variables for vue
+          cat > "$GITHUB_WORKSPACE"/src/main/resources/static/views/frontend-vue/.env <<EOL
+          VUE_APP_ENVIRONMENT=prod
+          EOL
+
+      - name: "Setup Node 16" 
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16
+
+      - name: Build frontend - Vue and Bulma
+        working-directory: src/main/resources/static/views/frontend-vue
+        run: |
+          echo "Building front-end files..."
+          npm ci
+          npm run build-bulma
+          npm run build
+          cp -r dist/* ../
+
       - name: Login to ECR
         run: |
           aws ecr get-login-password --region eu-north-1 \
@@ -90,5 +113,5 @@ jobs:
         if: success()
         run: |
           echo "Ansible deployment start..."
-          ansible-playbook -i $GITHUB_WORKSPACE/ansible/hosts \
-          $GITHUB_WORKSPACE/ansible/deploy.yml --vault-password-file ~/ansible-vault/password
+          ansible-playbook -i $GITHUB_WORKSPACE/ansible/inventory/hosts \
+          $GITHUB_WORKSPACE/ansible/playbooks/deploy.yml --vault-password-file ~/ansible-vault/password

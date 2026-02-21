@@ -1,0 +1,34 @@
+
+- name: Install Docker via amazon-linux-extras
+  ansible.builtin.command: amazon-linux-extras install docker -y
+  args:
+    creates: /usr/bin/docker #To achieve idempotency - don't execute task if folder exists
+
+- name: Extract docker compose version
+  ansible.builtin.command: /usr/local/bin/docker-compose -v
+  register: docker_compose_version
+  ignore_errors: yes
+
+- name: Print docker compose version
+  ansible.builtin.debug:
+    msg: "Docker compose version check output: {{ docker_compose_version }}"
+
+- name: Install docker compose if not installed
+  when: docker_compose_version.rc != 0 #Another way to achieve idempotency
+  ansible.builtin.shell: curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+   
+- name: Set permissions for docker compose
+  when: docker_compose_version.rc != 0
+  ansible.builtin.command: chmod +x /usr/local/bin/docker-compose
+
+- name: Ensure Docker service is started and enabled
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: yes # Start on boot
+
+- name: Add ec2-user to docker group
+  ansible.builtin.user:
+    name: ec2-user
+    groups: docker
+    append: yes

@@ -1,0 +1,7 @@
+
+- name: Install dependencies
+  ansible.builtin.yum:
+    name:
+      - unzip
+      - curl
+    state: present
