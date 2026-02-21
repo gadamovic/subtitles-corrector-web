@@ -8,6 +8,8 @@
   ansible.builtin.command: /usr/local/bin/docker-compose -v
   register: docker_compose_version
   ignore_errors: yes
+  changed_when: false
+  failed_when: false
 
 - name: Print docker compose version
   ansible.builtin.debug:
