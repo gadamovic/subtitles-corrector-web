@@ -38,12 +38,11 @@
     append: yes
 
 - name: Pull built docker image from ECR
-  ansible.builtin.shell: >
-    aws ecr get-login-password --region {{ aws_region }}
-    | docker login
-    --username AWS
-    --password-stdin {{ ecr_registry }}
+  ansible.builtin.shell: |
+    /usr/local/bin/aws ecr get-login-password --region {{ aws_region }} | docker login --username AWS --password-stdin {{ ecr_registry }}
   changed_when: false
+  args:
+    executable: /bin/bash
 
 - name: Update the Docker compose file with the new version
   ansible.builtin.template:
