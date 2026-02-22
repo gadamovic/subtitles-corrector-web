@@ -5,12 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.subtitlescorrector.adapters.in.SubtitleCorrectionEventConsumerImpl;
-
 @SpringBootApplication
 public class SubtitlescorrectorApplication {
 
-	public static Logger log = LoggerFactory.getLogger(SubtitleCorrectionEventConsumerImpl.class);
+	public static Logger log = LoggerFactory.getLogger(SubtitlescorrectorApplication.class);
 
 	public static void main(String[] args) {
 
