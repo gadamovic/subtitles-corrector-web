@@ -40,9 +40,13 @@
 - name: Pull built docker image from ECR
   ansible.builtin.shell: |
     /usr/local/bin/aws ecr get-login-password --region {{ aws_region }} | docker login --username AWS --password-stdin {{ ecr_registry }}
-  changed_when: false
   args:
     executable: /bin/bash
+  changed_when: false
+
+- name: Load docker compose vars from a file
+  ansible.builtin.include_vars:
+    file: ../vars/docker_compose_vars.yml # Relative to the playbook
 
 - name: Update the Docker compose file with the new version
   ansible.builtin.template:
