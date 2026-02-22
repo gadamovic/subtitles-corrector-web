@@ -1,4 +1,6 @@
 
+#------Docker Role------
+
 - name: Install Docker via amazon-linux-extras
   ansible.builtin.command: amazon-linux-extras install docker -y
   args:
@@ -34,3 +36,27 @@
     name: ec2-user
     groups: docker
     append: yes
+
+- name: Pull built docker image from ECR
+  ansible.builtin.shell: >
+    aws ecr get-login-password --region {{ aws_region }}
+    | docker login
+    --username AWS
+    --password-stdin {{ ecr_registry }}
+  changed_when: false
+
+- name: Update the Docker compose file with the new version
+  ansible.builtin.template:
+    src: docker-compose.j2
+    dest: "{{ scripts_folder }}/docker-compose.yaml"
+    mode: '0644'
+
+- name: Start Docker compose
+  ansible.builtin.shell: >
+    cd {{ scripts_folder }}
+    docker-compose up -d
+
+- name: Remove unused Docker images
+  ansible.builtin.shell: docker image prune -f
+
+

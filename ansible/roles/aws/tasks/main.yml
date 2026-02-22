@@ -1,4 +1,6 @@
 
+#------AWS Role------
+
 - name: Extract AWS CLI version
   ansible.builtin.command: /usr/local/bin/aws --version
   register: aws_version
