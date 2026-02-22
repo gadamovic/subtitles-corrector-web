@@ -56,6 +56,4 @@
     chdir: "{{ scripts_folder }}"
 
 - name: Remove unused Docker images
-  ansible.builtin.shell: docker image prune -f
-
-
+  ansible.builtin.shell: docker image prune -af
