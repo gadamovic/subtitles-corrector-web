@@ -115,4 +115,4 @@ jobs:
           echo "Ansible deployment start..."
           cd $GITHUB_WORKSPACE/ansible
           ansible-playbook -i $GITHUB_WORKSPACE/ansible/inventory/hosts \
-          $GITHUB_WORKSPACE/ansible/playbooks/deploy.yml --extra-vars app_version=${{ steps.version.outputs.version }} --vault-password-file ~/ansible-vault/password
+          $GITHUB_WORKSPACE/ansible/playbooks/deploy.yml --extra-vars app_version=${{ steps.version.outputs.version }} --vault-password-file ~/ansible-vault/password -vvvv

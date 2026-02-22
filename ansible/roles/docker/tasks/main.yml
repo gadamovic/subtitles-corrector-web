@@ -37,7 +37,7 @@
     groups: docker
     append: yes
 
-- name: Pull built docker image from ECR
+- name: Login to ECR
   ansible.builtin.shell: |
     /usr/local/bin/aws ecr get-login-password --region {{ aws_region }} | docker login --username AWS --password-stdin {{ ecr_registry }}
   args:
@@ -50,7 +50,7 @@
     dest: "{{ scripts_folder }}/docker-compose.yaml"
     mode: '0644'
 
-- name: Start Docker compose
+- name: Docker compose up
   ansible.builtin.shell: >
     cd {{ scripts_folder }}
     docker-compose up -d
