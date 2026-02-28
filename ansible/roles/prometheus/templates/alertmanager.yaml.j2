@@ -1,0 +1,16 @@
+
+route:
+  receiver: 'mail'
+  repeat_interval: 4h
+  group_by: [ alertname ]
+
+
+receivers:
+  - name: 'mail'
+    email_configs:
+      - smarthost: 'smtp.gmail.com:587'
+        auth_username: '{{ EMAIL_ADDRESS_FOR_SENDING }}'
+        auth_password: '{{ MAIL_SENDER_PASSWORD }}'
+        from: '{{ EMAIL_ADDRESS_FOR_SENDING }}'
+        to: '{{ ADMIN_EMAIL_ADDRESS }}'
+

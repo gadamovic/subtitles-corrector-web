@@ -1,12 +1,12 @@
 
 #------Grafana Role------
 
-- name: Deploy Grafana config
+- name: Deploy Nginx config
   ansible.builtin.template:
     src: defaults.ini.j2
-    dest: "{{ grafana_config_folder }}/defaults.ini"
+    dest: "{{ nginx_config_folder }}/default.conf"
     owner: root
     group: root
     mode: '0644'    
-  notify: Restart Grafana
+  notify: Restart Nginx
     

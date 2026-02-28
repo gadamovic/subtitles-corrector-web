@@ -1,0 +1,10 @@
+
+#------Loki Role------
+
+- name: Deploy Loki config
+  ansible.builtin.template:
+    src: local-config.yaml.j2
+    dest: "{{ loki_config_folder }}/local-config.yaml"
+    owner: root
+    group: root
+    mode: '0644'

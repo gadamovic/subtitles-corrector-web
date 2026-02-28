@@ -1,0 +1,50 @@
+groups:
+- name: Service down alerts
+  labels:
+    team: dev team
+  rules:
+
+  - alert: Broker1 down
+    expr: time() - container_last_seen{name="broker1"} > 340
+    for: 2m
+    keep_firing_for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: Broker1 down
+
+  - alert: Subtitles tomcat down
+    expr: time() - container_last_seen{name="subtitles-tomcat"} > 340
+    for: 2m
+    keep_firing_for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: Subtitles tomcat down
+
+  - alert: Schema-registry down
+    expr: time() - container_last_seen{name="schema-registry"} > 340
+    for: 2m
+    keep_firing_for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: Schema-registry down
+
+  - alert: Zookeeper down
+    expr: time() - container_last_seen{name="zookeeper"} > 340
+    for: 2m
+    keep_firing_for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: Zookeeper down
+
+  - alert: Used memory high
+    expr: (node_memory_MemTotal_bytes - (node_memory_MemFree_bytes + node_memory_Cached_bytes + node_memory_Buffers_bytes)) / node_memory_MemTotal_bytes > 0.88
+    for: 2m
+    keep_firing_for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: Percentage of available memory used

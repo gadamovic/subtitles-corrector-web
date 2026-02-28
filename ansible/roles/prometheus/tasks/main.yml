@@ -1,0 +1,29 @@
+
+#------Grafana Role------
+
+- name: Deploy Prometheus config - alertmanager
+  ansible.builtin.template:
+    src: defaults.ini.j2
+    dest: "{{ prometheus_config_folder }}/alertmanager.yaml"
+    owner: root
+    group: root
+    mode: '0644'    
+  notify: Restart Prometheus
+ 
+- name: Deploy Prometheus config - alert-rules
+  ansible.builtin.template:
+    src: defaults.ini.j2
+    dest: "{{ prometheus_config_folder }}/alert-rules.yaml"
+    owner: root
+    group: root
+    mode: '0644'    
+  notify: Restart Prometheus
+
+- name: Deploy Prometheus config - prometheus
+  ansible.builtin.template:
+    src: defaults.ini.j2
+    dest: "{{ prometheus_config_folder }}/prometheus.yaml"
+    owner: root
+    group: root
+    mode: '0644'    
+  notify: Restart Prometheus

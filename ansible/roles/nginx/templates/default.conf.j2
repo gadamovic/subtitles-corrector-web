@@ -1,0 +1,55 @@
+# Redirect HTTP to HTTPS without www
+server {
+    listen 80;
+    server_name subtitles-corrector.com www.subtitles-corrector.com;
+    return 301 https://subtitles-corrector.com$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name subtitles-corrector.com;
+
+    ssl_certificate /home/certbot/certs/fullchain.pem;
+    ssl_certificate_key /home/certbot/certs/privkey.pem;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+
+    location / {
+        proxy_pass http://subtitles-tomcat:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+
+        proxy_read_timeout 300;
+        proxy_connect_timeout 300;
+        proxy_send_timeout 300;
+        send_timeout 300;
+   }
+
+    # Add a location for handling WebSocket connections
+    location /sc-ws-connection-entrypoint {
+        proxy_pass http://subtitles-tomcat:8080;  # backend WebSocket handler
+        proxy_http_version 1.1;  # WebSocket requires HTTP/1.1
+        proxy_set_header Upgrade $http_upgrade;  # WebSocket Upgrade header
+        proxy_set_header Connection 'upgrade';  # WebSocket Connection header
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+
+}
+
+# Redirect HTTPs with www to HTTPS without www
+server {
+    listen 443 ssl;
+    server_name www.subtitles-corrector.com;
+
+    ssl_certificate /home/certbot/certs/fullchain.pem;
+    ssl_certificate_key /home/certbot/certs/privkey.pem;
+
+    return 301 https://subtitles-corrector.com$request_uri;
+}
+
