@@ -8,3 +8,6 @@
     - aws
     - docker
     - grafana
+    - loki
+    - nginx
+    - prometheus
