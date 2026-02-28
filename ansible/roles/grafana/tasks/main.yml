@@ -1,0 +1,12 @@
+
+#------Grafana Role------
+
+- name: Deploy Grafana config
+  ansible.builtin.template:
+    src: defaults.ini.j2
+    dest: "{{ grafana_config_folder }}/defaults.ini"
+    owner: root
+    group: root
+    mode: '0644'    
+    notify: Restart Grafana
+    
