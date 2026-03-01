@@ -11,3 +11,4 @@
     - loki
     - nginx
     - prometheus
+    - promtail
