@@ -3,7 +3,7 @@
 
 - name: Deploy Nginx config
   ansible.builtin.template:
-    src: defaults.ini.j2
+    src: default.conf.j2
     dest: "{{ nginx_config_folder }}/default.conf"
     owner: root
     group: root

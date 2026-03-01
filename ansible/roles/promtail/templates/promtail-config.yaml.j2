@@ -1,0 +1,25 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /etc/promtail/logs/metadata/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: subtitles-app
+          __path__: /etc/promtail/logs/application/app.json.log
+  - job_name: subtitles-app-access-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: subtitles-app-access-logs
+          __path__: /etc/promtail/logs/access_logs/tomcat_access_logs/access_log.*.log

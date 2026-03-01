@@ -1,0 +1,12 @@
+
+#------Promtail Role------
+
+- name: Deploy Promtail config
+  ansible.builtin.template:
+    src: promtail-config.yaml.j2
+    dest: "{{ promtail_config_folder }}/promtail-config.yaml"
+    owner: root
+    group: root
+    mode: '0644'    
+  notify: Restart Promtail
+
