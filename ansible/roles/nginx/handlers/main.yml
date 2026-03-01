@@ -1,6 +1,5 @@
 
 - name: Restart Nginx
-  ansible.builtin.service:
-    name: nginx
-    state: restarted
+  ansible.builtin.shell: docker compose restart nginx
+  chdir: "{{ scripts_folder }}"
     

@@ -1,3 +1,2 @@
-scripts_folder: /home/ec2-user/subtitles-corrector-files/application/deployment-prod/scripts/
 aws_region: eu-north-1
 ecr_registry: 841162706718.dkr.ecr.eu-north-1.amazonaws.com
