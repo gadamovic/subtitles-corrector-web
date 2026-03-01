@@ -1,5 +1,5 @@
 
 - name: Restart Grafana
-  ansible.builtin.shell: docker compose restart grafana
+  ansible.builtin.shell: docker-compose restart grafana
   chdir: "{{ scripts_folder }}"
     

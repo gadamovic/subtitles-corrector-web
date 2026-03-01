@@ -1,5 +1,5 @@
 
 - name: Restart Nginx
-  ansible.builtin.shell: docker compose restart nginx
+  ansible.builtin.shell: docker-compose restart nginx
   chdir: "{{ scripts_folder }}"
     

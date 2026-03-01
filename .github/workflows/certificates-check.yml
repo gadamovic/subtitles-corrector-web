@@ -1,0 +1,15 @@
+name: Certificates check
+
+on:
+  schedule:
+    - cron: 0 0 * * MON
+  workflow_dispatch:
+
+jobs:
+  check-certs:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Create log directories
+        run: echo "execute certbot-renew.sh"

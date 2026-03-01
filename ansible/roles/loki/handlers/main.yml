@@ -1,5 +1,5 @@
 
 - name: Restart Loki
-  ansible.builtin.shell: docker compose restart loki
+  ansible.builtin.shell: docker-compose restart loki
   chdir: "{{ scripts_folder }}"
     
