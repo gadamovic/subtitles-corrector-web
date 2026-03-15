@@ -20,6 +20,16 @@ jobs:
           # Python 3.7/3.8 environments
           pip install "ansible-core==2.14.11" ansible
 
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_PROD_SSH_PRIV_KEY }}" > ~/.ssh/id_rsa.pem
+          chmod 600 ~/.ssh/id_rsa.pem
+
+      - name: Add EC2 host key
+        run: |
+          ssh-keyscan -H 13.61.96.166 >> ~/.ssh/known_hosts
+
       - name: Setup Ansible Vault
         run: |
           mkdir -p ~/ansible-vault/
