@@ -20,5 +20,11 @@ jobs:
           # Python 3.7/3.8 environments
           pip install "ansible-core==2.14.11" ansible
 
+      - name: Setup Ansible Vault
+        run: |
+          mkdir -p ~/ansible-vault/
+          echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > ~/ansible-vault/password
+          chmod 600 ~/ansible-vault/password
+
       - name: Check using Ansible
-        run: ansible-playbook -i $GITHUB_WORKSPACE/ansible/inventory/hosts $GITHUB_WORKSPACE/ansible/playbooks/check_tls_certificates.yml
+        run: ansible-playbook -i $GITHUB_WORKSPACE/ansible/inventory/hosts $GITHUB_WORKSPACE/ansible/playbooks/check_tls_certificates.yml --vault-password-file ~/ansible-vault/password
