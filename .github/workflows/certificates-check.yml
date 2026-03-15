@@ -7,9 +7,16 @@ on:
 
 jobs:
   check-certs:
-    name: Run tests
+    name: Check tls certificates and update if needed
     runs-on: ubuntu-latest
     steps:
 
-      - name: Create log directories
-        run: echo "execute certbot-renew.sh"
+      - name: Install Compatible Ansible
+        run: |
+          python -m pip install --upgrade pip
+          # 2.14.x is the last version that fully supports the older
+          # Python 3.7/3.8 environments
+          pip install "ansible-core==2.14.11" ansible
+
+      - name: Check using Ansible
+        run: ansible-playbook -i $GITHUB_WORKSPACE/ansible/inventory/hosts check_tls_certificates.yml

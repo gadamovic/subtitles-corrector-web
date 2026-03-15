@@ -1,0 +1,43 @@
+
+#------Certbot Role------
+
+- name: Execute certbot renew command and store output
+  ansible.builtin.command: docker exec certbot certbot renew
+  register: certbot_renew_output
+
+- name: Print certbot renew output
+  ansible.builtin.debug:
+    var: certbot_renew_output
+
+- name: Remove old fullchain.pem
+  ansible.builtin.command: docker exec certbot rm /etc/letsencrypt/fullchain.pem
+  when: "'Congratulations, all renewals succeeded' in certbot_renew_output"
+
+- name: Remove old privkey.pem
+  ansible.builtin.command: docker exec certbot rm /etc/letsencrypt/privkey.pem
+  when: "'Congratulations, all renewals succeeded' in certbot_renew_output"
+
+- name: Place new fullchain.pem
+  ansible.builtin.command: docker exec certbot cp /etc/letsencrypt/live/subtitles-corrector.com/fullchain.pem /etc/letsencrypt/fullchain.pem
+  when: "'Congratulations, all renewals succeeded' in certbot_renew_output"
+
+- name: Place new privkey.pem
+  ansible.builtin.command: docker exec certbot cp /etc/letsencrypt/live/subtitles-corrector.com/privkey.pem /etc/letsencrypt/privkey.pem
+  when: "'Congratulations, all renewals succeeded' in certbot_renew_output"
+
+- name: Add writes for grafana user
+  ansible.builtin.command: docker exec -u root grafana chown grafana /home/certbot/certs/privkey.pem /home/certbot/certs/fullchain.pem
+  when: "'Congratulations, all renewals succeeded' in certbot_renew_output"
+
+- name: Restart nginx
+  ansible.builtin.command: docker restart nginx
+  when: "'Congratulations, all renewals succeeded' in certbot_renew_output"
+
+- name: Restart Grafana
+  ansible.builtin.command: docker restart grafana
+  when: "'Congratulations, all renewals succeeded' in certbot_renew_output"
+
+- name: Print not renewal needed
+  ansible.builtin.debug:
+    msg: "No renewal needed."
+  when: "'Congratulations, all renewals succeeded' not in certbot_renew_output"
