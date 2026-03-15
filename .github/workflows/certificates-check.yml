@@ -27,4 +27,7 @@ jobs:
           chmod 600 ~/ansible-vault/password
 
       - name: Check using Ansible
-        run: ansible-playbook -i $GITHUB_WORKSPACE/ansible/inventory/hosts $GITHUB_WORKSPACE/ansible/playbooks/check_tls_certificates.yml --vault-password-file ~/ansible-vault/password
+        run: |
+          cd $GITHUB_WORKSPACE/ansible
+          ansible-playbook -i $GITHUB_WORKSPACE/ansible/inventory/hosts $GITHUB_WORKSPACE/ansible/playbooks/check_tls_certificates.yml --vault-password-file ~/ansible-vault/password
+          
