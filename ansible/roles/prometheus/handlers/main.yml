@@ -1,5 +1,6 @@
 
 - name: Restart Prometheus
   ansible.builtin.shell: docker-compose restart prometheus
-  chdir: "{{ scripts_folder }}"
+  args:
+    chdir: "{{ scripts_folder }}"
     
