@@ -1,6 +1,6 @@
 
 - name: Restart Promtail
-  ansible.builtin.shell: docker-compose restart promtail
+  ansible.builtin.shell: /usr/local/bin/docker-compose restart promtail
   args:
     chdir: "{{ scripts_folder }}"
     
