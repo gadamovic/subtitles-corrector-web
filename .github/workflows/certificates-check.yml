@@ -19,4 +19,4 @@ jobs:
           pip install "ansible-core==2.14.11" ansible
 
       - name: Check using Ansible
-        run: ansible-playbook -i $GITHUB_WORKSPACE/ansible/inventory/hosts check_tls_certificates.yml
+        run: ansible-playbook -i $GITHUB_WORKSPACE/ansible/inventory/hosts $GITHUB_WORKSPACE/ansible/playbooks/check_tls_certificates.yml
