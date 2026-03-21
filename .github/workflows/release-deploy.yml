@@ -91,7 +91,7 @@ jobs:
 
     steps:
       - name: Set up Ansible
-        uses: actions/ansible-setup
+        uses: ./.github/actions/ansible-setup
 
       - name: Deployment
         if: success()
@@ -107,7 +107,7 @@ jobs:
 
     steps:
       - name: Set up Ansible
-        uses: actions/ansible-setup
+        uses: ./.github/actions/ansible-setup
 
       - name: Restart Tomcat
         run: |
