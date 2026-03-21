@@ -50,10 +50,5 @@
     dest: "{{ scripts_folder }}/docker-compose.yaml"
     mode: '0644'
 
-- name: Docker compose up
-  ansible.builtin.shell: /usr/local/bin/docker-compose up -d
-  args:
-    chdir: "{{ scripts_folder }}"
-
 - name: Remove unused Docker images
   ansible.builtin.shell: docker image prune -af
