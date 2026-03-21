@@ -88,7 +88,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     needs: build
-	
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -106,19 +106,19 @@ jobs:
           cd $GITHUB_WORKSPACE/ansible
           ansible-playbook -i inventory/hosts \
           playbooks/deploy.yml --extra-vars app_version=${{ steps.version.outputs.version }} --vault-password-file ~/ansible-vault/password
- 
+
   restart-tomcat:
     name: Restart Tomcat
     runs-on: ubuntu-latest
     needs: [build, deploy]
-	
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ github.event.inputs.tag }}
-		
+
       - name: Set up Ansible
         uses: ./.github/actions/ansible-setup
 
