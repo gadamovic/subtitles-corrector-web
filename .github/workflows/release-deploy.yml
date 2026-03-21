@@ -40,7 +40,7 @@ jobs:
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_PROD_SSH_PRIV_KEY }}" > ~/.ssh/id_rsa.pem
+          echo "${{ secrets.ANSIBLE_USER_SSH_PRIV_KEY }}" > ~/.ssh/id_rsa.pem
           chmod 600 ~/.ssh/id_rsa.pem
 
       - name: Add EC2 host key
@@ -65,8 +65,6 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::841162706718:role/subtitles-corrector-ecr-role
           aws-region: eu-north-1
-
-
 
       - name: Setup frontend env variables
         run: |
