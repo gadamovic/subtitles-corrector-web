@@ -131,4 +131,4 @@ jobs:
       - name: Restart Tomcat
         run: |
          cd $GITHUB_WORKSPACE/ansible
-         ansible-playbook -i inventory/hosts -vvvv playbooks/restart-tomcat.yml
+         ansible-playbook -i inventory/hosts playbooks/restart-tomcat.yml
