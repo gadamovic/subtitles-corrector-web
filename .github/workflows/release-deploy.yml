@@ -124,6 +124,9 @@ jobs:
 
       - name: Set up Ansible
         uses: ./.github/actions/ansible-setup
+        with: 
+          ssh_private_key: ${{ secrets.ANSIBLE_USER_SSH_PRIV_KEY }}
+          vault_password: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
 
       - name: Restart Tomcat
         run: |
