@@ -1,5 +1,12 @@
 name: Setup ansible
 description: "Sets up SSH, Ansible Vault, and installs Ansible"
+inputs:
+  ssh_private_key:
+    description: "SSH private key of the Ansible user"
+    required: true
+  vault_password:
+    description: "Ansible vault password"
+    required: true
 runs:
   using: "composite"
   steps:
@@ -7,7 +14,7 @@ runs:
     shell: bash
     run: |
       mkdir -p ~/.ssh
-      echo "${{ secrets.ANSIBLE_USER_SSH_PRIV_KEY }}" > ~/.ssh/id_rsa.pem
+      echo "${{ inputs.ssh_private_key }}" > ~/.ssh/id_rsa.pem
       chmod 600 ~/.ssh/id_rsa.pem
 
   - name: Add EC2 host key
@@ -19,9 +26,7 @@ runs:
     shell: bash
     run: |
       mkdir -p ~/ansible-vault/
-      echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > ~/ansible-vault/password
-      ls -la ~/ansible-vault
-      pwd
+      echo "${{ inputs.vault_password }}" > ~/ansible-vault/password
       chmod 600 ~/ansible-vault/password
 
   - name: Install Compatible Ansible
