@@ -3,7 +3,7 @@
 services:
 
   subtitles-tomcat:
-    image: 841162706718.dkr.ecr.eu-north-1.amazonaws.com/subtitles/subtitles-corrector:{{ app_version }}
+    image: "841162706718.dkr.ecr.eu-north-1.amazonaws.com/subtitles/subtitles-corrector:{{ app_version }}"
     container_name: subtitles-tomcat
     restart: unless-stopped
     environment:
