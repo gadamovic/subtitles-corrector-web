@@ -6,7 +6,7 @@ on:
       tag:
         description: 'Tag to run this workflow for'
         required: true
-		
+
 permissions:
   contents: write
   id-token: write

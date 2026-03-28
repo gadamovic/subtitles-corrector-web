@@ -8,7 +8,7 @@
       ansible.builtin.shell: pwd
       args:
         chdir: "{{ scripts_folder }}"
-	
+
     - name: Restart Tomcat
       ansible.builtin.shell: /usr/local/bin/docker-compose down subtitles-tomcat && /usr/local/bin/docker-compose up -d subtitles-tomcat
       args:
