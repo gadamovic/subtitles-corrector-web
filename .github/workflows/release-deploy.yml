@@ -108,7 +108,7 @@ jobs:
           echo "Ansible deployment start..."
           cd $GITHUB_WORKSPACE/ansible
           ansible-playbook -i inventory/hosts \
-          playbooks/deploy.yml --extra-vars app_version=${{ steps.version.outputs.version }} --vault-password-file ~/ansible-vault/password
+          playbooks/deploy.yml --extra-vars app_version=${{ needs.build.outputs.version }} --vault-password-file ~/ansible-vault/password
 
   restart-tomcat:
     name: Restart Tomcat
