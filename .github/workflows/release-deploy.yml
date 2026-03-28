@@ -6,11 +6,7 @@ on:
       tag:
         description: 'Tag to run this workflow for'
         required: true
-      use_latest:
-        description: "Use latest commit instead of tag"
-        required: false
-        default: "false"
-
+		
 permissions:
   contents: write
   id-token: write
@@ -25,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0   # REQUIRED for tags + release plugin
-          ref: ${{ github.event.inputs.use_latest == 'true' && github.ref || github.event.inputs.tag }}
+          ref: ${{ github.event.inputs.tag }}
 
       - name: Extract version
         id: version # Id to reference version from other steps
@@ -98,7 +94,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event.inputs.use_latest == 'true' && github.ref || github.event.inputs.tag }}
+          ref: ${{ github.event.inputs.tag }}
 
       - name: Set up Ansible
         uses: ./.github/actions/ansible-setup
@@ -124,7 +120,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event.inputs.use_latest == 'true' && github.ref || github.event.inputs.tag }}
+          ref: ${{ github.event.inputs.tag }}
 
       - name: Set up Ansible
         uses: ./.github/actions/ansible-setup
