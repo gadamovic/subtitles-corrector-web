@@ -20,6 +20,8 @@ runs:
     run: |
       mkdir -p ~/ansible-vault/
       echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > ~/ansible-vault/password
+      ls -la ~/ansible-vault
+      pwd
       chmod 600 ~/ansible-vault/password
 
   - name: Install Compatible Ansible
