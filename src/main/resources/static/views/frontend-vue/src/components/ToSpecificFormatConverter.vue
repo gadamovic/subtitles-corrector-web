@@ -4,6 +4,7 @@
             <div class="content p-5">
 
                 <h1>{{targetFormat}} Subtitle Converter</h1>
+                <p><strong>Convert your subtitle to {{targetFormat}}</strong></p>
 
                 <form @submit.prevent enctype="multipart/form-data" class="box" style="background-color: #004266;">
 
