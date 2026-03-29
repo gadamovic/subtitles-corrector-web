@@ -70,6 +70,24 @@ public class BasicViewController {
 		return "index";	
 	}
 	
+	@RequestMapping(path="fix-subtitle-encoding")
+	public String fixSubtitleEncodingSeoPage(HttpServletRequest request) {
+		log.info("fix-subtitle-encoding");
+		return "index";	
+	}
+	
+	@RequestMapping(path="subtitle-fixer")
+	public String subtitleFixerSeoPage(HttpServletRequest request) {
+		log.info("subtitle-fixer");
+		return "index";	
+	}
+	@RequestMapping(path="srt-converter-online")
+	public String srtConverterOnlineSeoPage(HttpServletRequest request) {
+		log.info("srt-converter-online");
+		return "index";	
+	}
+	
+	
 }
 
 

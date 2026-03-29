@@ -8,13 +8,16 @@ import ToSrtConverter from '@/components/ToSrtConverter.vue'
 import ToVttConverter from '@/components/ToVttConverter.vue'
 import ToAssConverter from '@/components/ToAssConverter.vue'
 import SubtitleTranslations from '@/components/SubtitleTranslations.vue'
+import FixSubtitleEncodingComponent from '@/components/seo/FixSubtitleEncodingComponent.vue'
+import SubtitleFixerComponent from '@/components/seo/SubtitleFixerComponent.vue'
+import SrtConverterOnlineComponent from '@/components/seo/SrtConverterOnlineComponent.vue'
 
 const routes = [
     {
         path: '/',
         component: Home,
         meta: {
-            title: 'Subtitles Corrector',
+            title: 'Subtitles Corrector - fix subtitle problems',
             //use default description
         }
 
@@ -75,6 +78,33 @@ const routes = [
             description: 'Translate subtitle file to another language.'
         }
     },
+        {
+        path: '/fix-subtitle-encoding',
+        component: FixSubtitleEncodingComponent,
+        meta: {
+            title: 'Fix Subtitle Encoding Issues (SRT, UTF-8, Broken Characters)',
+            description: 'Subtitles showing weird characters like Å½ or Ä‡? Fix encoding issues instantly. Convert SRT files to UTF-8 and repair broken subtitles online.'
+        }
+    },
+        {
+        path: '/subtitle-fixer',
+        component: SubtitleFixerComponent,
+        meta: {
+            title: 'Subtitle Fixer - Repair Broken Subtitles Online (Free Tool)',
+            description: 'Fix subtitle files with one click. Repair encoding, sync timing, remove errors, and clean subtitles online for free.'
+        }
+    },
+        {
+        path: '/srt-converter-online',
+        component: SrtConverterOnlineComponent,
+        meta: {
+            title: 'SRT Converter Online - Convert Subtitles to SRT Format Free',
+            description: 'Convert subtitles to SRT format instantly. Supports multiple formats, fast and free. No installation needed.'
+        }
+    }
+    
+
+    
 ]
 
 export const router = createRouter({
