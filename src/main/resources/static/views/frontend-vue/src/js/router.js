@@ -11,6 +11,8 @@ import SubtitleTranslations from '@/components/SubtitleTranslations.vue'
 import FixSubtitleEncodingComponent from '@/components/seo/FixSubtitleEncodingComponent.vue'
 import SubtitleFixerComponent from '@/components/seo/SubtitleFixerComponent.vue'
 import SrtConverterOnlineComponent from '@/components/seo/SrtConverterOnlineComponent.vue'
+import SubtitleEditorOnlineComponent from '@/components/seo/SubtitleEditorOnlineComponent.vue'
+import SubtitleShifterOnlineComponent from '@/components/seo/SubtitleShifterOnlineComponent.vue'
 
 const routes = [
     {
@@ -101,9 +103,23 @@ const routes = [
             title: 'SRT Converter Online - Convert Subtitles to SRT Format Free',
             description: 'Convert subtitles to SRT format instantly. Supports multiple formats, fast and free. No installation needed.'
         }
+    },
+        {
+        path: '/subtitle-editor-online',
+        component: SubtitleEditorOnlineComponent,
+        meta: {
+            title: 'Subtitle Editor Online - Edit and Fix Subtitles Easily',
+            description: 'Edit your subtitle files directly in your browser with a simple and powerful online subtitle editor'
+        }
+    },
+        {
+        path: '/subtitle-shifter-online',
+        component: SubtitleShifterOnlineComponent,
+        meta: {
+            title: 'Subtitle Shifter Online - Sync Subtitles Forward or Backward',
+            description: 'Easily shift subtitles forward or backward to match your video timing. Fix subtitle delays in seconds using this simple online subtitle sync tool.'
+        }
     }
-    
-
     
 ]
 

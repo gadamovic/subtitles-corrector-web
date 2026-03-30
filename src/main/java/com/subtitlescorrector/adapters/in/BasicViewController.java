@@ -86,7 +86,16 @@ public class BasicViewController {
 		log.info("srt-converter-online");
 		return "index";	
 	}
-	
+	@RequestMapping(path="subtitle-editor-online")
+	public String subtitleEditorOnlineSeoPage(HttpServletRequest request) {
+		log.info("subtitle-editor-online");
+		return "index";	
+	}
+	@RequestMapping(path="subtitle-shifter-online")
+	public String subtitleShifterOnlineSeoPage(HttpServletRequest request) {
+		log.info("subtitle-shifter-online");
+		return "index";	
+	}
 	
 }
 
