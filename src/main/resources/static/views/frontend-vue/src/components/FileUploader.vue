@@ -39,15 +39,14 @@
 
 
     <div class="box mb-3">
-        <p class="title is-5 has-text-centered mb-3">AI options (experimental)</p>
+        <p class="title is-5 has-text-centered mb-3">AI options</p>
         <div class="checkboxes">
           <label class="checkbox">
             <input type="checkbox" @click="toggleAi"/>
             AI correction
           </label>
-          <i>Give AI a try at correcting your file! Keep in mind that AI can make mistakes and this
-            feature is still in experimental phase.</i>
       </div>
+      <i>Automatically <strong>fix subtitle grammar, spelling, and readability</strong> using AI.</i>
     </div>
 
     <div class="box mb-3">

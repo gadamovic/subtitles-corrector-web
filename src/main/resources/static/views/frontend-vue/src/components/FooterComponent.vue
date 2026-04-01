@@ -10,7 +10,8 @@
           <a href="/subtitle-fixer">Subtitle fixer</a> |
           <a href="/srt-converter-online">Srt converter online</a> |
           <a href="/subtitle-editor-online">Subtitle editor online</a> |
-          <a href="/subtitle-shifter-online">Subtitle shifter online</a>
+          <a href="/subtitle-shifter-online">Subtitle shifter online</a> |
+          <a href="/ai-subtitle-fixer">AI Subtitle fixer</a>
         </p>
       </div>
 

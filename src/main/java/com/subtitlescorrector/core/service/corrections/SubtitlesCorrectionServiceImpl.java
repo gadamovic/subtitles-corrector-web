@@ -3,9 +3,12 @@ package com.subtitlescorrector.core.service.corrections;
 import java.io.File;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.subtitlescorrector.adapters.in.BasicViewController;
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.BomData;
@@ -28,6 +31,8 @@ import com.subtitlescorrector.core.util.Util;
 @Service
 public class SubtitlesCorrectionServiceImpl implements SubtitlesCorrectionService {
 
+	Logger log = LoggerFactory.getLogger(SubtitlesCorrectionServiceImpl.class);
+	
 	@Autowired
 	SubtitlesProcessorFactory processorFactory;
 	
@@ -51,6 +56,8 @@ public class SubtitlesCorrectionServiceImpl implements SubtitlesCorrectionServic
 		BomData bomData = new BomData();
 		
 		handleBOM(clientParameters, bomData, lines);
+		
+		logUserParameters(clientParameters);
 		
 		String jsonData = null;
 		
@@ -96,6 +103,10 @@ public class SubtitlesCorrectionServiceImpl implements SubtitlesCorrectionServic
 		
 	}
 	
+	private void logUserParameters(AdditionalData userParameters) {
+		log.info(userParameters.toString());
+	}
+
 	/**
 	 * BOM is actually added and removed in converters. Here we just set BOM related parameters to SubtitleFileData object
 	 * and send message about correction to the client if needed

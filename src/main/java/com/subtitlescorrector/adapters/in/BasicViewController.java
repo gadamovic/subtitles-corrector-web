@@ -54,7 +54,6 @@ public class BasicViewController {
 	public String toVttConverter(HttpServletRequest request) {
 		log.info("to-vtt-converter");
 		return "index";
-		
 	}
 
 	@RequestMapping(path="to-ass-converter")
@@ -94,6 +93,11 @@ public class BasicViewController {
 	@RequestMapping(path="subtitle-shifter-online")
 	public String subtitleShifterOnlineSeoPage(HttpServletRequest request) {
 		log.info("subtitle-shifter-online");
+		return "index";	
+	}
+	@RequestMapping(path="ai-subtitle-fixer")
+	public String aiSubtitlesCorrectorSeoPage(HttpServletRequest request) {
+		log.info("ai-subtitle-fixer");
 		return "index";	
 	}
 	

@@ -13,6 +13,7 @@ import SubtitleFixerComponent from '@/components/seo/SubtitleFixerComponent.vue'
 import SrtConverterOnlineComponent from '@/components/seo/SrtConverterOnlineComponent.vue'
 import SubtitleEditorOnlineComponent from '@/components/seo/SubtitleEditorOnlineComponent.vue'
 import SubtitleShifterOnlineComponent from '@/components/seo/SubtitleShifterOnlineComponent.vue'
+import AiSubtitleFixerComponent from '@/components/seo/AiSubtitleFixerComponent.vue'
 
 const routes = [
     {
@@ -118,6 +119,14 @@ const routes = [
         meta: {
             title: 'Subtitle Shifter Online - Sync Subtitles Forward or Backward',
             description: 'Easily shift subtitles forward or backward to match your video timing. Fix subtitle delays in seconds using this simple online subtitle sync tool.'
+        }
+    },
+    {
+        path: '/ai-subtitle-fixer',
+        component: AiSubtitleFixerComponent,
+        meta: {
+            title: 'AI Subtitle Fixer Online - Fix Grammar & Improve Readability',
+            description: 'Automatically fix subtitle grammar, spelling, and readability using AI Upload your subtitle file and let the tool analyze and improve each line in seconds.'
         }
     }
     

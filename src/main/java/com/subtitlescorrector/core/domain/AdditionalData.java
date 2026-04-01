@@ -164,4 +164,17 @@ public class AdditionalData {
 	public void setOriginalFilename(String originalFilename) {
 		this.originalFilename = originalFilename;
 	}
+
+	@Override
+	public String toString() {
+		return "AdditionalData [stripBTags=" + stripBTags + ", stripITags=" + stripITags + ", stripUTags=" + stripUTags
+				+ ", stripFontTags=" + stripFontTags + ", correctorIndex=" + correctorIndex + ", keepBOM=" + keepBOM
+				+ ", aeToTj=" + aeToTj + ", AEToTJ=" + AEToTJ + ", eToch=" + eToch + ", EToCH=" + EToCH + ", aiEnabled="
+				+ aiEnabled + ", numberOfCorrectors=" + numberOfCorrectors + ", processedLines=" + processedLines
+				+ ", totalNumberOfLines=" + totalNumberOfLines + ", targetConversionFormat=" + targetConversionFormat
+				+ ", originalFilename=" + originalFilename + "]";
+	}
+	
+	
+	
 }
