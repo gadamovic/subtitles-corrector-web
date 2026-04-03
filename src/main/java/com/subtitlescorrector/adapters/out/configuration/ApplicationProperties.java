@@ -46,6 +46,8 @@ public class ApplicationProperties {
 
 	private static final String SUBTITLES_PER_USER_PER_TIME_INTERVAL_LIMIT_KEY = "subtitles.subtitles_per_user_per_time_interval_limit_key";
 	private static final String SUBTITLES_FILE_SIZE_PER_USER_KB_KEY = "subtitles.subtitles_file_size_per_user_kb_limit_key";
+	private static final String DEEPL_API_PRO_URL_KEY = "subtitle.translation.deepl.url.pro";
+	private static final String DEEPL_API_FREE_URL_KEY = "subtitle.translation.deepl.url.free";
 	
 	public void init() {
 		
@@ -176,6 +178,14 @@ public class ApplicationProperties {
 
 	public Integer getFileSizeUploadLimitKb() {
 		return Integer.parseInt(getProperty(SUBTITLES_FILE_SIZE_PER_USER_KB_KEY));
+	}
+	
+	public String getDeeplUrlPro() {
+		return getProperty(DEEPL_API_PRO_URL_KEY);
+	}
+	
+	public String getDeeplUrlFree() {
+		return getProperty(DEEPL_API_FREE_URL_KEY);
 	}
 	
 }

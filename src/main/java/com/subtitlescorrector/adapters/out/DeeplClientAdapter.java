@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.deepl.DeepLResponse;
 import com.subtitlescorrector.core.domain.deepl.DeepLUsageData;
 import com.subtitlescorrector.core.port.DeepLUsageMetricsPort;
@@ -19,11 +20,14 @@ public class DeeplClientAdapter implements DeeplClientPort{
 	@Autowired
 	DeepLUsageMetricsPort usageMetrics;
 	
+	@Autowired
+	ApplicationProperties properties;
+	
 	WebClient client;
 	
 	public DeeplClientAdapter(WebClient.Builder builder, @Value("${deepl.api.key}") String apiKey) {
 		client = builder
-			    .baseUrl("https://api-free.deepl.com/v2")
+			    .baseUrl(properties.getDeeplUrlPro())
 			    .defaultHeader("Content-Type", "application/json")
 			    .defaultHeader("Authorization", "DeepL-Auth-Key " + apiKey)
 			    .build();
