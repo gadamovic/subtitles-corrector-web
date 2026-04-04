@@ -78,6 +78,7 @@ public class TranslationsController {
 			SubtitleTranslationDataResponse response = translationService.translate(storedFile, file.getOriginalFilename(), TranslationLanguage.findByDisplayName(language));
 			return ResponseEntity.ok(response);
 		}catch(Exception exception) {
+			log.error(exception.getMessage(), exception);
 			return getInvalidResponseEntity(HttpStatus.BAD_REQUEST, exception.getMessage());
 		}
 	}
