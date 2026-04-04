@@ -7,8 +7,8 @@
   
               <h2 class="has-mw-xl mt-8 mb-8 mb-12-desktop title is-1 is-size-2-mobile">Polish Your Subtitles with Ease.
               </h2>
-              <p class="has-mw-lg mb-8 mb-12-desktop is-size-5 has-text-grey-dark">With <span class="has-text-success">Subtitles Corrector</span> you can easily fix character encoding,
-                formatting and synchronization issues, edit and translate subtitles, ensuring your subtitle files are clean, accurate, and ready for
+              <p class="has-mw-lg mb-8 mb-12-desktop is-size-5 has-text-grey-dark">With <span class="has-text-success">Subtitles Corrector</span> you can easily edit your subtitles, fix character encoding,
+                formatting and synchronization issues, ensuring your subtitle files are clean, accurate, and ready for
                 use.
               </p>
   
@@ -39,12 +39,6 @@
                       <i class="fas fa-check"></i>
                     </span>
                     <span>Automatically update your <b>encoding</b> to <b>UTF-8</b> to support wide range of characters by simply uploading a subtitle file.</span>
-                  </li>
-                  <li class="is-flex is-align-items-center my-3">
-                    <span class="icon has-text-success mr-2">
-                      <i class="fas fa-check"></i>
-                    </span>
-                    <span><b>Translate</b> subtitle files.</span>
                   </li>
                   <li class="is-flex is-align-items-center my-3">
                     <span class="icon has-text-success mr-2">

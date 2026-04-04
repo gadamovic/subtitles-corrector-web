@@ -14,4 +14,6 @@ public interface EditDistanceService {
 	 */
 	List<EditOperation> getEditOperations(String source, String target);
 
+	int getEditDistance(String source, String target);
+	
 }

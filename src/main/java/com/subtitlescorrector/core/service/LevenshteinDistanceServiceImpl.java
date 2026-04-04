@@ -22,6 +22,20 @@ import com.subtitlescorrector.core.util.Util;
 @Service
 public class LevenshteinDistanceServiceImpl implements EditDistanceService {
 
+	@Override
+	public int getEditDistance(String str1, String str2) {
+
+		int[][] dpTable = generateLevenshteinDpTable(str1, str2);
+
+		if (dpTable.length > 0 && dpTable[0].length > 0) {
+			int dimX = dpTable.length;
+			int dimY = dpTable[0].length;
+			return dpTable[dimX-1][dimY-1];
+		} else {
+			return -1;
+		}
+	}
+	
 	/**
 	 * Returns all edit operations including 'keep' (no change) operation resulting
 	 * in the entire target string

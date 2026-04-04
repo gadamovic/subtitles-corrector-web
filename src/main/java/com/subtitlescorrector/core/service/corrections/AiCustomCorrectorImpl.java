@@ -28,6 +28,7 @@ import com.subtitlescorrector.core.domain.ai.CorrectionResponse;
 import com.subtitlescorrector.core.domain.ai.CorrectionsWrapper;
 import com.subtitlescorrector.core.domain.ai.LineForAiCorrection;
 import com.subtitlescorrector.core.port.AiServicePort;
+import com.subtitlescorrector.core.service.EditDistanceService;
 import com.subtitlescorrector.core.service.websocket.WebSocketMessageSender;
 import com.subtitlescorrector.core.util.Util;
 
@@ -41,6 +42,8 @@ import jakarta.annotation.PostConstruct;
  *
  */
 public class AiCustomCorrectorImpl implements AiCustomCorrector{
+
+	private static final double CHANGE_AMOUNT_THRESHOLD = 0.3;
 
 	private static final String CORRECTION_AI_PROMPT_TXT_FILE_PATH = "openAiCorrectionPrompt.txt";
 
@@ -59,6 +62,9 @@ public class AiCustomCorrectorImpl implements AiCustomCorrector{
 	
 	@Autowired
 	ExecutorService executorService;
+	
+	@Autowired
+	EditDistanceService editDistanceService;
 	
 	String promptTemplate = null;
 	
@@ -145,13 +151,36 @@ public class AiCustomCorrectorImpl implements AiCustomCorrector{
 					responsesByLineNumber.get(number).get(0) : null;
 			
 			if(resp != null && !resp.getDescription().equals("-1")) {
-				line = util.checkForChanges(resp.getCorrection(), line, resp.getDescription(), 100);
+				
+				String corrected = resp.getCorrection();
+				String original = line;
+				
+				if(shouldApplyCorrection(corrected, original)) {
+					line = util.checkForChanges(resp.getCorrection(), line, resp.getDescription(), 100);
+				}
 			}
 			
 			aiLine.setText(line);
 		}
 	}
 	
+	private boolean shouldApplyCorrection(String corrected, String original) {
+		
+		int editDistance = editDistanceService.getEditDistance(corrected, original);
+		if(editDistance == 0) {
+			return false;
+		}
+		
+		int originalLength = original.length();
+		if(((double) editDistance / (double) originalLength) > CHANGE_AMOUNT_THRESHOLD) {
+			//If AI made too much changes, discard correction
+			log.info("Discarding AI correction as it introduced to many changes. Original:[{}], Corrected: [{}]", original, corrected);
+			return false;
+		}
+		
+		return true;
+	}
+
 	private Map<Integer, List<LineForAiCorrection>> partitionSubUnits(List<LineForAiCorrection> data, int chunkSize) {
 		
 		AtomicInteger i = new AtomicInteger(0);

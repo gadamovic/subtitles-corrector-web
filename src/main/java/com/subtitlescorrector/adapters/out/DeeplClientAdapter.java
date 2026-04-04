@@ -12,7 +12,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.subtitlescorrector.core.domain.deepl.DeepLResponse;
 import com.subtitlescorrector.core.domain.deepl.DeepLUsageData;
 import com.subtitlescorrector.core.domain.translation.TranslationResponse;
-import com.subtitlescorrector.core.port.DeepLUsageMetricsPort;
 import com.subtitlescorrector.core.port.TranslationPort;
 
 @Service
@@ -20,7 +19,7 @@ import com.subtitlescorrector.core.port.TranslationPort;
 public class DeeplClientAdapter implements TranslationPort{
 
 	@Autowired
-	DeepLUsageMetricsPort usageMetrics;
+	//DeepLUsageMetricsPort usageMetrics;
 	
 	WebClient client;
 	

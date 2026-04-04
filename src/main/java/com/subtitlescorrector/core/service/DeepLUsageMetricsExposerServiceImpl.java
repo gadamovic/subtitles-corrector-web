@@ -41,9 +41,10 @@ public class DeepLUsageMetricsExposerServiceImpl implements DeepLUsageMetricsExp
 		usageMetrics.updatePercentUsed((double) current / (double) limit * 100.0);
 	}
 	
-	@PostConstruct
-	public void doReportUsage() {
-		scheduledExecutorService.scheduleAtFixedRate(() -> reportUsage(), 5, 60, TimeUnit.MINUTES);
-	}
+// Disabled
+//	@PostConstruct
+//	public void doReportUsage() {
+//		scheduledExecutorService.scheduleAtFixedRate(() -> reportUsage(), 5, 60, TimeUnit.MINUTES);
+//	}
 	
 }

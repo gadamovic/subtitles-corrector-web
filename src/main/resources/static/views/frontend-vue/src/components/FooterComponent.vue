@@ -11,7 +11,7 @@
           <a href="/srt-converter-online">Srt converter online</a> |
           <a href="/subtitle-editor-online">Subtitle editor online</a> |
           <a href="/subtitle-shifter-online">Subtitle shifter online</a> |
-          <a href="/ai-subtitle-fixer">AI Subtitle fixer</a>
+          <a href="/ai-subtitle-fixer">AI subtitle fixer</a>
         </p>
       </div>
 
