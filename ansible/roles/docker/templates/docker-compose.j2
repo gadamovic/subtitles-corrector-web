@@ -127,12 +127,12 @@ services:
      - /home/ec2-user/subtitles-corrector-files/docker-volumes/loki:/loki
      - /home/ec2-user/subtitles-corrector-files/docker-volumes/loki-config:/etc/loki
 
-  libretranslate:
-    image: libretranslate/libretranslate:v1.9.5-cuda
-    container_name: libretranslate
-    restart: unless-stopped
-    ports:
-      - "5000:5000"
+#  libretranslate:
+#    image: libretranslate/libretranslate:v1.9.5-cuda
+#    container_name: libretranslate
+#    restart: unless-stopped
+#    ports:
+#      - "5000:5000"
 
 volumes:
   prometheus-data:
