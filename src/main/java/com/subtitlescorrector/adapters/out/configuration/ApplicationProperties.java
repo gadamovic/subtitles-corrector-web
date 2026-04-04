@@ -48,6 +48,7 @@ public class ApplicationProperties {
 	private static final String SUBTITLES_FILE_SIZE_PER_USER_KB_KEY = "subtitles.subtitles_file_size_per_user_kb_limit_key";
 	private static final String DEEPL_API_PRO_URL_KEY = "subtitle.translation.deepl.url.pro";
 	private static final String DEEPL_API_FREE_URL_KEY = "subtitle.translation.deepl.url.free";
+	private static final String LIBRETRANSLATE_API_URL_KEY = "subtitle.translation.libre.url";
 	
 	public void init() {
 		
@@ -186,6 +187,10 @@ public class ApplicationProperties {
 	
 	public String getDeeplUrlFree() {
 		return getProperty(DEEPL_API_FREE_URL_KEY);
+	}
+	
+	public String getLibreTranslateUrl() {
+		return getProperty(LIBRETRANSLATE_API_URL_KEY);
 	}
 	
 }
