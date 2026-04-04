@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.core.domain.deepl.DeepLUsageData;
 import com.subtitlescorrector.core.port.DeepLUsageMetricsPort;
-import com.subtitlescorrector.core.port.DeeplClientPort;
+import com.subtitlescorrector.core.port.TranslationPort;
 
 import jakarta.annotation.PostConstruct;
 
@@ -23,7 +23,7 @@ public class DeepLUsageMetricsExposerServiceImpl implements DeepLUsageMetricsExp
 	DeepLUsageMetricsPort usageMetrics;
 	
 	@Autowired
-	DeeplClientPort deepLClient;
+	TranslationPort deepLClient;
 	
 	@Autowired
 	ScheduledExecutorService scheduledExecutorService;

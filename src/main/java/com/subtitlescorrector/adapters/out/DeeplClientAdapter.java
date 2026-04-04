@@ -11,12 +11,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.subtitlescorrector.core.domain.deepl.DeepLResponse;
 import com.subtitlescorrector.core.domain.deepl.DeepLUsageData;
+import com.subtitlescorrector.core.domain.translation.TranslationResponse;
 import com.subtitlescorrector.core.port.DeepLUsageMetricsPort;
-import com.subtitlescorrector.core.port.DeeplClientPort;
+import com.subtitlescorrector.core.port.TranslationPort;
 
 @Service
 @PropertySource("classpath:businessProperties.properties")
-public class DeeplClientAdapter implements DeeplClientPort{
+public class DeeplClientAdapter implements TranslationPort{
 
 	@Autowired
 	DeepLUsageMetricsPort usageMetrics;
@@ -32,7 +33,7 @@ public class DeeplClientAdapter implements DeeplClientPort{
 			    .build();
 	}
 	
-	public DeepLResponse translate(List<String> lines, String isoLanguage){	
+	public TranslationResponse translate(List<String> lines, String isoLanguage){	
 		
 		DeepLResponse response = client.post()
 		    .uri("/translate")
@@ -41,7 +42,7 @@ public class DeeplClientAdapter implements DeeplClientPort{
 		    .bodyToMono(DeepLResponse.class)
 		    .block();
 		
-		return response;
+		return response.toTranslationResponse();
 	}
 
 	@Override

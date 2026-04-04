@@ -16,17 +16,17 @@ import com.subtitlescorrector.core.domain.UserData;
 import com.subtitlescorrector.core.domain.UserSubtitleCorrectionCurrentVersionMetadata;
 import com.subtitlescorrector.core.domain.ass.AssSubtitleFileData;
 import com.subtitlescorrector.core.domain.ass.AssSubtitleUnitData;
-import com.subtitlescorrector.core.domain.deepl.DeepLResponse;
-import com.subtitlescorrector.core.domain.deepl.DeepLTranslation;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
 import com.subtitlescorrector.core.domain.translation.SubtitleTranslationDataResponse;
 import com.subtitlescorrector.core.domain.translation.TranslationLanguage;
+import com.subtitlescorrector.core.domain.translation.TranslationLine;
+import com.subtitlescorrector.core.domain.translation.TranslationResponse;
 import com.subtitlescorrector.core.domain.vtt.VttSubtitleFileData;
 import com.subtitlescorrector.core.domain.vtt.VttSubtitleUnitData;
-import com.subtitlescorrector.core.port.DeeplClientPort;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
+import com.subtitlescorrector.core.port.TranslationPort;
 import com.subtitlescorrector.core.service.DeepLUsageMetricsExposerService;
 import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleLinesToSubtitleUnitDataParser;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleLinesToSubtitleUnitDataParser;
@@ -47,7 +47,7 @@ public class TranslationServiceImpl implements TranslationService{
 	SubtitlesCloudStoragePort s3Service;
 	
 	@Autowired
-	DeeplClientPort deepLClient;
+	TranslationPort translator;
 	
 	@Autowired
 	ExternalCacheServicePort redisService;
@@ -99,12 +99,12 @@ public class TranslationServiceImpl implements TranslationService{
 			SrtSubtitleFileData srtFileData = srtParser.convertToSubtitleUnits(lines);
 
 			response.setNumberOfLines(srtFileData.getLines().size());
-			DeepLResponse translatedSrt = deepLClient.translate(srtFileData.getLines().stream()
+			TranslationResponse translatedSrt = translator.translate(srtFileData.getLines().stream()
 				.map(SrtSubtitleUnitData::getText)
 				.toList(), language.getIsoCode());
 			
 			List<String> translatedLinesSrt = translatedSrt.getTranslations().stream()
-				.map(DeepLTranslation::getText)
+				.map(TranslationLine::getText)
 				.toList();
 	
 			if(translatedLinesSrt.size() == srtFileData.getLines().size()) {
@@ -123,12 +123,12 @@ public class TranslationServiceImpl implements TranslationService{
 			VttSubtitleFileData vttFileData = vttParser.convertToSubtitleUnits(lines);
 
 			response.setNumberOfLines(vttFileData.getLines().size());
-			DeepLResponse translated = deepLClient.translate(vttFileData.getLines().stream()
+			TranslationResponse translated = translator.translate(vttFileData.getLines().stream()
 					.map(VttSubtitleUnitData::getText)
 					.toList(), language.getIsoCode());
 			
 			List<String> translatedLinesVtt = translated.getTranslations().stream()
-			.map(DeepLTranslation::getText)
+			.map(TranslationLine::getText)
 			.toList();
 	
 			if(translatedLinesVtt.size() == vttFileData.getLines().size()) {
@@ -146,12 +146,12 @@ public class TranslationServiceImpl implements TranslationService{
 			AssSubtitleFileData assFileData = assParser.convertToSubtitleUnits(lines);
 
 			response.setNumberOfLines(assFileData.getLines().size());
-			DeepLResponse translatedAss = deepLClient.translate(assFileData.getLines().stream()
+			TranslationResponse translatedAss = translator.translate(assFileData.getLines().stream()
 					.map(AssSubtitleUnitData::getText)
 					.toList(), language.getIsoCode());
 			
 			List<String> translatedLinesAss = translatedAss.getTranslations().stream()
-			.map(DeepLTranslation::getText)
+			.map(TranslationLine::getText)
 			.toList();
 	
 			if(translatedLinesAss.size() == assFileData.getLines().size()) {

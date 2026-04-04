@@ -12,11 +12,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -40,11 +37,12 @@ import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
 import com.subtitlescorrector.core.domain.translation.SubtitleTranslationDataResponse;
 import com.subtitlescorrector.core.domain.translation.TranslationLanguage;
+import com.subtitlescorrector.core.domain.translation.TranslationResponse;
 import com.subtitlescorrector.core.domain.vtt.VttSubtitleFileData;
 import com.subtitlescorrector.core.domain.vtt.VttSubtitleUnitData;
-import com.subtitlescorrector.core.port.DeeplClientPort;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.port.SubtitlesCloudStoragePort;
+import com.subtitlescorrector.core.port.TranslationPort;
 import com.subtitlescorrector.core.service.DeepLUsageMetricsExposerService;
 import com.subtitlescorrector.core.service.corrections.ass.AssSubtitleLinesToSubtitleUnitDataParser;
 import com.subtitlescorrector.core.service.corrections.srt.SrtSubtitleLinesToSubtitleUnitDataParser;
@@ -71,7 +69,7 @@ public class TranslationServiceTest {
 	SubtitlesCloudStoragePort s3Service;
 
 	@Mock
-	DeeplClientPort deepLClient;
+	TranslationPort deepLClient;
 
 	@Mock
 	ExternalCacheServicePort redisService;
@@ -371,14 +369,14 @@ public class TranslationServiceTest {
 		return assFileData;
 	}
 
-	private DeepLResponse createDeeplTranslateResponse() {
+	private TranslationResponse createDeeplTranslateResponse() {
 
 		DeepLResponse resp = new DeepLResponse();
 		DeepLTranslation translation = new DeepLTranslation();
 		translation.setDetectedSourceLanguage("source language");
 		translation.setText(TRANSLATED);
 		resp.setTranslations(Collections.singletonList(translation));
-		return resp;
+		return resp.toTranslationResponse();
 	}
 
 }
