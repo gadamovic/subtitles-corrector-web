@@ -2,9 +2,11 @@ package com.subtitlescorrector.core.service.corrections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.subtitlescorrector.core.domain.AdditionalData;
+import com.subtitlescorrector.core.domain.UserData;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
 
 @Service
@@ -12,8 +14,15 @@ public class InvalidCharactersCorrector extends AbstractCorrector{
 
 	Logger log = LoggerFactory.getLogger(InvalidCharactersCorrector.class);
 
+	@Autowired
+	UserData user;
+	
 	@Override
 	public String correct(String text, CorrectorParameters params, float processedPercentage) {
+		
+		if(!user.isHasInvalidCyrillic()) {
+			return text;
+		}
 		
 		String tmp = "";
 		String beforeCorrection = text;

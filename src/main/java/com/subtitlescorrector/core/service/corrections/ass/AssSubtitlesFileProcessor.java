@@ -89,6 +89,7 @@ public class AssSubtitlesFileProcessor{
 			
 			String s3Key = user.getWebSocketSessionId() + "_" + storedFile.getName();
 			s3Service.storeIfProd("v1_" + s3Key, storedFile);
+			Util.setInvalidCyrillicFlag(lines, user);
 			
 			Charset detectedEncoding = FileUtil.detectEncodingOfFile(storedFile);
 			

@@ -31,6 +31,7 @@ import com.subtitlescorrector.core.domain.EditOperation;
 import com.subtitlescorrector.core.domain.SubtitleConversionFileDataResponse;
 import com.subtitlescorrector.core.domain.SubtitleCorrectionEvent;
 import com.subtitlescorrector.core.domain.SubtitleFormat;
+import com.subtitlescorrector.core.domain.UserData;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleFileData;
 import com.subtitlescorrector.core.domain.srt.SrtSubtitleUnitData;
 import com.subtitlescorrector.core.service.conversion.VttSubtitleConversionFileData;
@@ -338,6 +339,20 @@ public class Util {
 		}else {
 			data.setHasBom(false);
 		}
+	}
+
+	public static void setInvalidCyrillicFlag(List<String> lines, UserData user) {
+		String joined = lines.stream().reduce("", (a, b) -> a.concat(b));
+		boolean hasInvalidCyrillic = (joined.contains("æ") || joined.contains("Æ")) &&
+				(joined.contains("è") || joined.contains("È"));
+		
+		if(hasInvalidCyrillic) {
+			log.info("Lines contain invalid Cyrillic");
+		}else {
+			log.info("Lines doesn't contain invalid Cyrillic");
+		}
+		
+		user.setHasInvalidCyrillic(hasInvalidCyrillic);
 	}
 	
 }

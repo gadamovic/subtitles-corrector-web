@@ -97,8 +97,7 @@
             Yes, you can see all changes in real time and review them later in the diff view.</p>
 
             <p><strong>What formats are supported?</strong><br>
-            SRT, VTT, and other common subtitle formats are supported.</p>
-
+            Currently SRT and VTT subtitle formats are supported.</p>
             </div>
         </div>
     </div>

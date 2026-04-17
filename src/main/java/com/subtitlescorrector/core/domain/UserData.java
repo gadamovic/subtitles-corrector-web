@@ -12,6 +12,7 @@ public class UserData {
 	private String userId;
 	private String webSocketSessionId;
 	private String userIp;
+	private boolean hasInvalidCyrillic;
 	
 	public String getUserId() {
 		return userId;
@@ -31,6 +32,11 @@ public class UserData {
 	public String getUserUp() {
 		return this.userIp;
 	}
-	
+	public boolean isHasInvalidCyrillic() {
+		return hasInvalidCyrillic;
+	}
+	public void setHasInvalidCyrillic(boolean hasInvalidCyrillic) {
+		this.hasInvalidCyrillic = hasInvalidCyrillic;
+	}
 	
 }
