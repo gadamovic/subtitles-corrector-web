@@ -124,6 +124,13 @@
               'Content-Type': 'application/json',
             }),
           });
+        } else {
+          fetch('api/rest/1.0/logUser', {
+            method: 'POST',
+            headers: new Headers({
+              'Content-Type': 'application/json',
+            }),
+          });
         }
       }
     },

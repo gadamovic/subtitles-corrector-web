@@ -349,7 +349,7 @@ public class Util {
 		if(hasInvalidCyrillic) {
 			log.info("Lines contain invalid Cyrillic");
 		}else {
-			log.info("Lines doesn't contain invalid Cyrillic");
+			log.info("Lines don't contain invalid Cyrillic");
 		}
 		
 		user.setHasInvalidCyrillic(hasInvalidCyrillic);

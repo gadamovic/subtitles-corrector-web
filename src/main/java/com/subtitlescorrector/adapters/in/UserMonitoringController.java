@@ -17,11 +17,15 @@ public class UserMonitoringController {
 	Logger log = LoggerFactory.getLogger(UserMonitoringController.class);
 	
 	@RequestMapping(path = "/logUser", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public void logUser(@RequestBody LogUserDataHolder data) {
+	public void logUser(@RequestBody(required = false) LogUserDataHolder data) {
 		
-		data.putAllIntoMDC();
-		log.info("LogUserDataHolder");
-		data.clearFromMDC();
+		if(data != null) {
+			data.putAllIntoMDC();
+			log.info("LogUserDataHolder");
+			data.clearFromMDC();
+		}else {
+			log.info("LogUserDataHolder");
+		}
 
 	}
 
