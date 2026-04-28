@@ -74,6 +74,7 @@ public class AssSubtitleLinesToSubtitleUnitDataParser {
 					String end = parts[format.indexOf("End")];
 					String text = parts[format.indexOf("Text")];
 					text = STYLE_PATTERN.matcher(text).replaceAll("");
+					text = text.replaceAll("\\\\[Nn]", "\n"); // Replace literal \n or \N with new line character
 					
 					AssSubtitleUnitData subUnit = new AssSubtitleUnitData();
 					subUnit.setFormat(SubtitleFormat.ASS);

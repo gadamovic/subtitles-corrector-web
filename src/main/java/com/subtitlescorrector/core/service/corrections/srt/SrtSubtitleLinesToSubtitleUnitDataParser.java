@@ -53,6 +53,8 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 		try {
 			for(String line : lines) {
 				
+				line = line.trim();
+				
 				//ignore multiple consecutive blank lines
 				i++;
 				if(StringUtils.isBlank(line) && (i < lines.size()) && StringUtils.isBlank(lines.get(i + 1))) {

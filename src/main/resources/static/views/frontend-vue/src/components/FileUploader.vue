@@ -263,6 +263,7 @@ export default {
             this.error = "Submission failed!";
           }
           this.loading = false;
+          this.showModal = false;
         }
       } catch (err) {
         console.error("Error:", err);
