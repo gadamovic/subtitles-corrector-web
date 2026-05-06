@@ -10,17 +10,44 @@
                 </p>
 
                 <ul>
-                <li>Život je lep → Å½ivot je lep</li>
-                <li>Č → È</li>
-                <li>Ć → Æ</li>
-                <li>Snimićemo film. Obećavam. → Snimiæemo film. Obeæavam.</li>
+                <li>Å½ivot je lep</li>
+                <li>Snimiæemo film. Obeæavam.</li>
+                <li>No sй cymo leer, Srta.</li>
+                <li>ïEs cuchara?</li>
                 </ul>
-
-                <p>This type of encoding problems are particularly common among Slavic / Balkan languages.</p>
 
                 <p>
                 You're dealing with a <strong>subtitle encoding issue</strong>. This usually happens when subtitle files are saved in the wrong character format (like ANSI instead of UTF-8).
                 </p>
+
+                <p>This type of encoding problems are common among Slavic / Balkan and Spanish languages.</p>
+
+                <p>After processing your file, this are corrections you can expect:</p>
+
+                <ul>
+                <li>Å½ivot je lep → Život je lep</li>
+                <li>È → Č</li>
+                <li>Æ → Ć</li>
+                <li>Snimiæemo film. Obeæavam. → Snimićemo film. Obećavam.</li>
+                <li>æ → ć</li>
+                </ul>
+
+                <p>Example with Spanish subtitles:</p>
+
+                <ul>
+                <li>No sй cymo leer, Srta. → No sé cómo leer, Srta.</li>
+                <li>й → é</li>
+                <li>y → ó</li>
+                <li>ïEs cuchara? → ¿Es cuchara?</li>
+                <li>ï → ¿</li>
+                </ul>
+
+                <div class="image-stack">
+                <p>Before:</p>
+                <img src="@/assets/subtitles-seo/windows-1252-spanish-2.png" alt="Spanish subtitles before" width="350px" /><br/>
+                <p>After:</p>
+                <img src="@/assets/subtitles-seo/windows-utf8-spanish-2.png" alt="Spanish subtitles after" width="350px"/>
+                </div>
 
                 <h2>How to Fix Subtitle Encoding Issues</h2>
 

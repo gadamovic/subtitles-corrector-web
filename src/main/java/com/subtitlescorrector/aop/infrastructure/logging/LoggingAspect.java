@@ -1,5 +1,6 @@
 package com.subtitlescorrector.aop.infrastructure.logging;
 
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,6 +46,12 @@ public class LoggingAspect {
 	            (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 		
 		String url = attrs.getRequest().getRequestURI().toString();
+		String queryString = attrs.getRequest().getQueryString();
+		
+		if(StringUtils.isNotBlank(queryString)) {
+			url += ("?" + URLDecoder.decode(queryString, "UTF-8"));
+		}
+		
 		mdcParameters.put("uri", url);
 		// For translations
 		if(StringUtils.isNotBlank(attrs.getRequest().getParameter("language"))) {
