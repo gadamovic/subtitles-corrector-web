@@ -85,6 +85,11 @@ public class CorrectionsController {
 		}
 		
 	}
+	
+	@RequestMapping(path="/events/shift", method = RequestMethod.GET)
+	public void logSubtitleShift() {
+		//will be handled by logging aspect
+	}
 
 	private ResponseEntity<SubtitleCorrectionFileDataWebDto> getInvalidResponseEntity(HttpStatus httpStatus, String message) {
 		SubtitleCorrectionFileDataWebDto data = new SubtitleCorrectionFileDataWebDto();

@@ -35,6 +35,9 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 	@Autowired
 	WebSocketMessageSender webSocketMessageSender;
 	
+	@Autowired
+	SrtSyntaxFixer srtFixer;
+	
 	public SrtSubtitleFileData convertToSubtitleUnits(List<String> lines) {
 		
 		SrtSubtitleFileData fileData = new SrtSubtitleFileData();
@@ -51,66 +54,84 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 		int i = -1;
 		
 		try {
-			for(String line : lines) {
+			for(String currentLine : lines) {
 				
-				line = line.trim();
-				
-				//ignore multiple consecutive blank lines
-				i++;
-				if(StringUtils.isBlank(line) && (i < lines.size()) && StringUtils.isBlank(lines.get(i + 1))) {
-					continue;
-				}
-				
-				Integer number = toInteger(line);
-				if(number != null && data == null) {
-					data = new SrtSubtitleUnitData();
-					data.setNumber(number);
-					data.setFormat(SubtitleFormat.SRT);
-					continue;
-				}
-				
-				if(line.contains("-->")) {
-					String from = (line.substring(0, line.indexOf("-->") - 1));
-					String to = line.substring((line.lastIndexOf(" ") + 1), line.length());
+				String line = currentLine.trim();
+
+				try {	
 					
-					SubtitleTimestamp tsFrom = util.parseSubtitleTimestampString(from, SecondMillisecondDelimiterRegex.COMMA);
-					SubtitleTimestamp tsTo = util.parseSubtitleTimestampString(to, SecondMillisecondDelimiterRegex.COMMA);
+					//ignore multiple consecutive blank lines
+					i++;
+					if(StringUtils.isBlank(line) && (i < lines.size()) && StringUtils.isBlank(lines.get(i + 1))) {
+						continue;
+					}
 					
-					tsFrom.setFormattedTimestamp(SubtitleTimestampUtils.formatTimestamp(tsFrom, ","));
-					tsTo.setFormattedTimestamp(SubtitleTimestampUtils.formatTimestamp(tsTo, ","));
-					
-					if(data == null) {
+					Integer number = toInteger(line);
+					if(number != null && data == null) {
 						data = new SrtSubtitleUnitData();
-						log.warn("Subtitle unit was null when --> was found in text!");
-						errorFlags.setInvalidNumbers(true); // If we found --> in text but data is still null, it might mean that line numbers are missing or invalid
-						webSocketMessageSender.sendMessage(createInvalidNumbersCorrectionEvent());
+						data.setNumber(number);
+						data.setFormat(SubtitleFormat.SRT);
+						continue;
 					}
 					
-					data.setTimestampFrom(tsFrom);
-					data.setTimestampTo(tsTo);
+					//Fix potentially invalid timestamp line before parsing it
+					line = srtFixer.validateAndFixTimestampLine(line);
 					
-					continue;
-				}
-				
-				if(StringUtils.isNotBlank(line)) {
-					if(StringUtils.isNotBlank(data.getText())) {
-						data.setText(data.getText() + "\n" + line);
+					if(line.contains("-->")) {
+						
+						//line = srtFixer.validateAndFixTimestamp(line, lines, lines.indexOf(currentLine));
+						
+						String from = (line.substring(0, line.indexOf("-->") - 1));
+						String to = line.substring((line.lastIndexOf(" ") + 1), line.length());
+						
+						SubtitleTimestamp tsFrom = util.parseSubtitleTimestampString(from, SecondMillisecondDelimiterRegex.COMMA);
+						SubtitleTimestamp tsTo = util.parseSubtitleTimestampString(to, SecondMillisecondDelimiterRegex.COMMA);
+						
+						tsFrom.setFormattedTimestamp(SubtitleTimestampUtils.formatTimestamp(tsFrom, ","));
+						tsTo.setFormattedTimestamp(SubtitleTimestampUtils.formatTimestamp(tsTo, ","));
+						
+						if(data == null) {
+							data = new SrtSubtitleUnitData();
+							log.warn("Subtitle unit was null when --> was found in text!");
+							errorFlags.setInvalidNumbers(true); // If we found --> in text but data is still null, it might mean that line numbers are missing or invalid
+							webSocketMessageSender.sendMessage(createInvalidNumbersCorrectionEvent());
+						}
+						
+						data.setTimestampFrom(tsFrom);
+						data.setTimestampTo(tsTo);
+						
+						continue;
+					}
+					
+					if(StringUtils.isNotBlank(line)) {
+						if(StringUtils.isNotBlank(data.getText())) {
+							data.setText(data.getText() + "\n" + line);
+						}else {
+							data.setText(line);
+						}
+						
+						if(i == lines.size()-1) {
+							//last line of the file
+							dataList.add(data);
+							data = null;
+						}
+						
 					}else {
-						data.setText(line);
+						//end of subtitle
+						if(data != null) {
+							dataList.add(data);
+							data = null;
+						}
 					}
-					
-					if(i == lines.size()-1) {
-						//last line of the file
-						dataList.add(data);
-						data = null;
-					}
-					
-				}else {
-					//end of subtitle
-					dataList.add(data);
-					data = null;
-				}
 				
+				
+			}catch(Exception e) {
+				log.error("Skipping invalid line: " + line);
+				data = null;
+				if(StringUtils.isNotBlank(line)) {
+					webSocketMessageSender.sendMessage(createInvalidLineEvent(line));
+				}
+			}
 				
 			}
 			
@@ -127,6 +148,14 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 	private SubtitleCorrectionEvent createInvalidNumbersCorrectionEvent() {
 		SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
 		String message = "Invalid line numbers detected, new valid ones will be generated";
+		log.info(message);
+		event.setCorrection(message);
+		return event;
+	}
+	
+	private SubtitleCorrectionEvent createInvalidLineEvent(String line) {
+		SubtitleCorrectionEvent event = new SubtitleCorrectionEvent();
+		String message = "Skipping invalid line: [" + line + "]";
 		log.info(message);
 		event.setCorrection(message);
 		return event;

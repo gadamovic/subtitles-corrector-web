@@ -91,6 +91,8 @@ export default {
                 return;
             }
 
+            fetch("api/rest/1.0/corrections/events/shift");
+
             this.showInvalidSyncInput = false;
 
             this.isApplySyncLoading = true;
