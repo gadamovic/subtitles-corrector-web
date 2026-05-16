@@ -57,6 +57,12 @@ public class SrtSyntaxFixerTest {
 		
 		assertEquals("00:47:24,737 --> 00:47:26,970", after);
 		
+		before = "00:47:24.737 --> 00:47:26.970";
+		after = fixer.validateAndFixTimestampLine(before);
+		
+		assertEquals("00:47:24,737 --> 00:47:26,970", after);
+		
+		
 	}
 	
 }

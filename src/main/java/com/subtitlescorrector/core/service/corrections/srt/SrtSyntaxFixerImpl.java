@@ -63,39 +63,40 @@ public class SrtSyntaxFixerImpl implements SrtSyntaxFixer {
 	
 	private String normalizeTimestamp(String ts) {
 
+		//this might be handled in parser already
 	    ts = ts.replace('.', ',');
 
 	    if (!ts.contains(",")) {
 	        ts += ",000";
-	    } else {
-
-	        String[] commaSplit = ts.split(",");
-
-	        String millis = commaSplit[1];
-
-	        if (millis.length() == 1) {
-	            millis += "00";
-	        } else if (millis.length() == 2) {
-	            millis += "0";
-	        } else if (millis.length() > 3) {
-	            millis = millis.substring(0, 3);
-	        }
-	        
-	        String[] colonSplit = ts.split(":");
-	        
-	        String seconds = colonSplit[colonSplit.length-1].split(",")[0];
-	        
-	        if(seconds.length() == 1) {
-	        	seconds += "0";
-	        }else if(seconds.length() > 2) {
-	        	seconds = seconds.substring(0, 2);
-	        }
-	        
-	        String[] hourMinuteSecond = commaSplit[0].split(":");
-	        
-	        ts = hourMinuteSecond[0] + ":" + hourMinuteSecond[1] + ":" + seconds + "," + millis;
-	        
 	    }
+
+        String[] commaSplit = ts.split(",");
+
+        String millis = commaSplit[1];
+
+        if (millis.length() == 1) {
+            millis += "00";
+        } else if (millis.length() == 2) {
+            millis += "0";
+        } else if (millis.length() > 3) {
+            millis = millis.substring(0, 3);
+        }
+        
+        String[] colonSplit = ts.split(":");
+        
+        String seconds = colonSplit[colonSplit.length-1].split(",")[0];
+        
+        if(seconds.length() == 1) {
+        	seconds += "0";
+        }else if(seconds.length() > 2) {
+        	seconds = seconds.substring(0, 2);
+        }
+        
+        String[] hourMinuteSecond = commaSplit[0].split(":");
+        
+        ts = hourMinuteSecond[0] + ":" + hourMinuteSecond[1] + ":" + seconds + "," + millis;
+	        
+	    
 
 	    // pad hour if needed
 	    String[] parts = ts.split(":");
