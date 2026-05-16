@@ -9,8 +9,8 @@
           <a href="/fix-subtitle-encoding">Fix subtitle encoding</a> |
           <a href="/subtitle-fixer">Subtitle fixer</a> |
           <a href="/srt-converter-online">Srt converter online</a> |
-          <a href="/subtitle-editor-online">Subtitle editor online</a> |
-          <a href="/subtitle-shifter-online">Subtitle shifter online</a> |
+          <a href="/subtitle-editor">Subtitle editor</a> |
+          <a href="/subtitle-shifter">Subtitle shifter</a> |
           <a href="/ai-subtitle-fixer">AI subtitle fixer</a>
         </p>
       </div>

@@ -3,7 +3,7 @@
         <div class="box has-text-grey column is-two-thirds">
             <div class="content p-5">
 
-                <h1>Subtitle Editor Online - Edit and Fix Subtitles Easily</h1>
+                <h1>Subtitle Editor - Edit and Fix Subtitles Easily</h1>
 
                 <p>
                 Edit your subtitle files directly in your browser with a simple and powerful 

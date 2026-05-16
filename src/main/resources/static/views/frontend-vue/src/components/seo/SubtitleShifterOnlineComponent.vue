@@ -3,10 +3,10 @@
         <div class="box has-text-grey column is-two-thirds">
             <div class="content p-5">
 
-                <h1>Subtitle Shifter Online - Sync Subtitles Forward or Backward</h1>
+                <h1>Subtitle Shifter - Fix Subtitle Delay and Sync Subtitle Files Instantly</h1>
 
                 <p>
-                Easily <strong>shift subtitles forward or backward</strong> to match your video timing. 
+                Easily <strong>delay or advance</strong> your subtitle to match your video timing. 
                 Fix subtitle delays in seconds using this simple online subtitle sync tool.
                 </p>
 
@@ -20,12 +20,6 @@
                 A subtitle shifter adjusts the timing of all subtitle lines at once. 
                 This is useful when subtitles appear too early or too late compared to the video.
                 </p>
-
-                <ul>
-                <li>Shift subtitles forward (delay subtitles)</li>
-                <li>Shift subtitles backward (speed them up)</li>
-                <li>Apply precise time adjustments</li>
-                </ul>
 
                 <h2>How to Shift Subtitles</h2>
 
@@ -67,9 +61,6 @@
                 </ul>
 
                 <h2>FAQ</h2>
-
-                <p><strong>Can I shift subtitles backward?</strong><br>
-                Yes, you can move subtitles earlier or later depending on your needs.</p>
 
                 <p><strong>What units can I use?</strong><br>
                 Subtitles are shifted in 0.1 second increments</p>

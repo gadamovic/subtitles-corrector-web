@@ -17,10 +17,12 @@
                 <li>Clean and format subtitle files</li>
                 <li>Sync subtitles with video timing</li>
                 <li>Convert between subtitle formats</li>
+                <li>Fix timestamp errors</li>
+                <li>Fix subtitle format syntax errors</li>
                 </ul>
 
                 <p>
-                <strong>Upload your subtitle file <a href="/">here</a> to fix encoding instantly.</strong>
+                <strong>Upload your subtitle file <a href="/">here</a> to fix errors instantly.</strong>
                 </p>
 
                 <h2>Common Subtitle Problems</h2>
@@ -30,6 +32,18 @@
                 <li>Timing is out of sync with the video</li>
                 <li>Extra HTML or formatting issues</li>
                 <li>Wrong file format</li>
+                <li>Subtitle format syntax errors</li>
+                <li>Timestamp errors</li>
+                </ul>
+
+                <h2>Automatically fixes subtitle timestamp errors like:</h2>
+
+                <ul>
+                <li>00:02:3,019 -> 00:02:03,019 (missing leading zeros)</li>
+                <li>00:47:34 -> 00:47:37 (invalid arrow symbols)</li>
+                <li>00:47:34,5 -> 00:47:34,500 (incomplete milliseconds)</li>
+                <li>00:47:34.618 -> 00:47:34,618 (wrong decimal separator)</li>
+                <li>Malformed or inconsistent timing formats</li>
                 </ul>
 
                 <h2>How It Works</h2>

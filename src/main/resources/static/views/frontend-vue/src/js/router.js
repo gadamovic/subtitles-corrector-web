@@ -106,18 +106,18 @@ const routes = [
         }
     },
         {
-        path: '/subtitle-editor-online',
+        path: '/subtitle-editor',
         component: SubtitleEditorOnlineComponent,
         meta: {
-            title: 'Subtitle Editor Online - Edit and Fix Subtitles Easily',
+            title: 'Subtitle Editor - Edit and Fix Subtitles Easily',
             description: 'Edit your subtitle files directly in your browser with a simple and powerful online subtitle editor'
         }
     },
         {
-        path: '/subtitle-shifter-online',
+        path: '/subtitle-shifter',
         component: SubtitleShifterOnlineComponent,
         meta: {
-            title: 'Subtitle Shifter Online - Sync Subtitles Forward or Backward',
+            title: 'Subtitle Shifter - Fix Subtitle Delay and Sync Subtitle Files Instantly',
             description: 'Easily shift subtitles forward or backward to match your video timing. Fix subtitle delays in seconds using this simple online subtitle sync tool.'
         }
     },

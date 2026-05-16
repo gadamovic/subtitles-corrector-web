@@ -27,6 +27,8 @@ import io.micrometer.common.util.StringUtils;
 @Service
 public class SrtSubtitleLinesToSubtitleUnitDataParser{
 
+	private static final double MAX_ALLOWED_LINES_TO_SKIP_FACTOR = 0.5;
+
 	Logger log = LoggerFactory.getLogger(SrtSubtitleLinesToSubtitleUnitDataParser.class);
 
 	@Autowired
@@ -52,6 +54,7 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 		SrtFileErrorsFlags errorFlags = new SrtFileErrorsFlags();
 		
 		int i = -1;
+		int numberOfSkippedLines = 0;
 		
 		try {
 			for(String currentLine : lines) {
@@ -127,6 +130,8 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 				
 			}catch(Exception e) {
 				log.error("Skipping invalid line: " + line);
+				numberOfSkippedLines++;
+				throwParsingExceptionIfSkippedToManyLines(numberOfSkippedLines, lines.size());
 				data = null;
 				if(StringUtils.isNotBlank(line)) {
 					webSocketMessageSender.sendMessage(createInvalidLineEvent(line));
@@ -143,6 +148,15 @@ public class SrtSubtitleLinesToSubtitleUnitDataParser{
 			log.error("Error parsing lines!", e);
 			throw new SubtitleFileParseException("Error parsing srt file!");
 		}
+	}
+
+	private void throwParsingExceptionIfSkippedToManyLines(int numberOfSkippedLines, int linesCount) {
+		
+		if(numberOfSkippedLines > (MAX_ALLOWED_LINES_TO_SKIP_FACTOR * (float) linesCount)) {
+			log.warn("Skipped to many lines, srt file will be reported as unparsable!");
+			throw new SubtitleFileParseException("Error parsing srt file!");
+		}
+		
 	}
 
 	private SubtitleCorrectionEvent createInvalidNumbersCorrectionEvent() {
