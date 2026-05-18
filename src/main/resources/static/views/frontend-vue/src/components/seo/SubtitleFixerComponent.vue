@@ -21,6 +21,16 @@
                 <li>Fix subtitle format syntax errors</li>
                 </ul>
 
+                <h2>Automatically fix subtitle timestamp errors like:</h2>
+
+                <ul>
+                <li>00:02:3,019 → 00:02:03,019 (missing leading zeros)</li>
+                <li>00:47:34 ---> 00:47:37 → 00:47:34 --> 00:47:37 (invalid arrow symbols)</li>
+                <li>00:47:34,5 → 00:47:34,500 (incomplete milliseconds)</li>
+                <li>00:47:34.618 → 00:47:34,618 (wrong decimal separator)</li>
+                <li>Malformed or inconsistent timing formats</li>
+                </ul>
+
                 <p>
                 <strong>Upload your subtitle file <a href="/">here</a> to fix errors instantly.</strong>
                 </p>
@@ -34,16 +44,6 @@
                 <li>Wrong file format</li>
                 <li>Subtitle format syntax errors</li>
                 <li>Timestamp errors</li>
-                </ul>
-
-                <h2>Automatically fixes subtitle timestamp errors like:</h2>
-
-                <ul>
-                <li>00:02:3,019 -> 00:02:03,019 (missing leading zeros)</li>
-                <li>00:47:34 -> 00:47:37 (invalid arrow symbols)</li>
-                <li>00:47:34,5 -> 00:47:34,500 (incomplete milliseconds)</li>
-                <li>00:47:34.618 -> 00:47:34,618 (wrong decimal separator)</li>
-                <li>Malformed or inconsistent timing formats</li>
                 </ul>
 
                 <h2>How It Works</h2>

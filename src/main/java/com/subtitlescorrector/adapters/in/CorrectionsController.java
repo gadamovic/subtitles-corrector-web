@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.subtitlescorrector.adapters.out.FeatureUsageMetricsExposerPort;
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.RequestValidatorStatus;
@@ -51,14 +52,19 @@ public class CorrectionsController {
 	@Autowired
 	EmailServicePort emailService;
 	
+	@Autowired
+	FeatureUsageMetricsExposerPort featureUsage;
+	
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
 	public ResponseEntity<SubtitleCorrectionFileDataWebDto> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		
 		String clientIp = request.getRemoteAddr();
 		
-		emailService.sendEmailOnlyIfProduction("Ip: " + clientIp + "\nFilename: " + file.getOriginalFilename(), properties.getAdminEmailAddress(),
-				"Somebody is uploading a subtitle for CORRECTION");
+//		emailService.sendEmailOnlyIfProduction("Ip: " + clientIp + "\nFilename: " + file.getOriginalFilename(), properties.getAdminEmailAddress(),
+//				"Somebody is uploading a subtitle for CORRECTION");
 
+
+		featureUsage.getCorrectionsUploadsCounter().increment();
 		
 		RequestValidatorStatus uploadRateCheck = validator.validateSubtitlesUploadRateLimit(clientIp);
 		RequestValidatorStatus fileSizeCheck = validator.validateFileSize(file);

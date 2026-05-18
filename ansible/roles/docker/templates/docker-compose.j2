@@ -39,7 +39,7 @@ services:
   prometheus:
     image: docker.io/prom/prometheus:v3.1.0
     container_name: prometheus
-    command: "--config.file=/etc/prometheus/prometheus.yaml"
+    command: "--config.file=/etc/prometheus/prometheus.yaml --storage.tsdb.retention.size=12GB"
     volumes:
       - /home/ec2-user/subtitles-corrector-files/docker-volumes/prometheus/config:/etc/prometheus/:ro
       - prometheus-data:/prometheus

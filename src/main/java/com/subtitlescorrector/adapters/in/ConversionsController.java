@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.subtitlescorrector.adapters.out.FeatureUsageMetricsExposerPort;
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.RequestValidatorStatus;
@@ -50,8 +51,13 @@ public class ConversionsController {
 	@Autowired
 	EmailServicePort emailService;
 	
+	@Autowired
+	FeatureUsageMetricsExposerPort featureUsage;
+	
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
 	public ResponseEntity<SubtitleConversionFileDataResponse> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+		
+		featureUsage.getConversionsUploadsCounter().increment();
 		
 		String clientIp = request.getRemoteAddr();
 		
