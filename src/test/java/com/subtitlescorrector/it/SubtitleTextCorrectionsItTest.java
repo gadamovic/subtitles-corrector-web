@@ -42,6 +42,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.subtitlescorrector.adapters.out.EmailServiceAdapter;
+import com.subtitlescorrector.adapters.out.PrometheusFeatureUsageMetricsExposerAdapter;
 import com.subtitlescorrector.adapters.out.RedisServiceAdapter;
 import com.subtitlescorrector.adapters.out.WebSocketOutboundAdapter;
 import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
@@ -99,6 +100,9 @@ public class SubtitleTextCorrectionsItTest {
 
 	@MockBean
 	EmailServiceAdapter emailService;
+	
+	@MockBean
+	PrometheusFeatureUsageMetricsExposerAdapter featureUsage;
 	
 	@Autowired
 	MockMvc mockMvc;
@@ -855,7 +859,7 @@ public class SubtitleTextCorrectionsItTest {
 		}
 		
 	    mockMvc.perform(MockMvcRequestBuilders
-                .multipart("/api/rest/1.0/corrections/upload") // replace with your actual endpoint path
+                .multipart("/api/rest/1.0/corrections/upload")
                 .file(testMultipartFile)
                 .contentType(MediaType.MULTIPART_FORM_DATA))
         .andExpect(MockMvcResultMatchers.status().isPayloadTooLarge());		
