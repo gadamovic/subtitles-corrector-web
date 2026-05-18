@@ -61,8 +61,8 @@ public class CorrectionsController {
 		
 		String clientIp = request.getRemoteAddr();
 		
-//		emailService.sendEmailOnlyIfProduction("Ip: " + clientIp + "\nFilename: " + file.getOriginalFilename(), properties.getAdminEmailAddress(),
-//				"Somebody is uploading a subtitle for CORRECTION");
+		emailService.sendEmailOnlyIfProduction("Ip: " + clientIp + "\nFilename: " + file.getOriginalFilename(), properties.getAdminEmailAddress(),
+				"Somebody is uploading a subtitle for CORRECTION");
 
 
 		featureUsage.track(Feature.CORRECTION);
