@@ -18,6 +18,7 @@ import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.RequestValidatorStatus;
 import com.subtitlescorrector.core.domain.SubtitleConversionFileDataResponse;
+import com.subtitlescorrector.core.domain.metrics.Feature;
 import com.subtitlescorrector.core.port.EmailServicePort;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.port.StorageSystemPort;
@@ -57,7 +58,7 @@ public class ConversionsController {
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
 	public ResponseEntity<SubtitleConversionFileDataResponse> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		
-		featureUsage.getConversionsUploadsCounter().increment();
+		featureUsage.track(Feature.CONVERSION);
 		
 		String clientIp = request.getRemoteAddr();
 		

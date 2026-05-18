@@ -1,11 +1,9 @@
 package com.subtitlescorrector.adapters.out;
 
-import io.micrometer.core.instrument.Counter;
+import com.subtitlescorrector.core.domain.metrics.Feature;
 
 public interface FeatureUsageMetricsExposerPort {
 
-	Counter getCorrectionsUploadsCounter();
-
-	Counter getConversionsUploadsCounter();
+	void track(Feature feature);
 
 }

@@ -18,6 +18,7 @@ import com.subtitlescorrector.adapters.out.configuration.ApplicationProperties;
 import com.subtitlescorrector.core.domain.AdditionalData;
 import com.subtitlescorrector.core.domain.RequestValidatorStatus;
 import com.subtitlescorrector.core.domain.exception.SubtitleFileParseException;
+import com.subtitlescorrector.core.domain.metrics.Feature;
 import com.subtitlescorrector.core.port.EmailServicePort;
 import com.subtitlescorrector.core.port.ExternalCacheServicePort;
 import com.subtitlescorrector.core.port.StorageSystemPort;
@@ -64,7 +65,7 @@ public class CorrectionsController {
 //				"Somebody is uploading a subtitle for CORRECTION");
 
 
-		featureUsage.getCorrectionsUploadsCounter().increment();
+		featureUsage.track(Feature.CORRECTION);
 		
 		RequestValidatorStatus uploadRateCheck = validator.validateSubtitlesUploadRateLimit(clientIp);
 		RequestValidatorStatus fileSizeCheck = validator.validateFileSize(file);
