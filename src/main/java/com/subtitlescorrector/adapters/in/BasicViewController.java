@@ -80,14 +80,14 @@ public class BasicViewController {
 		log.info("subtitle-fixer");
 		return "index";	
 	}
-	@RequestMapping(path="srt-converter-online")
+	@RequestMapping(path="srt-converter")
 	public String srtConverterOnlineSeoPage(HttpServletRequest request) {
 		log.info("srt-converter-online");
 		return "index";	
 	}
-	@RequestMapping(path="subtitle-editor")
+	@RequestMapping(path="subtitle-editor-online")
 	public String subtitleEditorOnlineSeoPage(HttpServletRequest request) {
-		log.info("subtitle-editor");
+		log.info("subtitle-editor-online");
 		return "index";	
 	}
 	@RequestMapping(path="subtitle-shifter")

@@ -98,7 +98,7 @@ const routes = [
         }
     },
         {
-        path: '/srt-converter-online',
+        path: '/srt-converter',
         component: SrtConverterOnlineComponent,
         meta: {
             title: 'SRT Converter Online - Convert Subtitles to SRT Format Free',
@@ -106,10 +106,10 @@ const routes = [
         }
     },
         {
-        path: '/subtitle-editor',
+        path: '/subtitle-editor-online',
         component: SubtitleEditorOnlineComponent,
         meta: {
-            title: 'Subtitle Editor - Edit and Fix Subtitles Easily',
+            title: 'Subtitle Editor Online - Edit and Fix Subtitles Easily',
             description: 'Edit your subtitle files directly in your browser with a simple and powerful online subtitle editor'
         }
     },
