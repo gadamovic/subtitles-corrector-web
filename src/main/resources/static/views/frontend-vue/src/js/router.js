@@ -86,7 +86,7 @@ const routes = [
         component: FixSubtitleEncodingComponent,
         meta: {
             title: 'Fix Subtitle Encoding Issues (SRT, UTF-8, Broken Characters)',
-            description: 'Subtitles showing weird characters like Å½ or Ä‡? Fix encoding issues instantly. Convert SRT files to UTF-8 and repair broken subtitles online.'
+            description: 'Subtitles showing weird characters like Å½ or Ä‡? Fix encoding issues instantly and convert SRT files to UTF-8 automatically.'
         }
     },
         {
@@ -125,8 +125,8 @@ const routes = [
         path: '/ai-subtitle-fixer',
         component: AiSubtitleFixerComponent,
         meta: {
-            title: 'AI Subtitle Fixer Online - Fix Grammar & Improve Readability',
-            description: 'Automatically fix subtitle grammar, spelling, and readability using AI Upload your subtitle file and let the tool analyze and improve each line in seconds.'
+            title: 'AI Subtitle Enhancer - Improve Grammar & Readability Online',
+            description: 'This AI subtitle enhancer improves subtitle language quality by enhancing grammar, clarity, and readability using AI.'
         }
     }
     
