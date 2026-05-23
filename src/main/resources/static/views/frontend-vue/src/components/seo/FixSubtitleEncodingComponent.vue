@@ -1,119 +1,147 @@
 <template>
-    <div class="columns is-centered m-5">
-        <div class="box has-text-grey column is-two-thirds">
-            <div class="content p-5">
+<div class="columns is-centered m-5">
+    <div class="box has-text-grey column is-two-thirds">
+        <div class="content p-5">
 
-                <h1>Fix Subtitle Encoding Issues (SRT, UTF-8, Broken Characters)</h1>
+            <h1>Fix Subtitle Encoding Issues Online (UTF-8, SRT, Broken Characters)</h1>
 
-                <p>
-                If your subtitles look like this:
-                </p>
+            <p>
+            Need to <strong>fix subtitle encoding</strong> problems? This online tool automatically repairs broken subtitle characters caused by incorrect subtitle encoding formats such as ANSI, Windows-1252, or ISO-8859-1.
+            </p>
 
-                <ul>
-                <li>Å½ivot je lep</li>
-                <li>Snimiæemo film. Obeæavam.</li>
-                <li>No sй cymo leer, Srta.</li>
-                <li>ïEs cuchara?</li>
-                </ul>
+            <p>
+            If your subtitles contain unreadable characters like:
+            </p>
 
-                <p>
-                You're dealing with a <strong>subtitle encoding issue</strong>. This usually happens when subtitle files are saved in the wrong character format (like ANSI instead of UTF-8).
-                </p>
+            <ul>
+            <li>Å½ivot je lep</li>
+            <li>Snimiæemo film. Obeæavam.</li>
+            <li>No sй cymo leer, Srta.</li>
+            <li>ïEs cuchara?</li>
+            </ul>
 
-                <p>This type of encoding problems are common among Slavic / Balkan and Spanish languages.</p>
+            <p>
+            then your subtitle file likely has an encoding mismatch issue. This usually happens when subtitle files are opened using the wrong character encoding instead of UTF-8.
+            </p>
 
-                <p>After processing your file, this are corrections you can expect:</p>
+            <p>
+            Subtitle encoding problems are especially common with Balkan, Slavic, Spanish, and other languages that use special characters.
+            </p>
 
-                <ul>
-                <li>Å½ivot je lep → Život je lep</li>
-                <li>È → Č</li>
-                <li>Æ → Ć</li>
-                <li>Snimiæemo film. Obeæavam. → Snimićemo film. Obećavam.</li>
-                <li>æ → ć</li>
-                </ul>
+            <p>
+            <strong>Upload your subtitle file <a href="/">here</a> to fix subtitle encoding instantly.</strong>
+            </p>
 
-                <p>Example with Spanish subtitles:</p>
+            <h2>Examples of Fixed Subtitle Encoding</h2>
 
-                <ul>
-                <li>No sй cymo leer, Srta. → No sé cómo leer, Srta.</li>
-                <li>й → é</li>
-                <li>y → ó</li>
-                <li>ïEs cuchara? → ¿Es cuchara?</li>
-                <li>ï → ¿</li>
-                </ul>
+            <p>
+            After processing your subtitle file, these are the kinds of corrections you can expect:
+            </p>
 
-                <div class="image-stack">
-                <p>Before:</p>
-                <img src="@/assets/subtitles-seo/windows-1252-spanish-2.png" alt="Spanish subtitles before" width="350px" /><br/>
-                <p>After:</p>
-                <img src="@/assets/subtitles-seo/windows-utf8-spanish-2.png" alt="Spanish subtitles after" width="350px"/>
-                </div>
+            <ul>
+            <li>Å½ivot je lep → Život je lep</li>
+            <li>È → Č</li>
+            <li>Æ → Ć</li>
+            <li>Snimiæemo film. Obeæavam. → Snimićemo film. Obećavam.</li>
+            <li>æ → ć</li>
+            </ul>
 
-                <h2>How to Fix Subtitle Encoding Issues</h2>
+            <p>Example with Spanish subtitle encoding issues:</p>
 
-                <p>
-                The easiest way is to use an online tool that automatically detects and fixes encoding problems.
-                </p>
+            <ul>
+            <li>No sй cymo leer, Srta. → No sé cómo leer, Srta.</li>
+            <li>й → é</li>
+            <li>y → ó</li>
+            <li>ïEs cuchara? → ¿Es cuchara?</li>
+            <li>ï → ¿</li>
+            </ul>
 
-                <strong>Upload your subtitle file <a href="/">here</a> to fix encoding instantly.</strong>
-
-                <h2>What Causes Broken Subtitle Characters?</h2>
-
-                <ul>
-                <li>Incorrect encoding (ANSI, ISO-8859-1 instead of UTF-8)</li>
-                <li>Subtitles downloaded from different regions</li>
-                <li>Media players misinterpreting character sets</li>
-                </ul>
-
-                <h2>Manual Fix (Alternative Method)</h2>
-
-                <p>
-                If you prefer to fix this manually:
-                </p>
-
-                <ol>
-                <li>Open the subtitle file in a text editor (like Notepad++)</li>
-                <li>Change encoding to UTF-8</li>
-                <li>Sometimes you need to replace manually every occurence of invalid character with the correct one</li>
-                <li>Save the file</li>
-                </ol>
-
-                <p>
-                However, this can be time-consuming.
-                </p>
-
-                <h2>Why Use This Tool?</h2>
-
-                <ul>
-                <li>Automatically detects encoding issues</li>
-                <li>Converts subtitles to UTF-8</li>
-                <li>Fixes broken characters instantly</li>
-                <li>No installation required</li>
-                </ul>
-
-                <h2>Watch live as your subtitle is being fixed and see what changes were applied</h2>
-
-                <p>
-                You can track exactly what is happening to your subtitle 
-                <strong>live</strong> as it's being processed on our server
-                </p>
-
-                <div class="image-stack">
-                <img src="@/assets/subtitles-seo/changes-live.png" alt="Live subtitle changes preview" />
-                <img src="@/assets/subtitles-seo/changes-diff.png" alt="Subtitle diff changes preview" />
-                </div>
-
-                <h2>FAQ</h2>
-
-                <p><strong>What encoding should subtitles use?</strong><br>
-                UTF-8 is the most widely supported and recommended encoding format.</p>
-
-                <p><strong>Will this fix all languages?</strong><br>
-                Yes, UTF-8 supports a wide range of languages including special characters.</p>
-
+            <div class="image-stack">
+                <p>Before fixing subtitle encoding:</p>
+                <img src="@/assets/subtitles-seo/windows-1252-spanish-2.png" alt="Broken Spanish subtitle encoding example" width="350px" /><br/>
+                <p>After converting subtitles to UTF-8:</p>
+                <img src="@/assets/subtitles-seo/windows-utf8-spanish-2.png" alt="Fixed Spanish subtitle encoding example" width="350px"/>
             </div>
+
+            <h2>How to Fix Subtitle Encoding</h2>
+
+            <p>
+            The easiest way to fix subtitle encoding issues is to use an online subtitle encoding fixer that automatically detects invalid character sets and converts subtitles to UTF-8.
+            </p>
+
+            <ol>
+            <li>Upload your subtitle file</li>
+            <li>The tool automatically detects encoding problems</li>
+            <li>Broken subtitle characters are repaired</li>
+            <li>Download the corrected subtitle file</li>
+            </ol>
+
+            <h2>What Causes Subtitle Encoding Problems?</h2>
+
+            <ul>
+            <li>Subtitle files saved with incorrect encoding</li>
+            <li>ANSI or Windows-1252 subtitles opened as UTF-8</li>
+            <li>Subtitles downloaded from different regions</li>
+            <li>Media players using the wrong character set</li>
+            <li>Subtitle conversion between incompatible formats</li>
+            </ul>
+
+            <h2>Convert Subtitles to UTF-8 Automatically</h2>
+
+            <p>
+            This tool automatically converts subtitle files to UTF-8 encoding, which is the most widely supported subtitle character format.
+            </p>
+
+            <ul>
+            <li>Fixes corrupted subtitle text instantly</li>
+            <li>Preserves subtitle timing and formatting</li>
+            <li>Removes unnecessary BOM (Byte Order Mark) unicode character that often confuses media players</li>
+            <li>Supports SRT and other subtitle formats</li>
+            <li>No software installation required</li>
+            </ul>
+
+            <h2>Manual Subtitle Encoding Fix (Alternative Method)</h2>
+
+            <p>
+            If you prefer to fix subtitle encoding manually:
+            </p>
+
+            <ol>
+            <li>Open the subtitle file in a text editor like Notepad++</li>
+            <li>Change the file encoding to UTF-8</li>
+            <li>Manually replace broken subtitle characters if needed</li>
+            <li>Save the subtitle file</li>
+            </ol>
+
+            <p>
+            Manual subtitle encoding repair can be slow and tedious, especially for large subtitle files.
+            </p>
+
+            <h2>Watch Live Subtitle Encoding Fixes</h2>
+
+            <p>
+            You can see subtitle encoding corrections happen live while your subtitle file is being processed.
+            </p>
+
+            <div class="image-stack">
+                <img src="@/assets/subtitles-seo/changes-live.png" alt="Live subtitle encoding fix preview" />
+                <img src="@/assets/subtitles-seo/changes-diff.png" alt="Subtitle encoding diff preview" />
+            </div>
+
+            <h2>FAQ</h2>
+
+            <p><strong>What is the best subtitle encoding format?</strong><br>
+            UTF-8 is the recommended subtitle encoding format because it supports special characters from many languages.</p>
+
+            <p><strong>Can this tool fix broken SRT subtitle characters?</strong><br>
+            Yes, the tool can automatically repair many common SRT subtitle encoding problems.</p>
+
+            <p><strong>Does this work for Balkan and Spanish subtitles?</strong><br>
+            Yes, this subtitle encoding fixer works well with Balkan, Slavic, Spanish, and many other languages.</p>
+
         </div>
     </div>
+</div>
 </template>
 
 <script>

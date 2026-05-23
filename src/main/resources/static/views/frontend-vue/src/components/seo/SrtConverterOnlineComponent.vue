@@ -77,13 +77,13 @@
             <h2>Example of SRT Format</h2>
 
             <pre>
-            1
-            00:00:01,000 --> 00:00:03,000
-            Hello world
+1
+00:00:01,000 --> 00:00:03,000
+Hello world
 
-            2
-            00:00:04,000 --> 00:00:06,000
-            This is a subtitle example
+2
+00:00:04,000 --> 00:00:06,000
+This is a subtitle example
             </pre>
 
             <h2>FAQ</h2>
