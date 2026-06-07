@@ -11,33 +11,33 @@
 
 - name: Remove old fullchain.pem
   ansible.builtin.command: docker exec certbot rm /etc/letsencrypt/fullchain.pem
-  when: "'Congratulations, all renewals succeeded' in certbot_renew_output"
+  when: "'Congratulations, all renewals succeeded' in certbot_renew_output.stdout"
 
 - name: Remove old privkey.pem
   ansible.builtin.command: docker exec certbot rm /etc/letsencrypt/privkey.pem
-  when: "'Congratulations, all renewals succeeded' in certbot_renew_output"
+  when: "'Congratulations, all renewals succeeded' in certbot_renew_output.stdout"
 
 - name: Place new fullchain.pem
   ansible.builtin.command: docker exec certbot cp /etc/letsencrypt/live/subtitles-corrector.com/fullchain.pem /etc/letsencrypt/fullchain.pem
-  when: "'Congratulations, all renewals succeeded' in certbot_renew_output"
+  when: "'Congratulations, all renewals succeeded' in certbot_renew_output.stdout"
 
 - name: Place new privkey.pem
   ansible.builtin.command: docker exec certbot cp /etc/letsencrypt/live/subtitles-corrector.com/privkey.pem /etc/letsencrypt/privkey.pem
-  when: "'Congratulations, all renewals succeeded' in certbot_renew_output"
+  when: "'Congratulations, all renewals succeeded' in certbot_renew_output.stdout"
 
 - name: Add writes for grafana user
   ansible.builtin.command: docker exec -u root grafana chown grafana /home/certbot/certs/privkey.pem /home/certbot/certs/fullchain.pem
-  when: "'Congratulations, all renewals succeeded' in certbot_renew_output"
+  when: "'Congratulations, all renewals succeeded' in certbot_renew_output.stdout"
 
 - name: Restart nginx
   ansible.builtin.command: docker restart nginx
-  when: "'Congratulations, all renewals succeeded' in certbot_renew_output"
+  when: "'Congratulations, all renewals succeeded' in certbot_renew_output.stdout"
 
 - name: Restart Grafana
   ansible.builtin.command: docker restart grafana
-  when: "'Congratulations, all renewals succeeded' in certbot_renew_output"
+  when: "'Congratulations, all renewals succeeded' in certbot_renew_output.stdout"
 
 - name: Print not renewal needed
   ansible.builtin.debug:
     msg: "No renewal needed."
-  when: "'Congratulations, all renewals succeeded' not in certbot_renew_output"
+  when: "'Congratulations, all renewals succeeded' not in certbot_renew_output.stdout"
