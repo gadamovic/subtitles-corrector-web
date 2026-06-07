@@ -9,14 +9,6 @@
   ansible.builtin.debug:
     var: certbot_renew_output
 
-- name: Test print
-  ansible.builtin.debug:
-    msg: "Renewal succeeded (stdout): {{'The following certificates are not due for renewal yet' in certbot_renew_output.stdout}}"
-
-- name: Test print
-  ansible.builtin.debug:
-    msg: "Renewal succeeded (no stdout): {{'The following certificates are not due for renewal yet' in certbot_renew_output}}"
-
 - name: Remove old fullchain.pem
   ansible.builtin.command: docker exec certbot rm /etc/letsencrypt/fullchain.pem
   when: "'Congratulations, all renewals succeeded' in certbot_renew_output.stdout"
